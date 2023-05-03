@@ -1,20 +1,19 @@
 package sae.saejavafx;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import jeu.Intro;
+
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
+        Intro intro = new Intro();
+        Stage fenetre = intro.getMainStage();
+        fenetre.setTitle("Jeu 2048");
+        fenetre.show();
     }
 
     public static void main(String[] args) {
