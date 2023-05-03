@@ -19,7 +19,7 @@ public class Intro {
 
 
 
-    private final static String IMAGE_INTRO = "/montagnes.jpg";
+    private final static String IMAGE_INTRO = "/UPHF_logo.svg.png";
 
     public Intro() throws FileNotFoundException {
         panneau = new AnchorPane();
@@ -44,10 +44,11 @@ public class Intro {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    //
+                    Menu menu = new Menu(panneau, mainScene);
+                    menu.getMainStage();
                 });
             }
-        }, 5000);
+        }, 2000);
 
         mainStage.show();
     }
