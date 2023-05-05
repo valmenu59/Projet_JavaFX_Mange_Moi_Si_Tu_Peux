@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -53,11 +54,17 @@ public class Menu {
         return bouton;
     }
 
+
+    public Label champTexte(){
+        Label label = new Label("Nombre de lignes : ");
+        return label;
+    }
     public Button demarrerJeu(Button bouton, AnchorPane panneau, Scene mainScene){
         bouton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //
+                Jeu jeu = new Jeu(18,14, mainScene, panneau);
+                jeu.getMainStage();
             }
         });
         return bouton;

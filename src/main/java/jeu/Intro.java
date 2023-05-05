@@ -25,7 +25,7 @@ public class Intro {
         panneau = new AnchorPane();
         mainScene = new Scene(panneau, 1280, 720 );
         mainStage = new Stage();
-        mainStage.setResizable(false);
+        mainStage.setResizable(true);
         mainStage.setScene(mainScene);
 
         Image imageIntro = new  Image(getClass().getResource(IMAGE_INTRO).toExternalForm(),
