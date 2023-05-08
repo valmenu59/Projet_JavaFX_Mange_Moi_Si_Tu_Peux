@@ -289,12 +289,12 @@ public class Jeu {
 
     public int getChoixNbLignes() {
         //Permet de récupérer la valeur choisie du menu déroulant
-        return (int) choixNblignes.getValue();
+        return choixNblignes.getValue();
     }
 
     public int getChoixNbColonnes() {
         //Permet de récupérer la valeur choisie du menu déroulant
-        return (int) choixNbColonnes.getValue();
+        return choixNbColonnes.getValue();
     }
 
 
