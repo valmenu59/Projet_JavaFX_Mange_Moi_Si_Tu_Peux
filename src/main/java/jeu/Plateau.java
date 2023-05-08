@@ -7,7 +7,7 @@ public class Plateau {
 
     protected Case[][] cases;
 
-    public Plateau(int l, int c){
+    public Plateau(int c, int l){
         this.lignes = c;
         this.colonnes = l;
 
@@ -18,7 +18,6 @@ public class Plateau {
         this.cases = new Case[this.lignes][this.colonnes];
         for (int i = 0; i < this.lignes; i++){
             for (int j = 0; j < this.colonnes; j++){
-
                 if (i == 0 || i == this.lignes - 1 || j == 0 || j == this.colonnes - 1) {
                     this.cases[i][j] = new Case(new Roche());
                 } else {

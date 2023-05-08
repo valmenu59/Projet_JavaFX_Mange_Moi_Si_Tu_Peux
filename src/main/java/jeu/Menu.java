@@ -21,25 +21,17 @@ public class Menu {
 
     public Menu(AnchorPane panneau, Scene mainScene) {
         panneau.getChildren().clear();
-
         Text texte = new Text("Menu ");
-        texte.setX(100);
-        texte.setY(100);
-        texte.setFont(Font.font("calibri", FontWeight.BOLD,50));
-
+        texte.setX(100.0);
+        texte.setY(100.0);
+        texte.setFont(Font.font("calibri", FontWeight.BOLD, 50.0));
         panneau.getChildren().add(texte);
-
-        Button demarrer = bouton("Démarrer", 100, 200, Color.rgb(115,115,115));
-
-        demarrer = demarrerJeu(demarrer,panneau, mainScene);
-
+        Button demarrer = this.bouton("Démarrer", 100.0, 200.0, Color.rgb(115, 115, 115));
+        demarrer = this.demarrerJeu(demarrer, panneau, mainScene);
         panneau.getChildren().add(demarrer);
-
-        Button parametre = bouton("Paramètres", 100, 350,Color.rgb(115,115,115));
-        parametre = parametreJeu(parametre,panneau,mainScene);
-
+        Button parametre = this.bouton("Paramètres", 100.0, 350.0, Color.rgb(115, 115, 115));
+        parametre = this.parametreJeu(parametre, panneau, mainScene);
         panneau.getChildren().add(parametre);
-
     }
 
     public Button bouton(String texte, double X, double Y, Color couleur){
@@ -63,7 +55,7 @@ public class Menu {
         bouton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Jeu jeu = new Jeu(18,14, mainScene, panneau);
+                Jeu jeu = new Jeu(12,8, mainScene, panneau);
                 jeu.getMainStage();
             }
         });
