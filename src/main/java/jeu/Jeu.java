@@ -24,8 +24,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Jeu {
+    //Reprend les classes du jeu
     protected Plateau plateau;
     private NbTour tour = new NbTour();
+
+    //Récupère la source des images
     private static final String IMG_CACTUS = "/ElementsJeu/cactus.png";
     private static final String IMG_HERBE = "/ElementsJeu/herbe.png";
     private static final String IMG_LOUP = "/ElementsJeu/loup.png";
@@ -54,243 +57,326 @@ public class Jeu {
     private int numeroEtape;
 
     public Jeu(int l, int h, Scene mainScene, AnchorPane panneau) {
-        //On récupère la scène
+        this.tour = new NbTour();
         this.mainScene = mainScene;
-        //Permet de créer la fenêtre du jeu
+
+        //Permet de créer la base pour les autres éléments visuels
         creerFenetreJeu(panneau);
-        //Va à la méthode étape 1
+
+
+        //On va vers l'étape n°1
         etape1();
+
     }
 
+
     public void etape1() {
-        //Permet d'initialiser le numéro étape par 1
-        this.numeroEtape = 1;
-        //On rajoute un texte à la VBox
+        //Initialisation de l'attribut numeroEtape
+        numeroEtape = 1;
+        //On crée un texte
         Text texte = new Text("Options");
-        panneau2.getChildren().add(texte);
-        //Permet d'afficher le texte de l'étape au panneau principal
+        //Cette méthode permet le texte du jeu
         texteEtape();
-        //On initie la valeur du plateau par null
-        this.plateau = null;
-        //Permet de créer un menu déroulant
+        //On initie un plateau vide
+        plateau = null;
+        //On rajoute le texte dans panneau2
+        panneau2.getChildren().add(texte);
+        //Cette méthode permet de créer un menu déroulant avec un chiffre mini, maxi et celui affiché par défaut
         choixNbColonnes = creerMenuDeroulant("Nombre de colonnes : ", 10, 18, 14);
         choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 14, 9);
-        //Ce bouton permet de créer le plateau
+        //Ensuite on crée différents boutons
         boutonCreerPlateau = new Button("Créer votre plateau");
-        //On rajoute un event au bouton
         boutonCreerPlateau = validerLignesColonnes(boutonCreerPlateau);
-        //On rajoute ce bouton au panneau 2
         panneau2.getChildren().add(boutonCreerPlateau);
-        //Ce bouton permet de valider les étapes
         boutonValiderEtape = new Button("Valider cette étape");
         boutonValiderEtape = validerEtape(boutonValiderEtape);
-        boutonValiderEtape.setDisable(true);
+        boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
         panneau2.getChildren().add(boutonValiderEtape);
     }
 
+
     public void etape2() {
+        //Passage à l'étape 2
         this.numeroEtape = 2;
-        this.boutonValiderEtape.setDisable(true);
-        this.panneauPrincipal.getChildren().remove(this.rectangleInvisible);
-        this.panneau2.getChildren().removeAll(this.listeLabel);
-        this.panneau2.getChildren().removeAll(this.listeDeListeDeroulant);
-        this.panneau2.getChildren().remove(this.boutonCreerPlateau);
-        this.listeLabel.clear();
-        this.listeDeListeDeroulant.clear();
-        this.texteEtape();
+        boutonValiderEtape.setDisable(true);
+        //Avant on supprime tout ce qu'on a plus besoin
+        panneauPrincipal.getChildren().remove(rectangleInvisible);
+        panneau2.getChildren().removeAll(listeLabel);
+        panneau2.getChildren().removeAll(listeDeListeDeroulant);
+        panneau2.getChildren().remove(boutonCreerPlateau);
+        //On vide les 2 ArrayList
+        listeLabel.clear();
+        listeDeListeDeroulant.clear();
+        //Permet d'afficher le texte sur le panneau principal
+        texteEtape();
     }
 
     public void etape3() {
         this.numeroEtape = 3;
-        this.texteEtape();
+        texteEtape();
+
     }
+
 
     public void creerFenetreJeu(AnchorPane panneau) {
-        this.mainScene = panneau.getScene();
-        Pane parentPane = (Pane)this.mainScene.getRoot();
+        //On récupère l'AnchorPane de la scène
+        mainScene = panneau.getScene();
+        //On va à la racine
+        Pane parentPane = (Pane) mainScene.getRoot();
+        //On supprime l'AnchorPane de Menu
         parentPane.getChildren().remove(panneau);
+
+        //Création du VBox à la partie gauche qui prend 20% de la scène
         this.panneau2 = new VBox();
-        this.panneau2.setPrefWidth(this.mainScene.getWidth() * 0.2);
+        panneau2.setPrefWidth(mainScene.getWidth() * 0.20);
+
+        // Création de l'AnchorPane pour la partie droite
         this.panneauPrincipal = new AnchorPane();
+
+        // Création du SplitPane
         SplitPane splitPane = new SplitPane();
-        splitPane.getItems().addAll(this.panneau2, this.panneauPrincipal);
-        splitPane.setDividerPositions(0.2);
-        this.panneau2.maxWidthProperty().bind(splitPane.widthProperty().multiply(0.2));
-        this.panneau2.minWidthProperty().bind(splitPane.widthProperty().multiply(0.2));
-        this.mainScene.setRoot(splitPane);
-        this.panneau2.setStyle("-fx-background-color: rgb(179,204,161)");
+        splitPane.getItems().addAll(panneau2, panneauPrincipal);
+        //Permet de diviser les deux parties à 20% de la taille de la scène
+        splitPane.setDividerPositions(0.20);
+        //Permet de ne plus redimensionner les panneaux
+        panneau2.maxWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
+        panneau2.minWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
+        //on rajoute à la racine le splitPane
+        mainScene.setRoot(splitPane);
+        //Permet de définir le style de panneau2
+        panneau2.setStyle("-fx-background-color: rgb(220,241,196)");
+
     }
+
 
     public void texteEtape() {
-        if (this.numeroEtape == 1) {
-            Font font = Font.font("Segoe UI", FontWeight.BOLD, 25.0);
-            Font font1 = Font.font("Segoe UI", 15.0);
-            this.texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
-            this.texteEtape.setX(50.0);
-            this.texteEtape.setY(50.0);
-            this.texteEtape.setFont(font);
-            this.texteExplicationEtape = new Text("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran.\nCliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
-            this.texteExplicationEtape.setX(50.0);
-            this.texteExplicationEtape.setY(75.0);
-            this.texteExplicationEtape.setFont(font1);
-            this.panneauPrincipal.getChildren().addAll(new Node[]{this.texteEtape, this.texteExplicationEtape});
-        } else if (this.numeroEtape == 2) {
-            this.texteEtape.setText("Etape 2 : Choisissez l'emplacement de sortie");
-            this.texteExplicationEtape.setText("Pour cette étape, choisissez une unique sortie c'est à dire que vous remplacez une case rocher par une case herbe.\nPour cela, sur le plateau, cliquez sur un rocher sauf les extrémités puis cliquez sur 'Valider cette étape' pour passer à l'étape n°3");
-        } else if (this.numeroEtape == 3) {
-            this.texteEtape.setText("Etape 3 : Personnalisez le plateau du jeu");
-            this.texteExplicationEtape.setText("Pour cette étape, cliquez sur terrain puis sélectionnez votre type de terrain souhaité.\nAttention il n'est pas possible de boucher la sortie ni de séparer le terrain en 2, il faut qu'à partir de tout plante on puisse sortir !");
+        //Cette méthode permet de créer un texte en fonction du numéro de l'étape
+        if (numeroEtape == 1) {
+            Font font = Font.font("Segoe UI", FontWeight.BOLD, 25); //Permet de modifier la police
+            Font font1 = Font.font("Segoe UI", 15);
+            texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
+            texteEtape.setX(50);
+            texteEtape.setY(50);
+            texteEtape.setFont(font);
+            texteExplicationEtape = new Text("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran." + "\n" +
+                    "Cliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
+            texteExplicationEtape.setX(50);
+            texteExplicationEtape.setY(75);
+            texteExplicationEtape.setFont(font1);
+            panneauPrincipal.getChildren().addAll(texteEtape, texteExplicationEtape);
+        } else if (numeroEtape == 2) {
+            //.setText permet de modifier un texte déjà initialisé
+            texteEtape.setText("Etape 2 : Choisissez l'emplacement de sortie");
+            texteExplicationEtape.setText("Pour cette étape, choisissez une unique sortie c'est à dire que vous remplacez une case rocher par une case herbe." + "\n" +
+                    "Pour cela, sur le plateau, cliquez sur un rocher sauf les extrémités puis cliquez sur 'Valider cette étape' pour passer à l'étape n°3");
+        } else if (numeroEtape == 3) {
+            texteEtape.setText("Etape 3 : Personnalisez le plateau du jeu");
+            texteExplicationEtape.setText("Pour cette étape, cliquez sur terrain puis sélectionnez votre type de terrain souhaité." + "\n" +
+                    "Attention il n'est pas possible de boucher la sortie ni de séparer le terrain en 2, il faut qu'à partir de tout plante on puisse sortir !");
         }
-
     }
 
-    public ChoiceBox<Integer> creerMenuDeroulant(String texte, int nbMin, int nbMax, int nbDefaut) {
-        Label lab = new Label(texte);
-        ChoiceBox<Integer> choix = new ChoiceBox();
 
-        for(int i = nbMin; i <= nbMax; ++i) {
+    public ChoiceBox<Integer> creerMenuDeroulant(String texte, int nbMin, int nbMax, int nbDefaut) {
+        //Cette méthode permet de créer un menu déroulant à partir de différents paramètres
+        //D'abord on crée un label avec texte comme paramètre
+        Label lab = new Label(texte);
+        //On crée un menu déroulant composé de chiffres entiers
+        ChoiceBox<Integer> choix = new ChoiceBox<>();
+        //On rajoute les chiffres souhaités en faisant une boucle
+        for (int i = nbMin; i <= nbMax; i++) {
             choix.getItems().add(i);
         }
-
+        //Permet d'afficher la valeur par défaut
         choix.setValue(nbDefaut);
+        //On rajoute le label et la choiceBox dans une arraylist (pour les supprimer ensuite)
         listeLabel.add(lab);
         listeDeListeDeroulant.add(choix);
+        //On ajoute les 2 dans le panneau2
         panneau2.getChildren().addAll(lab, choix);
+        //Returne la ChoiceBox
         return choix;
     }
 
-    public ImageView remplacerRocheHerbe(final ImageView img) {
+
+    public ImageView remplacerRocheHerbe(ImageView img) {
+        //Cette méthode permet dee rendre les images du jeu cliquable
         img.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
             public void handle(MouseEvent mouseEvent) {
+                //On récupère la position x et y de l'image
                 double x = img.getX();
                 double y = img.getY();
-                int[] liste = Jeu.this.retrouverPosIetJ(x, y);
+                //Cette méthode permet de convertir les positions x et y en matrice[i][j]
+                int[] liste = retrouverPosIetJ(x, y);
                 int j = liste[0];
                 int i = liste[1];
-                Image roche;
-                if (!Jeu.this.sortieCree) {
-                    Jeu.this.sortieCree = true;
-                    roche = Jeu.this.creerImage("/ElementsJeu/herbe.png");
-                    img.setImage(roche);
+                //si la sortie n'est pas crée
+                if (!(sortieCree)) {
+                    sortieCree = true;
+                    //On récupère l'image d'herbe à la source
+                    Image herbe = creerImage(IMG_HERBE);
+                    //On remplace l'image roche par une image herbe
+                    img.setImage(herbe);
+                    //remplacerRocheHerbe(img);
+                    //La case sélectionnée devient de type herbe
                     Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
-                    Jeu.this.boutonValiderEtape.setDisable(false);
-                } else if (Jeu.this.sortieCree && Jeu.this.plateau.cases[i][j].getContenu() instanceof Herbe) {
-                    Jeu.this.sortieCree = false;
-                    roche = Jeu.this.creerImage("/ElementsJeu/rocher.png");
+                    //Permet d'activer le bouton valider
+                    boutonValiderEtape.setDisable(false);
+                    //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
+                } else if (sortieCree && Jeu.this.plateau.cases[i][j].getContenu() instanceof Herbe) {
+                    //Même principe qu'au dessus
+                    sortieCree = false;
+                    Image roche = creerImage(IMG_ROCHER);
                     img.setImage(roche);
                     Jeu.this.plateau.cases[i][j] = new Case(new Roche());
-                    Jeu.this.boutonValiderEtape.setDisable(true);
+                    boutonValiderEtape.setDisable(true);
                 }
-
             }
         });
+        //On retourne l'imageView
         return img;
     }
 
     public int[] retrouverPosIetJ(double x, double y) {
-        int[] l = new int[]{(int)Math.round((x - this.xDepart) / this.taille), (int)Math.round((y - this.yDepart) / this.taille)};
+        int[] l = new int[2];
+        //Permet de convertir la position x et y de la souris en matrice [i][j]
+        l[0] = (int) Math.round((x - xDepart) / taille);
+        l[1] = (int) Math.round((y - yDepart) / taille);
         return l;
     }
 
     public Button validerLignesColonnes(Button b) {
+        //Cette méthode permet de donner l'action de créer le plateau de jeu visuellement et en mémoire
         b.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
             public void handle(ActionEvent actionEvent) {
-                Jeu.this.panneauPrincipal.getChildren().clear();
-                Jeu.this.plateau = new Plateau(Jeu.this.getChoixNbLignes(), Jeu.this.getChoixNbColonnes());
+                //On supprime tout du panneau principal
+                panneauPrincipal.getChildren().clear();
+                //On initie un nouveau plateau en mémoire
+                Jeu.this.plateau = new Plateau(getChoixNbLignes(), getChoixNbColonnes());
+                //On crée le plateau
                 Jeu.this.plateau.creerPlateau();
-                Jeu.this.afficherPlateauJeu();
-                Jeu.this.rectangleInvisible = new Rectangle(0.0, 0.0, Jeu.this.panneauPrincipal.getWidth(), Jeu.this.panneauPrincipal.getHeight());
-                Jeu.this.rectangleInvisible.setFill(Color.TRANSPARENT);
-                Jeu.this.panneauPrincipal.getChildren().add(Jeu.this.rectangleInvisible);
+                //Permet de visualiser le plateau sur JavaFX
+                afficherPlateauJeu();
+                //On crée un rectangle invisible sur le plateau principal pour iniber toute les actions possibles
+                rectangleInvisible = new Rectangle(0, 0, panneauPrincipal.getWidth(), panneauPrincipal.getHeight());
+                rectangleInvisible.setFill(Color.TRANSPARENT);
+                panneauPrincipal.getChildren().add(rectangleInvisible);
             }
         });
         return b;
     }
 
     public Button validerEtape(Button b) {
+        //Le but de cette étape est de rajouter une action Valider au bouton
         b.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent actionEvent) {
-                if (Jeu.this.numeroEtape == 1) {
-                    Jeu.this.etape2();
-                } else if (Jeu.this.numeroEtape == 2) {
-                    Jeu.this.etape3();
-                }
 
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (numeroEtape == 1) {
+                    //Passage à l'étape n°2
+                    etape2();
+                } else if (numeroEtape == 2) {
+                    //Passage à l'étape n°3
+                    etape3();
+                }
             }
         });
         return b;
     }
 
     public int getChoixNbLignes() {
-        return (Integer)this.choixNblignes.getValue();
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return (int) choixNblignes.getValue();
     }
 
     public int getChoixNbColonnes() {
-        return (Integer)this.choixNbColonnes.getValue();
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return (int) choixNbColonnes.getValue();
     }
 
+
     public Image creerImage(String imageSource) {
-        Image image = new Image(this.getClass().getResource(imageSource).toExternalForm(), this.taille, this.taille, true, false);
+        //permet de récupérer une image dans le répertoire
+        Image image = new Image(getClass().getResource(imageSource).toExternalForm(),
+                taille, taille, true, false);
         return image;
     }
 
     public void afficherPlateauJeu() {
-        this.texteEtape();
-        this.boutonValiderEtape.setDisable(false);
-        double x = this.mainScene.getWidth() * 0.8 * 0.05;
-        double y = this.mainScene.getHeight() * 0.1;
-        if ((this.mainScene.getWidth() * 0.8 - 2.0 * x) / (double)this.plateau.getColonnes() <= (this.mainScene.getHeight() - 2.0 * y) / (double)this.plateau.getLignes()) {
-            this.taille = (this.mainScene.getWidth() * 0.8 - 2.0 * x) / (double)this.plateau.getColonnes();
-            y = (this.mainScene.getHeight() - this.taille * (double)this.plateau.getLignes()) / 2.0;
+        //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
+        //Permet d'afficher l'explication de l'étape n°1
+        texteEtape();
+        //Permet de rendre le bouton 'Valider étape' cliquable
+        boutonValiderEtape.setDisable(false);
+        /*
+        Tout ce qui en dessous permet de centrer le plateau du jeu pour que peu importe le nombre de lignes
+        et le nombre de colonnes le plateau soit centré et que la taille des cases s'adaptent pour que tout
+        soit directement visible
+         */
+        double x = (mainScene.getWidth() * 0.8) * 0.05;
+        double y = mainScene.getHeight() * 0.1;
+        if ((mainScene.getWidth() * 0.8 - 2 * x) / this.plateau.getColonnes() <=
+                (mainScene.getHeight() - 2 * y) / this.plateau.getLignes()) {
+            taille = (mainScene.getWidth() * 0.8 - 2 * x) / this.plateau.getColonnes();
+            y = (mainScene.getHeight() - taille * this.plateau.getLignes()) / 2;
         } else {
-            this.taille = (this.mainScene.getHeight() - 2.0 * y) / (double)this.plateau.getLignes();
-            x = (this.mainScene.getWidth() * 0.8 - this.taille * (double)this.plateau.getColonnes()) / 2.0;
+            taille = (mainScene.getHeight() - 2 * y) / this.plateau.getLignes();
+            x = (mainScene.getWidth() * 0.8 - taille * this.plateau.getColonnes()) / 2;
         }
+        xDepart = x;
+        y += 50;
+        yDepart = y;
 
-        this.xDepart = x;
-        y += 50.0;
-        this.yDepart = y;
-        Image roche = this.creerImage("/ElementsJeu/rocher.png");
-        Image herbe = this.creerImage("/ElementsJeu/herbe.png");
+        //Permet de récupérer les images dans le répertoire
+        Image roche = creerImage(IMG_ROCHER);
+        Image herbe = creerImage(IMG_HERBE);
 
-        for(int i = 0; i < this.plateau.getLignes(); ++i) {
-            for(int j = 0; j < this.plateau.getColonnes(); ++j) {
-                Rectangle carre = new Rectangle(x, y, this.taille, this.taille);
+
+        //Maintenant on fait une double boucle pour créer un "tableau" en fonction du nombre de colonnes et lignes choisies
+        for (int i = 0; i < this.plateau.getLignes(); i++) {
+            for (int j = 0; j < this.plateau.getColonnes(); j++) {
+                //D'abord on ne créer que des carrés
+                Rectangle carre = new Rectangle(x, y, taille, taille);
                 carre.setFill(Color.WHITE);
                 carre.setStroke(Color.BLACK);
                 carre.setStrokeWidth(0.5);
-                this.panneauPrincipal.getChildren().add(carre);
-                ImageView imageView;
-                if (!this.plateau.cases[i][j].getContenu().getNom().equals("Roche")) {
-                    imageView = new ImageView(herbe);
+                panneauPrincipal.getChildren().add(carre);
+                //On regarde si la case est de type roche
+                if (this.plateau.cases[i][j].getContenu().getNom().equals("Roche")) {
+                    ImageView imageView = new ImageView(roche); //on créé une image roche
                     imageView.setX(x);
                     imageView.setY(y);
-                    this.panneauPrincipal.getChildren().add(imageView);
-                } else {
-                    imageView = new ImageView(roche);
-                    imageView.setX(x);
-                    imageView.setY(y);
-                    if ((i != 0 || j != 0) && (i != 0 || j != this.plateau.getColonnes() - 1) && (i != this.plateau.getLignes() - 1 || j != 0) && (i != this.plateau.getLignes() - 1 || j != this.plateau.getColonnes() - 1)) {
-                        imageView = this.remplacerRocheHerbe(imageView);
+                    //Le but est d'enlever les extrémités
+                    if (!((i == 0 && j == 0) || (i == 0 && j == this.plateau.getColonnes() - 1) ||
+                            (i == this.plateau.getLignes() - 1 && j == 0) || (i == this.plateau.getLignes() - 1 &&
+                            j == this.plateau.getColonnes() - 1))) {
+                        imageView = remplacerRocheHerbe(imageView); //permet de rajouter une action
                     }
-
-                    this.panneauPrincipal.getChildren().add(imageView);
+                    panneauPrincipal.getChildren().add(imageView); // on ajoute l'image dans panneauPrincipal
+                } else {
+                    ImageView imageView = new ImageView(herbe);
+                    imageView.setX(x);
+                    imageView.setY(y);
+                    panneauPrincipal.getChildren().add(imageView);
                 }
-
-                x += this.taille;
+                x += taille; //permet d'avoir une cohérance visuelle
             }
-
-            x = this.xDepart;
-            y += this.taille;
+            x = xDepart;
+            y += taille; //on fait pareil pour l'axe des ordonnées
         }
-
     }
 
+
     public Stage getMainStage() {
-        return this.mainStage;
+        return mainStage;
     }
 
     public void jeu() {
+        //Méthode test
         this.plateau.printMatrices();
     }
+
 }

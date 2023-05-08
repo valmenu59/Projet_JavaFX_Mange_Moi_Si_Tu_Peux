@@ -15,6 +15,7 @@ public class Plateau {
     }
 
     public void creerPlateau(){
+        //Permet d'initialiser le plateau
         this.cases = new Case[this.lignes][this.colonnes];
         for (int i = 0; i < this.lignes; i++){
             for (int j = 0; j < this.colonnes; j++){
