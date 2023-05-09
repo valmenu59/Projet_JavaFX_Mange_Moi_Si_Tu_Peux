@@ -10,8 +10,6 @@ public class Plateau {
     public Plateau(int c, int l){
         this.lignes = c;
         this.colonnes = l;
-
-
     }
 
     public void creerPlateau(){

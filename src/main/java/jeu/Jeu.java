@@ -46,11 +46,12 @@ public class Jeu {
     private AnimationTimer tempsJeu;
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
-    private Rectangle rectangleInvisible;
     private Text texteEtape;
     private Text texteExplicationEtape;
-    private ArrayList<Label> listeLabel = new ArrayList();
-    private ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList();
+    private final ArrayList<Label> listeLabel = new ArrayList<>();
+    private final ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList<>();
+    private final ArrayList<Rectangle> listeRectangleRougeTransparant = new ArrayList<>();
+    private final ArrayList<ImageView> listeImages = new ArrayList<>();
     private double xDepart;
     private double yDepart;
     private boolean sortieCree = false;
@@ -86,10 +87,10 @@ public class Jeu {
         choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 14, 9);
         //Ensuite on crée différents boutons
         boutonCreerPlateau = new Button("Créer votre plateau");
-        boutonCreerPlateau = validerLignesColonnes(boutonCreerPlateau);
+        validerLignesColonnes(boutonCreerPlateau);
         panneau2.getChildren().add(boutonCreerPlateau);
         boutonValiderEtape = new Button("Valider cette étape");
-        boutonValiderEtape = validerEtape(boutonValiderEtape);
+        validerEtape(boutonValiderEtape);
         boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
         panneau2.getChildren().add(boutonValiderEtape);
     }
@@ -100,19 +101,22 @@ public class Jeu {
         this.numeroEtape = 2;
         boutonValiderEtape.setDisable(true);
         //Avant on supprime tout ce qu'on a plus besoin
-        panneauPrincipal.getChildren().remove(rectangleInvisible);
         panneau2.getChildren().removeAll(listeLabel);
         panneau2.getChildren().removeAll(listeDeListeDeroulant);
         panneau2.getChildren().remove(boutonCreerPlateau);
         //On vide les 2 ArrayList
         listeLabel.clear();
         listeDeListeDeroulant.clear();
+        //Permet de placer des rectangles rouges transparants
+        placerRectanglesRougesTransparants();
         //Permet d'afficher le texte sur le panneau principal
         texteEtape();
     }
 
     public void etape3() {
         this.numeroEtape = 3;
+        changerActionCaseSortie();
+        placerRectanglesRougesTransparants();
         texteEtape();
 
     }
@@ -148,6 +152,51 @@ public class Jeu {
 
     }
 
+    public void placerRectanglesRougesTransparants(){
+        if (numeroEtape == 2){
+            for (int i = 0; i < this.plateau.getLignes(); i++) {
+                for (int j = 0; j < this.plateau.getColonnes(); j++) {
+                    if ((i == 0 && j == 0) || (i == 0 && j == this.plateau.getColonnes() - 1) ||
+                            (i == this.plateau.getLignes() - 1 && j == 0) || (i == this.plateau.getLignes() - 1 &&
+                            j == this.plateau.getColonnes() - 1) || (i != 0 && j != 0 && j != this.plateau.getColonnes() - 1 &&
+                            i != plateau.getLignes() -1 )){
+                        creerRectangleRougeTansparant(i,j);
+                    }
+                }
+            }
+        } else if (numeroEtape == 3){
+            panneauPrincipal.getChildren().removeAll(listeRectangleRougeTransparant);
+            listeRectangleRougeTransparant.clear();
+            for (int i = 0; i < this.plateau.getLignes(); i++) {
+                for (int j = 0; j < this.plateau.getColonnes(); j++) {
+
+                }
+            }
+        }
+    }
+
+
+    public void creerRectangleRougeTansparant(double i, double j){
+        double x = xDepart + j * taille;
+        double y = yDepart + i * taille;
+        Rectangle rectangle = new Rectangle(x,y,taille,taille);
+        rectangle.setFill(Color.rgb(200,0,0,0.33));
+        listeRectangleRougeTransparant.add(rectangle);
+        panneauPrincipal.getChildren().add(rectangle);
+    }
+
+    public void changerActionCaseSortie(){
+        for (int i = 0; i < this.plateau.getLignes(); i++) {
+            for (int j = 0; j < this.plateau.getColonnes(); j++) {
+                if (i == 0 || j == 0 || i == plateau.getLignes() - 1 || j == plateau.getColonnes() - 1){
+                    if (this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")){
+                        ImageView img = listeImages.get(i * plateau.getColonnes() + j);
+                        remplacerTypeTerrain(img, false,true);
+                    }
+                }
+            }
+        }
+    }
 
     public void texteEtape() {
         //Cette méthode permet de créer un texte en fonction du numéro de l'étape
@@ -199,8 +248,7 @@ public class Jeu {
     }
 
 
-    public ImageView remplacerRocheHerbe(ImageView img) {
-        //Cette méthode permet dee rendre les images du jeu cliquable
+    public void remplacerTypeTerrain(ImageView img, boolean remplacerRocheParHerbe, boolean isSortie){
         img.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -211,31 +259,59 @@ public class Jeu {
                 int[] liste = retrouverPosIetJ(x, y);
                 int j = liste[0];
                 int i = liste[1];
-                //si la sortie n'est pas crée
-                if (!(sortieCree)) {
-                    sortieCree = true;
-                    //On récupère l'image d'herbe à la source
-                    Image herbe = creerImage(IMG_HERBE);
-                    //On remplace l'image roche par une image herbe
-                    img.setImage(herbe);
-                    //remplacerRocheHerbe(img);
-                    //La case sélectionnée devient de type herbe
-                    Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
-                    //Permet d'activer le bouton valider
-                    boutonValiderEtape.setDisable(false);
-                    //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
-                } else if (sortieCree && Jeu.this.plateau.cases[i][j].getContenu() instanceof Herbe) {
-                    //Même principe qu'au dessus
-                    sortieCree = false;
-                    Image roche = creerImage(IMG_ROCHER);
-                    img.setImage(roche);
-                    Jeu.this.plateau.cases[i][j] = new Case(new Roche());
-                    boutonValiderEtape.setDisable(true);
+
+                //Ne marche qu'à l'étape n°2
+                if (numeroEtape == 2 && remplacerRocheParHerbe) {
+                    //si la sortie n'est pas crée
+                    if (!(sortieCree)) {
+                        sortieCree = true;
+                        //On récupère l'image d'herbe à la source
+                        Image herbe = creerImage(IMG_HERBE);
+                        //On remplace l'image roche par une image herbe
+                        img.setImage(herbe);
+                        //La case sélectionnée devient de type herbe
+                        Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                        //Permet d'activer le bouton valider
+                        boutonValiderEtape.setDisable(false);
+                        //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
+                    } else if (sortieCree && Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
+                        //Même principe qu'au dessus
+                        sortieCree = false;
+                        Image roche = creerImage(IMG_ROCHER);
+                        img.setImage(roche);
+                        Jeu.this.plateau.cases[i][j] = new Case(new Roche());
+                        boutonValiderEtape.setDisable(true);
+                    }
+                }
+
+                //Ne marche qu'à l'étape n°3
+                if (numeroEtape == 3 && !remplacerRocheParHerbe) {
+                    if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
+                        Image cactus = creerImage(IMG_CACTUS);
+                        img.setImage(cactus);
+                        Jeu.this.plateau.cases[i][j] = new Case(new Cactus());
+                    } else if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Cactus")) {
+                        Image marguerite = creerImage(IMG_MARGUERITE);
+                        img.setImage(marguerite);
+                        Jeu.this.plateau.cases[i][j] = new Case(new Marguerite());
+                    } else if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Marguerite")) {
+                        if (isSortie) {
+                            Image herbe = creerImage(IMG_HERBE);
+                            img.setImage(herbe);
+                            Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                        } else {
+                            Image roche = creerImage(IMG_ROCHER);
+                            img.setImage(roche);
+                            Jeu.this.plateau.cases[i][j] = new Case(new Roche());
+                        }
+                    } else {
+                        Image herbe = creerImage(IMG_HERBE);
+                        img.setImage(herbe);
+                        Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                    }
                 }
             }
         });
-        //On retourne l'imageView
-        return img;
     }
 
     public int[] retrouverPosIetJ(double x, double y) {
@@ -246,7 +322,14 @@ public class Jeu {
         return l;
     }
 
-    public Button validerLignesColonnes(Button b) {
+    public double[] retrouverPosXetY(int i, int j){
+        double[] l = new double[2];
+        l[0]  = xDepart + j * taille;
+        l[1] = yDepart + i * taille;
+        return l;
+    }
+
+    public void validerLignesColonnes(Button b) {
         //Cette méthode permet de donner l'action de créer le plateau de jeu visuellement et en mémoire
         b.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -260,16 +343,11 @@ public class Jeu {
                 Jeu.this.plateau.creerPlateau();
                 //Permet de visualiser le plateau sur JavaFX
                 afficherPlateauJeu();
-                //On crée un rectangle invisible sur le plateau principal pour iniber toute les actions possibles
-                rectangleInvisible = new Rectangle(0, 0, panneauPrincipal.getWidth(), panneauPrincipal.getHeight());
-                rectangleInvisible.setFill(Color.TRANSPARENT);
-                panneauPrincipal.getChildren().add(rectangleInvisible);
             }
         });
-        return b;
     }
 
-    public Button validerEtape(Button b) {
+    public void validerEtape(Button b) {
         //Le but de cette étape est de rajouter une action Valider au bouton
         b.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -284,7 +362,6 @@ public class Jeu {
                 }
             }
         });
-        return b;
     }
 
     public int getChoixNbLignes() {
@@ -353,13 +430,19 @@ public class Jeu {
                     if (!((i == 0 && j == 0) || (i == 0 && j == this.plateau.getColonnes() - 1) ||
                             (i == this.plateau.getLignes() - 1 && j == 0) || (i == this.plateau.getLignes() - 1 &&
                             j == this.plateau.getColonnes() - 1))) {
-                        imageView = remplacerRocheHerbe(imageView); //permet de rajouter une action
+                        //remplacerRocheHerbe(imageView); //permet de rajouter une action
+                        remplacerTypeTerrain(imageView,true,false);
                     }
+                    //rajoute imageView dans Arraylist
+                    listeImages.add(imageView);
                     panneauPrincipal.getChildren().add(imageView); // on ajoute l'image dans panneauPrincipal
                 } else {
                     ImageView imageView = new ImageView(herbe);
                     imageView.setX(x);
                     imageView.setY(y);
+                    remplacerTypeTerrain(imageView, false, false);
+                    //rajoute imageView dans Arraylist
+                    listeImages.add(imageView);
                     panneauPrincipal.getChildren().add(imageView);
                 }
                 x += taille; //permet d'avoir une cohérance visuelle
