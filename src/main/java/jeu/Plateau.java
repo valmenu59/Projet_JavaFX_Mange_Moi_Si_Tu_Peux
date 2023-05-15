@@ -81,6 +81,26 @@ public class Plateau {
         }
     }
 
+    public boolean verifAccederPosition(int iDepart, int jDepart, int iSortie, int jSortie){
+        ArrayList<int[]> listeCasePassees = new ArrayList<>();
+        Stack<int[]> pileCase = new Stack<>();
+        int[] tableau = new int[]{iDepart, jDepart};
+        listeCasePassees.add(tableau);
+        pileCase.push(tableau);
+        System.out.println(pileCase);
+        boolean pilePossedePositionSortie = false;
+        while (!pilePossedePositionSortie){
+            iDepart+=1;
+            if (this.cases[iDepart][jDepart].getContenu().getNom().equals("Herbe")){
+                int[] tableau2 = new int[]{iDepart,jDepart};
+                listeCasePassees.add(tableau2);
+                pileCase.push(tableau2);
+            } else {
+
+            }
+        }
+    }
+
 
 
 
