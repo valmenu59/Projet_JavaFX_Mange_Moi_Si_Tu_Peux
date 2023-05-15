@@ -2,17 +2,13 @@ package jeu;
 
 public abstract class TypeTerrain {
 
-    String nom;
-    boolean mangeable;
+    private String nom;
 
-    public TypeTerrain(){
-        this.nom = "Nom";
-        this.mangeable = false;
+    public TypeTerrain(String n){
+        this.nom = n;
     }
 
-    public boolean isMangeable() {
-        return mangeable;
-    }
+
 
     public String getNom(){
         return this.nom;

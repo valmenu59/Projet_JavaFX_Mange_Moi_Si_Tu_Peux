@@ -1,10 +1,9 @@
 package jeu;
 
-public class Marguerite extends TypeTerrain{
+public class Marguerite extends Plante {
 
     public Marguerite(){
-        this.nom = "Marguerite";
-        this.mangeable = true;
+        super("Marguerite", true);
     }
 
 

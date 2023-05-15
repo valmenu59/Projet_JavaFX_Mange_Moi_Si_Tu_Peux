@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -12,10 +11,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -23,9 +25,13 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 public class Jeu {
     //Reprend les classes du jeu
     protected Plateau plateau;
+    protected Plateau plateauTest;
     private NbTour tour = new NbTour();
 
     //Récupère la source des images
@@ -56,8 +62,17 @@ public class Jeu {
     private double yDepart;
     private boolean sortieCree = false;
     private int numeroEtape;
+    private boolean moutonCree = false;
+    private boolean loupCree = false;
 
-    public Jeu(int l, int h, Scene mainScene, AnchorPane panneau) {
+    private boolean joue = false;
+
+    String musicFile = "/bruh.wav"; // Remplacez cette chaîne par le chemin vers votre fichier audio
+
+
+
+
+    public Jeu(Scene mainScene, AnchorPane panneau) {
         this.tour = new NbTour();
         this.mainScene = mainScene;
 
@@ -65,8 +80,18 @@ public class Jeu {
         creerFenetreJeu(panneau);
 
 
+        jouerSon();
+
+
         //On va vers l'étape n°1
         etape1();
+
+    }
+
+    public Jeu(int colonnes, int lignes){
+        //sert uniquement pour les tests, il n'y a aucun composant JavaFx
+        plateauTest = new Plateau(lignes,colonnes);
+        plateauTest.creerPlateau();
 
     }
 
@@ -95,6 +120,38 @@ public class Jeu {
         panneau2.getChildren().add(boutonValiderEtape);
     }
 
+    public void jouerSon(){
+        Media musique = new Media(getClass().getResource("/The Underdog Project - Summer Jam (Official Video HD).mp3").toExternalForm());
+        MediaPlayer jouerMusique = new MediaPlayer(musique);
+
+        mainScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+
+                if (keyEvent.getCode() == KeyCode.O ){
+                    System.out.println("ici");
+                    AudioClip sound = new AudioClip(getClass().getResource(musicFile).toExternalForm());
+                    sound.play();
+
+                } else if (keyEvent.getCode() == KeyCode.C) {
+                    if (!joue) {
+                        jouerMusique.play();
+                        joue = true;
+                        System.out.println("Lecture de la musique...");
+                    } else {
+                        jouerMusique.pause();
+                        joue = false;
+                        System.out.println("Musique en pause.");
+                    }
+                } else if (keyEvent.getCode() == KeyCode.S){
+                    jouerMusique.stop();
+                    joue = false;
+                    System.out.println("Musique arrêtée");
+                }
+            }
+        });
+    }
+
 
     public void etape2() {
         //Passage à l'étape 2
@@ -118,7 +175,17 @@ public class Jeu {
         changerActionCaseSortie();
         placerRectanglesRougesTransparants();
         texteEtape();
+        Button boutonCreerLabyrinthe = new Button("Générer un labyrinthe aléatoire");
+        panneau2.getChildren().add(1,boutonCreerLabyrinthe);
 
+    }
+
+    public void etape4(){
+        this.numeroEtape = 4;
+        boutonValiderEtape.setDisable(true);
+        boutonValiderEtape.setText("Commencer le jeu");
+        panneau2.getChildren().remove(1);
+        texteEtape();
     }
 
 
@@ -222,6 +289,10 @@ public class Jeu {
             texteEtape.setText("Etape 3 : Personnalisez le plateau du jeu");
             texteExplicationEtape.setText("Pour cette étape, cliquez sur terrain puis sélectionnez votre type de terrain souhaité." + "\n" +
                     "Attention il n'est pas possible de boucher la sortie ni de séparer le terrain en 2, il faut qu'à partir de tout plante on puisse sortir !");
+        } else if (numeroEtape == 4){
+            texteEtape.setText("Etape 4 : Placez le loup et le mouton dans le plateau du jeu");
+            texteExplicationEtape.setText("Pour cette étape, cliquez sur le plateau du jeu où vous voulez placer votre loup et mouton." +"\n" +
+                    "Il faut que ces 2 animaux soient au moins distancés de 4 cases. Une fois cette finie le jeu commencera si vous cliquez sur valider !");
         }
     }
 
@@ -247,6 +318,13 @@ public class Jeu {
         return choix;
     }
 
+    /**
+     *
+     * @param img
+     * @param remplacerRocheParHerbe
+     * @param isSortie
+     */
+
 
     public void remplacerTypeTerrain(ImageView img, boolean remplacerRocheParHerbe, boolean isSortie){
         img.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -260,59 +338,104 @@ public class Jeu {
                 int j = liste[0];
                 int i = liste[1];
 
+                //On initie toutes les images à partir de la source
+                Image herbe = creerImage(IMG_HERBE);
+                Image roche = creerImage(IMG_ROCHER);
+                Image cactus = creerImage(IMG_CACTUS);
+                Image marguerite = creerImage(IMG_MARGUERITE);
+                Image mouton = creerImage(IMG_MOUTON);
+                Image loup = creerImage(IMG_LOUP);
+
+
                 //Ne marche qu'à l'étape n°2
                 if (numeroEtape == 2 && remplacerRocheParHerbe) {
                     //si la sortie n'est pas crée
                     if (!(sortieCree)) {
                         sortieCree = true;
-                        //On récupère l'image d'herbe à la source
-                        Image herbe = creerImage(IMG_HERBE);
                         //On remplace l'image roche par une image herbe
                         img.setImage(herbe);
                         //La case sélectionnée devient de type herbe
-                        Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                        Jeu.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
                         //Permet d'activer le bouton valider
                         boutonValiderEtape.setDisable(false);
                         //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
                     } else if (sortieCree && Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
                         //Même principe qu'au dessus
                         sortieCree = false;
-                        Image roche = creerImage(IMG_ROCHER);
                         img.setImage(roche);
-                        Jeu.this.plateau.cases[i][j] = new Case(new Roche());
+                        Jeu.this.plateau.cases[i][j].setContenuGeneral(new Roche());
                         boutonValiderEtape.setDisable(true);
                     }
                 }
-
                 //Ne marche qu'à l'étape n°3
-                if (numeroEtape == 3 && !remplacerRocheParHerbe) {
+                else if (numeroEtape == 3 && !remplacerRocheParHerbe) {
                     if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
-                        Image cactus = creerImage(IMG_CACTUS);
                         img.setImage(cactus);
-                        Jeu.this.plateau.cases[i][j] = new Case(new Cactus());
+                        Jeu.this.plateau.cases[i][j].setContenuGeneral(new Cactus());
                     } else if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Cactus")) {
-                        Image marguerite = creerImage(IMG_MARGUERITE);
                         img.setImage(marguerite);
-                        Jeu.this.plateau.cases[i][j] = new Case(new Marguerite());
+                        Jeu.this.plateau.cases[i][j].setContenuGeneral(new Marguerite());
                     } else if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Marguerite")) {
                         if (isSortie) {
-                            Image herbe = creerImage(IMG_HERBE);
                             img.setImage(herbe);
-                            Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                            Jeu.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
                         } else {
-                            Image roche = creerImage(IMG_ROCHER);
                             img.setImage(roche);
-                            Jeu.this.plateau.cases[i][j] = new Case(new Roche());
+                            Jeu.this.plateau.cases[i][j].setContenuGeneral(new Roche());
                         }
                     } else {
-                        Image herbe = creerImage(IMG_HERBE);
                         img.setImage(herbe);
-                        Jeu.this.plateau.cases[i][j] = new Case(new Herbe());
+                        Jeu.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
+                    }
+                }
+
+                else if (numeroEtape == 4 && !remplacerRocheParHerbe) {
+                    if (Jeu.this.plateau.cases[i][j].getContenu() instanceof Plante){
+                        if (!moutonCree && !loupCree) {
+                            img.setImage(mouton);
+                            Jeu.this.plateau.cases[i][j].setAnimal(new Mouton());
+                            moutonCree = true;
+                        }
+                        else if (!loupCree) {
+                            img.setImage(loup);
+                            Jeu.this.plateau.cases[i][j].setAnimal(new Loup());
+                            loupCree = true;
+                        } else if (Jeu.this.plateau.cases[i][j].animalPresent()) {
+                            if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")){
+                                img.setImage(herbe);
+                            } else if (Jeu.this.plateau.cases[i][j].getContenu().getNom().equals("Cactus")){
+                                img.setImage(cactus);
+                            } else {
+                                img.setImage(marguerite);
+                            }
+                            Jeu.this.plateau.cases[i][j].removeAnimal();
+                        } else if (loupCree && !moutonCree){
+                            img.setImage(mouton);
+                            Jeu.this.plateau.cases[i][j].setAnimal(new Mouton());
+                            moutonCree = true;
+                        }
+                        loupCree = verifPresenceAnimal("Loup");
+                        moutonCree = verifPresenceAnimal("Mouton");
+                        boutonValiderEtape.setDisable(!moutonCree || !loupCree);
                     }
                 }
             }
         });
     }
+
+    public boolean verifPresenceAnimal(String n){
+        for (int i = 0; i < this.plateau.getLignes(); i++) {
+            for (int j = 0; j < this.plateau.getColonnes(); j++) {
+                if (this.plateau.cases[i][j].animalPresent()) {
+                    if (this.plateau.cases[i][j].getAnimal().getNom().equals(n)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     public int[] retrouverPosIetJ(double x, double y) {
         int[] l = new int[2];
@@ -359,6 +482,8 @@ public class Jeu {
                 } else if (numeroEtape == 2) {
                     //Passage à l'étape n°3
                     etape3();
+                } else if (numeroEtape == 3){
+                    etape4();
                 }
             }
         });
@@ -378,7 +503,7 @@ public class Jeu {
     public Image creerImage(String imageSource) {
         //permet de récupérer une image dans le répertoire
         Image image = new Image(getClass().getResource(imageSource).toExternalForm(),
-                taille, taille, true, false);
+                taille, taille, false, false);
         return image;
     }
 
@@ -386,6 +511,8 @@ public class Jeu {
         //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
         //Permet d'afficher l'explication de l'étape n°1
         texteEtape();
+        //Permet d'effacer l'Arraylist listrImages
+        listeImages.clear();
         //Permet de rendre le bouton 'Valider étape' cliquable
         boutonValiderEtape.setDisable(false);
         /*
@@ -457,9 +584,11 @@ public class Jeu {
         return mainStage;
     }
 
-    public void jeu() {
-        //Méthode test
-        this.plateau.printMatrices();
+    public Plateau getPlateau(){
+        //sert uniquement pour les tests Junit
+        return this.plateauTest;
     }
+
+
 
 }

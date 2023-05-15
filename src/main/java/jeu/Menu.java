@@ -55,7 +55,7 @@ public class Menu {
         bouton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Jeu jeu = new Jeu(12,8, mainScene, panneau);
+                Jeu jeu = new Jeu(mainScene, panneau);
                 jeu.getMainStage();
             }
         });

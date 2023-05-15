@@ -1,12 +1,11 @@
 package jeu;
 
-public class Terre extends TypeTerrain {
+public class Terre extends Plante {
 
     private int nbJourVide;
 
     public Terre(){
-        this.nom = "Terre";
-        this.mangeable = false;
+        super("Terre", false);
         this.nbJourVide = 0;
     }
 

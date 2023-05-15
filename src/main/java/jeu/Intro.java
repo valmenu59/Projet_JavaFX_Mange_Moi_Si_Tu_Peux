@@ -2,6 +2,8 @@ package jeu;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.scene.image.*;
 import java.io.FileNotFoundException;
@@ -21,7 +23,8 @@ public class Intro {
 
     private final static String IMAGE_INTRO = "/UPHF_logo.svg.png";
 
-    public Intro() throws FileNotFoundException {
+    public Intro()  {
+
         panneau = new AnchorPane();
         mainScene = new Scene(panneau, 1280, 720 );
         mainStage = new Stage();

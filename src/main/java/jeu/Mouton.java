@@ -3,6 +3,6 @@ package jeu;
 public class Mouton extends Animal {
 
     public Mouton (){
-        super(2);
+        super("Mouton",2);
     }
 }
