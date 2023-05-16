@@ -35,12 +35,12 @@ public class Jeu {
     private NbTour tour = new NbTour();
 
     //Récupère la source des images
-    private static final String IMG_CACTUS = "/ElementsJeu/cactusv2.png";
-    private static final String IMG_HERBE = "/ElementsJeu/HERBEv2.jpg";
-    private static final String IMG_LOUP = "/ElementsJeu/LOUPv2.png";
-    private static final String IMG_MARGUERITE = "/ElementsJeu/MARGUERITEv2.png";
-    private static final String IMG_MOUTON = "/ElementsJeu/MOUTONv2.jpg";
-    private static final String IMG_ROCHER = "/ElementsJeu/ROCHERv2.jpg";
+    private static final String IMG_CACTUS = "/ElementsJeu/CactusColors.png";
+    private static final String IMG_HERBE = "/ElementsJeu/HerbeColors.png";
+    private static final String IMG_LOUP = "/ElementsJeu/LoupColors.png";
+    private static final String IMG_MARGUERITE = "/ElementsJeu/MargueColors.png";
+    private static final String IMG_MOUTON = "/ElementsJeu/MoutonColors.png";
+    private static final String IMG_ROCHER = "/ElementsJeu/RocherColors.png";
     private static final String IMG_TERRE = "/ElementsJeu/vide.png";
     private AnchorPane panneauPrincipal;
     private Stage mainStage;

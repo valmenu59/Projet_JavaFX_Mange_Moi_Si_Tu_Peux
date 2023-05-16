@@ -184,6 +184,10 @@ public class Plateau {
         } else if (jCourant == colonnes-1){
             jCourant--;
         }
+        int[] caseDepart = new int[]{iCourant, jCourant};
+        supprimerTableauListePlante(caseDepart);
+        listeCasePassees.add(caseDepart);
+        chemin.push(caseDepart);
 
 
         while (!casesPlante.isEmpty()) {
@@ -194,45 +198,37 @@ public class Plateau {
                 jCourant--;
                 int[] caseActuelle = new int[]{iCourant, jCourant};
                 //Regarde si l'élément est disponible dans la liste
-                if (presentDansLaListe(casesPlante,caseActuelle)) {
-                    casesPlante.remove(caseActuelle);
-                }
+                supprimerTableauListePlante(caseActuelle);
                 listeCasePassees.add(caseActuelle);
                 chemin.push(caseActuelle);
                 deplacementPossible = true;
             }
             //Correspond à haut
-            if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
+            else if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
                 iCourant--;
                 int[] caseActuelle = new int[]{iCourant, jCourant};
                 //Regarde si l'élément est disponible dans la liste
-                if (presentDansLaListe(casesPlante,caseActuelle)) {
-                    casesPlante.remove(caseActuelle);
-                }
+                supprimerTableauListePlante(caseActuelle);
                 listeCasePassees.add(caseActuelle);
                 chemin.push(caseActuelle);
                 deplacementPossible = true;
             }
             //Correspond à droite
-            if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
+            else if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
                 jCourant++;
                 int[] caseActuelle = new int[]{iCourant, jCourant};
                 //Regarde si l'élément est disponible dans la liste
-                if (presentDansLaListe(casesPlante,caseActuelle)) {
-                    casesPlante.remove(caseActuelle);
-                }
+                supprimerTableauListePlante(caseActuelle);
                 listeCasePassees.add(caseActuelle);
                 chemin.push(caseActuelle);
                 deplacementPossible = true;
             }
             //Correspond à bas
-            if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
+            else if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
                 iCourant++;
                 int[] caseActuelle = new int[]{iCourant, jCourant};
                 //Regarde si l'élément est disponible dans la liste
-                if (presentDansLaListe(casesPlante,caseActuelle)) {
-                    casesPlante.remove(caseActuelle);
-                }
+                supprimerTableauListePlante(caseActuelle);
                 listeCasePassees.add(caseActuelle);
                 chemin.push(caseActuelle);
                 deplacementPossible = true;
@@ -264,6 +260,15 @@ public class Plateau {
             }
         }
         return false;
+    }
+
+
+    private void supprimerTableauListePlante(int[] l){
+        for (int i=0; i < casesPlante.size(); i++){
+            if (l[0] == casesPlante.get(i)[0] && l[1] == casesPlante.get(i)[1]){
+                casesPlante.remove(i);
+            }
+        }
     }
 
 
