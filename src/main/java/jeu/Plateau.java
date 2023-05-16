@@ -1,6 +1,7 @@
 package jeu;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Stack;
 
@@ -11,7 +12,10 @@ public class Plateau {
 
     protected Case[][] cases;
 
+    ArrayList<int[]> casesPlante = new ArrayList<>();
     ArrayList<int[]> listeCasePassees = new ArrayList<>();
+    Stack<int[]> chemin = new Stack<>();
+
 
     public Plateau(int c, int l){
         this.lignes = c;
@@ -73,47 +77,29 @@ public class Plateau {
             }
         }
 
-        for (int i=1; i < lignes - 1; i++) {
-            for (int j = 1; j < colonnes - 1; j++) {
-                if (this.cases[i][j].getContenu() instanceof Plante) {
-                    if (!listeCasePassees.contains(new int[]{i, j})) {
-                        System.out.println("je suis ici");
-                        if (!verifAccederPosition(i, j, lignes - 2, colonnes - 2)) {
-                            System.out.println("je suis ici222");
-                            ArrayList<Character> pos = new ArrayList<>();
-                            boolean est, sud = false;
-                            if (this.cases[i + 1][j].getContenu() instanceof Roche && i + 1 != lignes - 1) {
-                                pos.add('S');
-                            }
-                            if (this.cases[i][j + 1].getContenu() instanceof Plante && i + 1 != colonnes - 1) {
-                                pos.add('E');
-                            }
-                            char lettre = pos.get((int) (Math.random() * pos.size()));
-                            if (lettre == 'S') {
-                                supprimerObstacle(i + 1, j, lettre);
-                            } else {
-                                supprimerObstacle(i, j + 1, lettre);
-                            }
 
-                        }
-                    }
-                }
-            }
-        }
+        System.out.println(verifPlateauCorrect(0,1));
+        System.out.println(casesPlante.toString());
+        System.out.println();
     }
 
 
 
     private void supprimerObstacle(int i, int j, char orientation){
+        System.out.println("j'ai remplacé l'herbe par roche"+" "+i+" "+j);
         switch (orientation){
+            case 'N' -> this.cases[i-1][j].setContenuGeneral(new Herbe());
             case 'E' -> this.cases[i][j+1].setContenuGeneral(new Herbe());
             case 'S' -> this.cases[i+1][j].setContenuGeneral(new Herbe());
+            case 'O' -> this.cases[i][j-1].setContenuGeneral(new Herbe());
         }
     }
 
-    public boolean verifAccederPosition(int iDepart, int jDepart, int iSortie, int jSortie){
+
+    /*
+    public boolean verifPlateauValide(int iSortie, int jSortie){
         Stack<int[]> pileCase = new Stack<>();
-        int[] tableau = new int[]{iDepart, jDepart};
+        int[] tableau = new int[]{1,1};
         listeCasePassees.add(tableau);
         pileCase.push(tableau);
         while (!pileCase.isEmpty()) {
@@ -129,9 +115,7 @@ public class Plateau {
 
             // Vérification des cases voisines non visitées
             boolean deplacementPossible = false;
-            System.out.println(!listeCasePassees.contains(new int[]{iCourant, jCourant - 1})+" "+listeCasePassees.contains(new int[]{iCourant, jCourant + 1})
-            +" "+listeCasePassees.contains(new int[]{iCourant - 1, jCourant})+" "+listeCasePassees.contains(new int[]{iCourant + 1, jCourant}));
-            if (jCourant > 0 && !listeCasePassees.contains(new int[]{iCourant, jCourant - 1})) {
+            if (jCourant > 0 && !presentDansLaListe(new int[]{iCourant, jCourant - 1})) {
                 if (this.cases[iCourant][jCourant - 1].getContenu().getNom().equals("Herbe")) {
                     int[] nouvelleCase = new int[]{iCourant, jCourant - 1};
                     pileCase.push(nouvelleCase);
@@ -139,7 +123,7 @@ public class Plateau {
                     deplacementPossible = true;
                 }
             }
-            if (jCourant < colonnes - 1 && !listeCasePassees.contains(new int[]{iCourant, jCourant + 1})) {
+            if (jCourant < colonnes - 1 && !presentDansLaListe(new int[]{iCourant, jCourant + 1})){
                 if (this.cases[iCourant][jCourant + 1].getContenu().getNom().equals("Herbe")) {
                     int[] nouvelleCase = new int[]{iCourant, jCourant + 1};
                     pileCase.push(nouvelleCase);
@@ -147,7 +131,7 @@ public class Plateau {
                     deplacementPossible = true;
                 }
             }
-            if (iCourant > 0 && !listeCasePassees.contains(new int[]{iCourant - 1, jCourant})) {
+            if (iCourant > 0 && !presentDansLaListe(new int[]{iCourant - 1, jCourant})) {
                 if (this.cases[iCourant - 1][jCourant].getContenu().getNom().equals("Herbe")) {
                     int[] nouvelleCase = new int[]{iCourant - 1, jCourant};
                     pileCase.push(nouvelleCase);
@@ -155,7 +139,7 @@ public class Plateau {
                     deplacementPossible = true;
                 }
             }
-            if (iCourant < lignes - 1 && !listeCasePassees.contains(new int[]{iCourant + 1, jCourant})) {
+            if (iCourant < lignes - 1 && !presentDansLaListe(new int[]{iCourant + 1, jCourant})) {
                 if (this.cases[iCourant + 1][jCourant].getContenu().getNom().equals("Herbe")) {
                     int[] nouvelleCase = new int[]{iCourant + 1, jCourant};
                     pileCase.push(nouvelleCase);
@@ -167,6 +151,116 @@ public class Plateau {
             // Si aucun déplacement possible à partir de la case courante, on la supprime de la pile
             if (!deplacementPossible) {
                 pileCase.pop();
+            }
+        }
+        return false;
+    }
+    */
+
+
+    public boolean verifPlateauCorrect(int iSortie, int jSortie){
+        //D'abord on stocke dans une liste toutes les cases passées
+        casesPlante.clear();
+        listeCasePassees.clear();
+        chemin.clear();
+        for (int i = 1; i < lignes-1; i++){
+            for (int j=1; j < colonnes-1; j++){
+                if (this.cases[i][j].getContenu() instanceof Plante){
+                    casesPlante.add(new int[]{i,j});
+                }
+            }
+        }
+        //On supprime l'autre liste tous les éléments
+        //Maintenant on stocke dans une autre liste toutes les cases qui sont passables
+        int iCourant = iSortie;
+        int jCourant = jSortie;
+
+        if (iSortie == 0){
+            iCourant++;
+        } else if (jSortie == 0){
+            jCourant++;
+        } else if (iCourant == lignes-1){
+            iCourant--;
+        } else if (jCourant == colonnes-1){
+            jCourant--;
+        }
+
+
+        while (!casesPlante.isEmpty()) {
+            // Vérifier les cases voisines de la case courante
+            boolean deplacementPossible = false;
+            //Correspond à gauche
+            if (jCourant - 1 > 0 && this.cases[iCourant][jCourant - 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant-1})) {
+                jCourant--;
+                int[] caseActuelle = new int[]{iCourant, jCourant};
+                //Regarde si l'élément est disponible dans la liste
+                if (presentDansLaListe(casesPlante,caseActuelle)) {
+                    casesPlante.remove(caseActuelle);
+                }
+                listeCasePassees.add(caseActuelle);
+                chemin.push(caseActuelle);
+                deplacementPossible = true;
+            }
+            //Correspond à haut
+            if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
+                iCourant--;
+                int[] caseActuelle = new int[]{iCourant, jCourant};
+                //Regarde si l'élément est disponible dans la liste
+                if (presentDansLaListe(casesPlante,caseActuelle)) {
+                    casesPlante.remove(caseActuelle);
+                }
+                listeCasePassees.add(caseActuelle);
+                chemin.push(caseActuelle);
+                deplacementPossible = true;
+            }
+            //Correspond à droite
+            if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
+                jCourant++;
+                int[] caseActuelle = new int[]{iCourant, jCourant};
+                //Regarde si l'élément est disponible dans la liste
+                if (presentDansLaListe(casesPlante,caseActuelle)) {
+                    casesPlante.remove(caseActuelle);
+                }
+                listeCasePassees.add(caseActuelle);
+                chemin.push(caseActuelle);
+                deplacementPossible = true;
+            }
+            //Correspond à bas
+            if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
+                iCourant++;
+                int[] caseActuelle = new int[]{iCourant, jCourant};
+                //Regarde si l'élément est disponible dans la liste
+                if (presentDansLaListe(casesPlante,caseActuelle)) {
+                    casesPlante.remove(caseActuelle);
+                }
+                listeCasePassees.add(caseActuelle);
+                chemin.push(caseActuelle);
+                deplacementPossible = true;
+            }
+
+            System.out.println(iCourant+" "+jCourant+" "+deplacementPossible);
+            // Si aucun déplacement n'est possible, on doit revenir en arrière
+            if (!deplacementPossible) {
+                int[] casePrecedente = chemin.peek();
+                chemin.pop();
+                iCourant = casePrecedente[0];
+                jCourant = casePrecedente[1];
+                if (chemin.isEmpty()){
+                    return false;
+                }
+            }
+        }
+
+
+        return true;
+    }
+
+
+
+    private boolean presentDansLaListe(Collection<int[]> liste, int[] position){
+        for (int[] l : liste){
+            if (l[0] == position[0] && l[1] == position[1]){
+                return true;
             }
         }
         return false;
@@ -185,9 +279,8 @@ public class Plateau {
 
 
 
-    public void detruireMur(){
 
-    }
+
 
 
     public void printMatrices () {
