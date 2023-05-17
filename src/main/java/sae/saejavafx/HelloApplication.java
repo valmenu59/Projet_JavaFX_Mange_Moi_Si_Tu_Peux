@@ -1,20 +1,22 @@
 package sae.saejavafx;
 
+import demarrage.Intro;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import jeu.*;
-
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        Intro intro = new Intro();
-        Stage fenetre = intro.getMainStage();
-        fenetre.setTitle("LOUP ET MOUTON");
-        fenetre.show();
+        Intro intro = new Intro(stage);
+        stage.setTitle("LOUP ET MOUTON");
+        stage.setResizable(true);
+        stage.show();
+        stage.setScene(intro);
+
+
 
     }
 

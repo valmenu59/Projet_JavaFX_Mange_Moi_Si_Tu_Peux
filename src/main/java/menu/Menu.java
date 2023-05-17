@@ -1,5 +1,6 @@
-package jeu;
+package menu;
 
+import demarrage.Intro;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -14,23 +15,31 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import jeu.Jeu;
 
-public class Menu {
+public class Menu extends Scene {
+    private AnchorPane panneau;
+    private Intro intro;
+    private MenuControleur menuControleur;
 
-    private Stage mainStage;
-
-    public Menu(AnchorPane panneau, Scene mainScene) {
-        panneau.getChildren().clear();
+    //public Menu(AnchorPane panneau, Scene mainScene) {
+    public Menu (Stage stage){
+        super(new AnchorPane(),1280, 720);
+        menuControleur = new MenuControleur(this);
+        //mainScene = new Scene(panneau);
+        panneau = (AnchorPane) getRoot();
+        //panneau.getChildren().clear();
         Text texte = new Text("Menu ");
         texte.setX(100.0);
         texte.setY(100.0);
         texte.setFont(Font.font("calibri", FontWeight.BOLD, 50.0));
         panneau.getChildren().add(texte);
         Button demarrer = this.bouton("Démarrer", 100.0, 200.0, Color.rgb(115, 115, 115));
-        demarrer = this.demarrerJeu(demarrer, panneau, mainScene);
+        //demarrer = this.demarrerJeu(demarrer, panneau, mainScene);
+        menuControleur.demarrerJeu(demarrer,stage);
         panneau.getChildren().add(demarrer);
         Button parametre = this.bouton("Paramètres", 100.0, 350.0, Color.rgb(115, 115, 115));
-        parametre = this.parametreJeu(parametre, panneau, mainScene);
+        menuControleur.parametreJeu(parametre,stage);
         panneau.getChildren().add(parametre);
     }
 
@@ -47,34 +56,5 @@ public class Menu {
     }
 
 
-    public Label champTexte(){
-        Label label = new Label("Nombre de lignes : ");
-        return label;
-    }
-    public Button demarrerJeu(Button bouton, AnchorPane panneau, Scene mainScene){
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Jeu jeu = new Jeu(mainScene, panneau);
-                jeu.getMainStage();
-            }
-        });
-        return bouton;
-    }
-
-    public Button parametreJeu(Button bouton, AnchorPane panneau, Scene mainScene){
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Parametre param = new Parametre(panneau, mainScene);
-                param.getMainStage();
-            }
-        });
-        return bouton;
-    }
-
-    public Stage getMainStage() {
-        return mainStage;
-    }
 
 }

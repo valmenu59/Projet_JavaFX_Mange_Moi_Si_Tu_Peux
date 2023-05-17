@@ -1,39 +1,34 @@
-package jeu;
+package demarrage;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.scene.image.*;
-import java.io.FileNotFoundException;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javafx.application.Platform;
+import menu.Menu;
 
 
-public class Intro {
+public class Intro extends Scene {
 
-    private Scene mainScene;
-    private Stage mainStage;
+    //private Scene mainScene;
     private AnchorPane panneau;
-
-
 
     private final static String IMAGE_INTRO = "/UPHF_logo.svg.png";
 
-    public Intro()  {
-
-        panneau = new AnchorPane();
-        mainScene = new Scene(panneau, 1280, 720 );
-        mainStage = new Stage();
-        mainStage.setResizable(true);
-        mainStage.setScene(mainScene);
+    public Intro (Stage stage) {
+        super(new AnchorPane(),1280, 720 );
+        panneau = (AnchorPane) getRoot();
+        //panneau = new AnchorPane();
+        //mainStage = new Stage();
+        //mainStage.setResizable(true);
+        //mainStage.setScene(mainScene);
 
         Image imageIntro = new  Image(getClass().getResource(IMAGE_INTRO).toExternalForm(),
-                mainScene.getWidth()/1.5,mainScene.getHeight()/1.5,
-                true,false);
+                getWidth()/1.5, getHeight()/1.5, true,false);
         ImageView imageView = new ImageView(imageIntro);
         panneau.getChildren().add(imageView);
 
@@ -47,18 +42,31 @@ public class Intro {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    Menu menu = new Menu(panneau, mainScene);
-                    menu.getMainStage();
+                    Menu menu = new Menu(stage);
+                    stage.setScene(menu);
                 });
             }
         }, 2000);
 
-        mainStage.show();
+        //mainStage.show();
     }
 
-
+/*
     public Stage getMainStage() {
         return mainStage;
+    }
+
+ */
+
+    /*
+    public Scene getMainScene(){
+        return mainScene;
+    }
+
+     */
+
+    public AnchorPane getPanneau(){
+        return this.panneau;
     }
 
 }

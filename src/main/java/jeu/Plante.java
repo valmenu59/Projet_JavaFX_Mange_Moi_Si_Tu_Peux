@@ -1,6 +1,6 @@
 package jeu;
 
-public abstract class Plante extends TypeTerrain {
+public abstract class  Plante extends TypeTerrain {
 
     private boolean mangeable;
     boolean loupEstLa;

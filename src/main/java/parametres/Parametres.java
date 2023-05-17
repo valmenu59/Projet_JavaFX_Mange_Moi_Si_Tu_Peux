@@ -1,4 +1,4 @@
-package jeu;
+package parametres;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,12 +14,17 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class Parametre {
+public class Parametres extends Scene {
 
-    private Stage mainStage;
+    private ParametresControleur parametresControleur;
 
-    public Parametre(AnchorPane panneau, Scene mainScene) {
-        panneau.getChildren().clear();
+    public Parametres(Stage stage) {
+        super(new AnchorPane(), 1280,720);
+
+        AnchorPane panneau = (AnchorPane) getRoot();
+
+        parametresControleur = new ParametresControleur(this);
+
 
         Text texte = new Text("Paramètres ");
         texte.setX(100);
@@ -30,7 +35,8 @@ public class Parametre {
 
         Button menuPrincipal = bouton("Menu Principal", 100, 200, Color.rgb(115,115,115));
 
-        menuPrincipal = demarrerJeu(menuPrincipal,panneau, mainScene);
+        //menuPrincipal = demarrerJeu(stage);
+        parametresControleur.demarrerJeu(menuPrincipal,stage);
 
         panneau.getChildren().add(menuPrincipal);
 
@@ -49,19 +55,13 @@ public class Parametre {
         return bouton;
     }
 
-    public Button demarrerJeu(Button bouton, AnchorPane panneau, Scene mainScene){
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Menu menu = new Menu(panneau, mainScene);
-                menu.getMainStage();
-            }
-        });
-        return bouton;
-    }
+
+    /*
 
     public Stage getMainStage() {
         return mainStage;
     }
+
+     */
 
 }
