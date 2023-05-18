@@ -2,6 +2,7 @@ package jeu;
 
 import java.util.ArrayList;
 import javafx.animation.AnimationTimer;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -48,6 +49,7 @@ public class Jeu extends Scene {
     private AnimationTimer tempsJeu;
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
+    private Button boutonRetour;
     private Text texteEtape;
     private Text texteExplicationEtape;
     private final ArrayList<Label> listeLabel = new ArrayList<>();
@@ -88,6 +90,8 @@ public class Jeu extends Scene {
 
 
     public void etape1() {
+        panneauPrincipal.getChildren().clear();
+        panneau2.getChildren().clear();
         //Initialisation de l'attribut numeroEtape
         numeroEtape = 1;
         //On crée un texte
@@ -109,6 +113,12 @@ public class Jeu extends Scene {
         controleur.validerEtape(boutonValiderEtape);
         boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
         panneau2.getChildren().add(boutonValiderEtape);
+
+        //On crée un bouton qui permet de retourner à l'étape précédente
+        boutonRetour = new Button("Retourner à l'étape précédente");
+        controleur.retournerEtapePrecedente(boutonRetour);
+        boutonRetour.setDisable(true);
+        panneau2.getChildren().add(boutonRetour);
     }
 
 
@@ -118,6 +128,7 @@ public class Jeu extends Scene {
         //Passage à l'étape 2
         this.numeroEtape = 2;
         boutonValiderEtape.setDisable(true);
+        boutonRetour.setDisable(false);
         //Avant on supprime tout ce qu'on a plus besoin
         panneau2.getChildren().removeAll(listeLabel);
         panneau2.getChildren().removeAll(listeDeListeDeroulant);
@@ -133,6 +144,9 @@ public class Jeu extends Scene {
 
     public void etape3() {
         this.numeroEtape = 3;
+        if (boutonValiderEtape.getText().equals("Commencer le jeu")){
+            boutonValiderEtape.setText("Valider cette étape");
+        }
         changerActionCaseSortie();
         placerRectanglesRougesTransparants();
         texteEtape();

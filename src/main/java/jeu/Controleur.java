@@ -164,6 +164,8 @@ public class Controleur {
                     jeu.etape3();
                 } else if (jeu.getNumeroEtape() == 3){
                     jeu.etape4();
+                } else if (jeu.getNumeroEtape() == 4){
+                    //
                 }
             }
         });
@@ -174,10 +176,7 @@ public class Controleur {
         b.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (jeu.getNumeroEtape() == 1){
-                    b.setDisable(true);
-                } else if (jeu.getNumeroEtape() == 2){
-                    b.setDisable(false);
+                if (jeu.getNumeroEtape() == 2){
                     jeu.etape1();
                 } else if (jeu.getNumeroEtape() == 3){
                     jeu.etape2();
