@@ -46,14 +46,15 @@ public class Jeu extends Scene {
     private double taille;
     private ChoiceBox<Integer> choixNblignes;
     private ChoiceBox<Integer> choixNbColonnes;
+    private ArrayList<Node> listeMenuDeroulantetLabelEtape1 = new ArrayList<>();
     private AnimationTimer tempsJeu;
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
     private Button boutonRetour;
     private Text texteEtape;
     private Text texteExplicationEtape;
-    private final ArrayList<Label> listeLabel = new ArrayList<>();
-    private final ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList<>();
+    //private final ArrayList<Label> listeLabel = new ArrayList<>();
+    //private final ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList<>();
     private final ArrayList<Rectangle> listeRectangleRougeTransparant = new ArrayList<>();
     private final ArrayList<ImageView> listeImages = new ArrayList<>();
     private double xDepart;
@@ -82,43 +83,49 @@ public class Jeu extends Scene {
         creerFenetreJeu(panneauTemporaire);
 
         //On va vers l'étape n°1
-        etape1();
+        etape1(false);
 
     }
 
 
 
 
-    public void etape1() {
-        panneauPrincipal.getChildren().clear();
-        panneau2.getChildren().clear();
+    public void etape1(boolean retour) {
         //Initialisation de l'attribut numeroEtape
         numeroEtape = 1;
-        //On crée un texte
-        Text texte = new Text("Options");
-        //Cette méthode permet le texte du jeu
-        texteEtape();
-        //On initie un plateau vide
-        controleur = new Controleur(this);
-        //On rajoute le texte dans panneau2
-        panneau2.getChildren().add(texte);
-        //Cette méthode permet de créer un menu déroulant avec un chiffre mini, maxi et celui affiché par défaut
-        choixNbColonnes = creerMenuDeroulant("Nombre de colonnes : ", 10, 18, 14);
-        choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 14, 9);
-        //Ensuite on crée différents boutons
-        boutonCreerPlateau = new Button("Créer votre plateau");
-        controleur.validerLignesColonnes(boutonCreerPlateau);
-        panneau2.getChildren().add(boutonCreerPlateau);
-        boutonValiderEtape = new Button("Valider cette étape");
-        controleur.validerEtape(boutonValiderEtape);
-        boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
-        panneau2.getChildren().add(boutonValiderEtape);
+        if (!retour){
+            //On crée un texte
+            Text texte = new Text("Options");
+            //Cette méthode permet le texte du jeu
+            texteEtape(true);
+            //On initie un plateau vide
+            controleur = new Controleur(this);
+            //On rajoute le texte dans panneau2
+            panneau2.getChildren().add(texte);
+            //Cette méthode permet de créer un menu déroulant avec un chiffre mini, maxi et celui affiché par défaut
+            choixNbColonnes = creerMenuDeroulant("Nombre de colonnes : ", 10, 18, 14);
+            choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 14, 9);
+            //Ensuite on crée différents boutons
+            boutonCreerPlateau = new Button("Créer votre plateau");
+            controleur.validerLignesColonnes(boutonCreerPlateau);
+            panneau2.getChildren().add(boutonCreerPlateau);
+            boutonValiderEtape = new Button("Valider cette étape");
+            controleur.validerEtape(boutonValiderEtape);
+            boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
+            panneau2.getChildren().add(boutonValiderEtape);
 
-        //On crée un bouton qui permet de retourner à l'étape précédente
-        boutonRetour = new Button("Retourner à l'étape précédente");
-        controleur.retournerEtapePrecedente(boutonRetour);
-        boutonRetour.setDisable(true);
-        panneau2.getChildren().add(boutonRetour);
+            //On crée un bouton qui permet de retourner à l'étape précédente
+            boutonRetour = new Button("Retourner à l'étape précédente");
+            controleur.retournerEtapePrecedente(boutonRetour);
+            boutonRetour.setDisable(true);
+            panneau2.getChildren().add(boutonRetour);
+        } else {
+            texteEtape(false);
+            panneauPrincipal.getChildren().removeAll(listeRectangleRougeTransparant);
+            panneau2.getChildren().addAll(1,listeMenuDeroulantetLabelEtape1);
+            boutonValiderEtape.setDisable(false);
+        }
+
     }
 
 
@@ -130,16 +137,15 @@ public class Jeu extends Scene {
         boutonValiderEtape.setDisable(true);
         boutonRetour.setDisable(false);
         //Avant on supprime tout ce qu'on a plus besoin
-        panneau2.getChildren().removeAll(listeLabel);
-        panneau2.getChildren().removeAll(listeDeListeDeroulant);
+        panneau2.getChildren().removeAll(listeMenuDeroulantetLabelEtape1);
         panneau2.getChildren().remove(boutonCreerPlateau);
         //On vide les 2 ArrayList
-        listeLabel.clear();
-        listeDeListeDeroulant.clear();
+        //listeLabel.clear();
+        //listeDeListeDeroulant.clear();
         //Permet de placer des rectangles rouges transparants
         placerRectanglesRougesTransparants();
         //Permet d'afficher le texte sur le panneau principal
-        texteEtape();
+        texteEtape(false);
     }
 
     public void etape3() {
@@ -149,7 +155,7 @@ public class Jeu extends Scene {
         }
         changerActionCaseSortie();
         placerRectanglesRougesTransparants();
-        texteEtape();
+        texteEtape(false);
         Button boutonCreerLabyrinthe = new Button("Générer un labyrinthe aléatoire");
         panneau2.getChildren().add(1,boutonCreerLabyrinthe);
 
@@ -160,7 +166,7 @@ public class Jeu extends Scene {
         boutonValiderEtape.setDisable(true);
         boutonValiderEtape.setText("Commencer le jeu");
         panneau2.getChildren().remove(1);
-        texteEtape();
+        texteEtape(false);
     }
 
 
@@ -241,21 +247,27 @@ public class Jeu extends Scene {
         }
     }
 
-    public void texteEtape() {
+    public void texteEtape(boolean nouveau) {
         //Cette méthode permet de créer un texte en fonction du numéro de l'étape
         if (numeroEtape == 1) {
-            Font font = Font.font("Segoe UI", FontWeight.BOLD, 25); //Permet de modifier la police
-            Font font1 = Font.font("Segoe UI", 15);
-            texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
-            texteEtape.setX(50);
-            texteEtape.setY(50);
-            texteEtape.setFont(font);
-            texteExplicationEtape = new Text("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran." + "\n" +
-                    "Cliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
-            texteExplicationEtape.setX(50);
-            texteExplicationEtape.setY(75);
-            texteExplicationEtape.setFont(font1);
-            panneauPrincipal.getChildren().addAll(texteEtape, texteExplicationEtape);
+            if (nouveau) {
+                Font font = Font.font("Segoe UI", FontWeight.BOLD, 25); //Permet de modifier la police
+                Font font1 = Font.font("Segoe UI", 15);
+                texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
+                texteEtape.setX(50);
+                texteEtape.setY(50);
+                texteEtape.setFont(font);
+                texteExplicationEtape = new Text("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran." + "\n" +
+                        "Cliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
+                texteExplicationEtape.setX(50);
+                texteExplicationEtape.setY(75);
+                texteExplicationEtape.setFont(font1);
+                panneauPrincipal.getChildren().addAll(texteEtape, texteExplicationEtape);
+            } else {
+                texteEtape.setText("Etape 1 : Choisissez la taille de votre plateau");
+                texteExplicationEtape.setText("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran." + "\n" +
+                        "Cliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
+            }
         } else if (numeroEtape == 2) {
             //.setText permet de modifier un texte déjà initialisé
             texteEtape.setText("Etape 2 : Choisissez l'emplacement de sortie");
@@ -286,8 +298,10 @@ public class Jeu extends Scene {
         //Permet d'afficher la valeur par défaut
         choix.setValue(nbDefaut);
         //On rajoute le label et la choiceBox dans une arraylist (pour les supprimer ensuite)
-        listeLabel.add(lab);
-        listeDeListeDeroulant.add(choix);
+        //listeLabel.add(lab);
+        //listeDeListeDeroulant.add(choix);
+        listeMenuDeroulantetLabelEtape1.add(lab);
+        listeMenuDeroulantetLabelEtape1.add(choix);
         //On ajoute les 2 dans le panneau2
         panneau2.getChildren().addAll(lab, choix);
         //Returne la ChoiceBox
@@ -343,7 +357,7 @@ public class Jeu extends Scene {
     public void afficherPlateauJeu() {
         //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
         //Permet d'afficher l'explication de l'étape n°1
-        texteEtape();
+        texteEtape(true);
         //Permet d'effacer l'Arraylist listrImages
         listeImages.clear();
         //Permet de rendre le bouton 'Valider étape' cliquable

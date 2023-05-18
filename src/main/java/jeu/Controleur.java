@@ -177,7 +177,7 @@ public class Controleur {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (jeu.getNumeroEtape() == 2){
-                    jeu.etape1();
+                    jeu.etape1(true);
                 } else if (jeu.getNumeroEtape() == 3){
                     jeu.etape2();
                 } else if (jeu.getNumeroEtape() == 4){
