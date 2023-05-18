@@ -51,17 +51,20 @@ public class Jeu extends Scene {
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
     private Button boutonRetour;
-    private Text texteEtape;
-    private Text texteExplicationEtape;
+    private Text texteEtape = null;
+    private Text texteExplicationEtape = null;
     //private final ArrayList<Label> listeLabel = new ArrayList<>();
     //private final ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList<>();
     private final ArrayList<Rectangle> listeRectangleRougeTransparant = new ArrayList<>();
+    private final ArrayList<Rectangle> listeCarreNoir = new ArrayList<>();
     private final ArrayList<ImageView> listeImages = new ArrayList<>();
     private double xDepart;
     private double yDepart;
     private Menu menu;
 
     private int numeroEtape;
+
+
 
 
 
@@ -93,11 +96,12 @@ public class Jeu extends Scene {
     public void etape1(boolean retour) {
         //Initialisation de l'attribut numeroEtape
         numeroEtape = 1;
+        texteEtape();
         if (!retour){
             //On crée un texte
             Text texte = new Text("Options");
             //Cette méthode permet le texte du jeu
-            texteEtape(true);
+
             //On initie un plateau vide
             controleur = new Controleur(this);
             //On rajoute le texte dans panneau2
@@ -120,9 +124,9 @@ public class Jeu extends Scene {
             boutonRetour.setDisable(true);
             panneau2.getChildren().add(boutonRetour);
         } else {
-            texteEtape(false);
             panneauPrincipal.getChildren().removeAll(listeRectangleRougeTransparant);
             panneau2.getChildren().addAll(1,listeMenuDeroulantetLabelEtape1);
+            panneau2.getChildren().add(5,boutonCreerPlateau);
             boutonValiderEtape.setDisable(false);
         }
 
@@ -131,21 +135,28 @@ public class Jeu extends Scene {
 
 
 
-    public void etape2() {
+    public void etape2(boolean retour) {
         //Passage à l'étape 2
         this.numeroEtape = 2;
-        boutonValiderEtape.setDisable(true);
         boutonRetour.setDisable(false);
-        //Avant on supprime tout ce qu'on a plus besoin
-        panneau2.getChildren().removeAll(listeMenuDeroulantetLabelEtape1);
-        panneau2.getChildren().remove(boutonCreerPlateau);
+        if (controleur.sortieBienCree()) {
+            boutonValiderEtape.setDisable(false);
+        } else {
+            boutonValiderEtape.setDisable(true);
+        }
+        //boutonRetour.setDisable(false);
+        if (!retour) {
+            //Avant on supprime tout ce qu'on a plus besoin
+            panneau2.getChildren().removeAll(listeMenuDeroulantetLabelEtape1);
+            panneau2.getChildren().remove(boutonCreerPlateau);
+        }
         //On vide les 2 ArrayList
         //listeLabel.clear();
         //listeDeListeDeroulant.clear();
         //Permet de placer des rectangles rouges transparants
         placerRectanglesRougesTransparants();
         //Permet d'afficher le texte sur le panneau principal
-        texteEtape(false);
+        texteEtape();
     }
 
     public void etape3() {
@@ -155,7 +166,7 @@ public class Jeu extends Scene {
         }
         changerActionCaseSortie();
         placerRectanglesRougesTransparants();
-        texteEtape(false);
+        texteEtape();
         Button boutonCreerLabyrinthe = new Button("Générer un labyrinthe aléatoire");
         panneau2.getChildren().add(1,boutonCreerLabyrinthe);
 
@@ -166,7 +177,7 @@ public class Jeu extends Scene {
         boutonValiderEtape.setDisable(true);
         boutonValiderEtape.setText("Commencer le jeu");
         panneau2.getChildren().remove(1);
-        texteEtape(false);
+        texteEtape();
     }
 
 
@@ -247,10 +258,10 @@ public class Jeu extends Scene {
         }
     }
 
-    public void texteEtape(boolean nouveau) {
+    public void texteEtape() {
         //Cette méthode permet de créer un texte en fonction du numéro de l'étape
         if (numeroEtape == 1) {
-            if (nouveau) {
+            if (texteEtape == null) {
                 Font font = Font.font("Segoe UI", FontWeight.BOLD, 25); //Permet de modifier la police
                 Font font1 = Font.font("Segoe UI", 15);
                 texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
@@ -357,9 +368,12 @@ public class Jeu extends Scene {
     public void afficherPlateauJeu() {
         //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
         //Permet d'afficher l'explication de l'étape n°1
-        texteEtape(true);
-        //Permet d'effacer l'Arraylist listrImages
+        //texteEtape();
+        panneauPrincipal.getChildren().removeAll(listeCarreNoir);
+        panneauPrincipal.getChildren().removeAll(listeImages);
+        listeCarreNoir.clear();
         listeImages.clear();
+        //Permet d'effacer l'Arraylist listrImages
         //Permet de rendre le bouton 'Valider étape' cliquable
         boutonValiderEtape.setDisable(false);
         /*
@@ -395,6 +409,8 @@ public class Jeu extends Scene {
                 carre.setStroke(Color.BLACK);
                 carre.setStrokeWidth(0.5);
                 panneauPrincipal.getChildren().add(carre);
+                listeCarreNoir.add(carre);
+
                 //On regarde si la case est de type roche
                 if (getPlateau().cases[i][j].getContenu().getNom().equals("Roche")) {
                     ImageView imageView = new ImageView(roche); //on créé une image roche
@@ -474,7 +490,7 @@ public class Jeu extends Scene {
                 return IMG_LOUP;
             }
             default -> {
-                return IMG_ROCHER;
+                return null;
             }
         }
     }
@@ -482,6 +498,10 @@ public class Jeu extends Scene {
     public Scene getMainScene(){
         return this.mainScene;
     }
+
+
+
+
 
 
 

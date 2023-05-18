@@ -21,6 +21,8 @@ public class Controleur {
     private boolean joue = false;
     private boolean sortieCree = false;
 
+    private int[] caseSortie = new int[2];
+
 
     public Controleur(Jeu jeu){
         this.plateau = null;
@@ -138,7 +140,7 @@ public class Controleur {
             @Override
             public void handle(ActionEvent actionEvent) {
                 //On supprime tout du panneau principal
-                jeu.getPanneauPrincipale().getChildren().clear();
+                //jeu.getPanneauPrincipale().getChildren().clear();
                 //On initie un nouveau plateau en mémoire
                 plateau = new Plateau(jeu.getChoixNbLignes(), jeu.getChoixNbColonnes());
                 //On crée le plateau
@@ -158,7 +160,7 @@ public class Controleur {
             public void handle(ActionEvent actionEvent) {
                 if (jeu.getNumeroEtape() == 1) {
                     //Passage à l'étape n°2
-                    jeu.etape2();
+                    jeu.etape2(false);
                 } else if (jeu.getNumeroEtape() == 2) {
                     //Passage à l'étape n°3
                     jeu.etape3();
@@ -179,13 +181,23 @@ public class Controleur {
                 if (jeu.getNumeroEtape() == 2){
                     jeu.etape1(true);
                 } else if (jeu.getNumeroEtape() == 3){
-                    jeu.etape2();
+                    jeu.etape2(true);
                 } else if (jeu.getNumeroEtape() == 4){
                     jeu.etape3();
                 }
             }
         });
     }
+
+    public void setSortie(int i, int j){
+        caseSortie[0] = i;
+        caseSortie[1] = j;
+    }
+
+    public boolean sortieBienCree(){
+        return sortieCree;
+    }
+
 
 
 
