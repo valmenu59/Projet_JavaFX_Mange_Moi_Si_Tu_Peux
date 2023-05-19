@@ -63,6 +63,7 @@ public class Controleur {
                         sortieCree = true;
                         //On remplace l'image roche par une image herbe
                         img.setImage(herbe);
+                        setCaseSortie(i,j);
                         //La case sélectionnée devient de type herbe
                         Controleur.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
                         //Permet d'activer le bouton valider
@@ -147,6 +148,7 @@ public class Controleur {
                 plateau.creerPlateau();
                 //Permet de visualiser le plateau sur JavaFX
                 jeu.afficherPlateauJeu();
+                sortieCree = false;
             }
         });
     }
@@ -173,6 +175,17 @@ public class Controleur {
         });
     }
 
+    public void boutonCreerLabyrinthe(Button b){
+        b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                plateau.creerLabyrinthe();
+                plateau.printMatrices();
+                jeu.mettreAJourAffichagePlateau();
+            }
+        });
+    }
+
 
     public void retournerEtapePrecedente(Button b){
         b.setOnAction(new EventHandler<ActionEvent>() {
@@ -189,9 +202,13 @@ public class Controleur {
         });
     }
 
-    public void setSortie(int i, int j){
+    public void setCaseSortie(int i, int j){
         caseSortie[0] = i;
         caseSortie[1] = j;
+    }
+
+    public int[] getCaseSortie(){
+        return caseSortie;
     }
 
     public boolean sortieBienCree(){

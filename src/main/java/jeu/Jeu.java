@@ -46,11 +46,12 @@ public class Jeu extends Scene {
     private double taille;
     private ChoiceBox<Integer> choixNblignes;
     private ChoiceBox<Integer> choixNbColonnes;
-    private ArrayList<Node> listeMenuDeroulantetLabelEtape1 = new ArrayList<>();
+    private final ArrayList<Node> listeMenuDeroulantetLabelEtape1 = new ArrayList<>();
     private AnimationTimer tempsJeu;
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
     private Button boutonRetour;
+    private Button boutonCreerLabyrinthe;
     private Text texteEtape = null;
     private Text texteExplicationEtape = null;
     //private final ArrayList<Label> listeLabel = new ArrayList<>();
@@ -128,6 +129,7 @@ public class Jeu extends Scene {
             panneau2.getChildren().addAll(1,listeMenuDeroulantetLabelEtape1);
             panneau2.getChildren().add(5,boutonCreerPlateau);
             boutonValiderEtape.setDisable(false);
+            boutonRetour.setDisable(true);
         }
 
     }
@@ -138,7 +140,11 @@ public class Jeu extends Scene {
     public void etape2(boolean retour) {
         //Passage à l'étape 2
         this.numeroEtape = 2;
+        //Permet de placer des rectangles rouges transparants
+        placerRectanglesRougesTransparants();
         boutonRetour.setDisable(false);
+        //Permet d'afficher le texte sur le panneau principal
+        texteEtape();
         if (controleur.sortieBienCree()) {
             boutonValiderEtape.setDisable(false);
         } else {
@@ -149,14 +155,14 @@ public class Jeu extends Scene {
             //Avant on supprime tout ce qu'on a plus besoin
             panneau2.getChildren().removeAll(listeMenuDeroulantetLabelEtape1);
             panneau2.getChildren().remove(boutonCreerPlateau);
+        } else {
+            panneau2.getChildren().remove(boutonCreerLabyrinthe);
         }
         //On vide les 2 ArrayList
         //listeLabel.clear();
         //listeDeListeDeroulant.clear();
-        //Permet de placer des rectangles rouges transparants
-        placerRectanglesRougesTransparants();
-        //Permet d'afficher le texte sur le panneau principal
-        texteEtape();
+
+
     }
 
     public void etape3() {
@@ -167,9 +173,9 @@ public class Jeu extends Scene {
         changerActionCaseSortie();
         placerRectanglesRougesTransparants();
         texteEtape();
-        Button boutonCreerLabyrinthe = new Button("Générer un labyrinthe aléatoire");
+        boutonCreerLabyrinthe = new Button("Générer un labyrinthe aléatoire");
+        controleur.boutonCreerLabyrinthe(boutonCreerLabyrinthe);
         panneau2.getChildren().add(1,boutonCreerLabyrinthe);
-
     }
 
     public void etape4(){
@@ -251,7 +257,7 @@ public class Jeu extends Scene {
                 if (i == 0 || j == 0 || i == getPlateau().getLignes() - 1 || j == getPlateau().getColonnes() - 1){
                     if (getPlateau().cases[i][j].getContenu().getNom().equals("Herbe")){
                         ImageView img = listeImages.get(i * getPlateau().getColonnes() + j);
-                        controleur.remplacerTypeTerrain(img, false,true);
+                        controleur.remplacerTypeTerrain(img, true,true);
                     }
                 }
             }
@@ -444,6 +450,43 @@ public class Jeu extends Scene {
 
 
 
+
+    public void mettreAJourAffichagePlateau(){
+        Image herbe = creerImage(getSource("herbe"));
+        Image roche = creerImage(getSource("roche"));
+        Image cactus = creerImage(getSource("cactus"));
+        Image marguerite = creerImage(getSource("marguerite"));
+        Image mouton = creerImage(getSource("mouton"));
+        Image loup = creerImage(getSource("loup"));
+        Image terre = creerImage(getSource("terre"));
+        for (int i=0; i < getPlateau().getLignes(); i++){
+            for (int j=0; j < getPlateau().getColonnes(); j++){
+                ImageView img = getImageView(i,j);
+                if (getPlateau().cases[i][j].getContenu() instanceof Roche){
+                    img.setImage(roche);
+                } else if (getPlateau().cases[i][j].getContenu() instanceof Herbe){
+                    img.setImage(herbe);
+                } else if (getPlateau().cases[i][j].getContenu() instanceof Cactus){
+                    img.setImage(cactus);
+                } else if (getPlateau().cases[i][j].getContenu() instanceof Marguerite){
+                    img.setImage(marguerite);
+                } else {
+                    img.setImage(terre);
+                }
+
+                if (getPlateau().cases[i][j].animalPresent()){
+                    if (getPlateau().cases[i][j].getAnimal() instanceof Loup){
+                        img.setImage(loup);
+                    } else {
+                        img.setImage(mouton);
+                    }
+                }
+            }
+        }
+    }
+
+
+
     public int getNumeroEtape(){
         return this.numeroEtape;
     }
@@ -489,10 +532,17 @@ public class Jeu extends Scene {
             case "loup" -> {
                 return IMG_LOUP;
             }
+            case "terre" -> {
+                return IMG_TERRE;
+            }
             default -> {
                 return null;
             }
         }
+    }
+
+    public ImageView getImageView(int i, int j){
+        return listeImages.get(i * getPlateau().getColonnes() + j );
     }
 
     public Scene getMainScene(){

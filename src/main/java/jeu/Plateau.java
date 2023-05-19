@@ -19,7 +19,7 @@ public class Plateau {
         this.colonnes = l;
     }
 
-    /*
+
     public void creerPlateau(){
         //Permet d'initialiser le plateau
         this.cases = new Case[this.lignes][this.colonnes];
@@ -33,23 +33,23 @@ public class Plateau {
             }
         }
     }
-*/
 
 
 
 
-    public void creerPlateau() {
-        this.cases = new Case[lignes][colonnes];
+
+    public void creerLabyrinthe() {
+        //this.cases = new Case[lignes][colonnes];
 
         // Initialisation du labyrinthe avec des roches en bordure et de l'herbe à l'intérieur
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
-                if (i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1) {
-                    this.cases[i][j] = new Case(new Roche(), null);
-                } else if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
-                    this.cases[i][j] = new Case(new Herbe(), null);
-                } else {
-                    this.cases[i][j] = new Case(new Roche(), null);
+                //if (i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1) {
+                   // this.cases[i][j] = new Case(new Roche(), null);
+                if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
+                    this.cases[i][j].setContenuPlante(new Herbe());
+                } else if (!(i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1)) {
+                    this.cases[i][j].setContenuGeneral(new Roche());
                 }
             }
         }
