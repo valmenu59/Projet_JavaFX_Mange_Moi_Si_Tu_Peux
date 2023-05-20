@@ -1,5 +1,9 @@
 package jeu;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class Plateau {
@@ -8,6 +12,7 @@ public class Plateau {
     private int lignes;
 
     protected Case[][] cases;
+    private int[] caseSortie = new int[2];
 
     ArrayList<int[]> casesPlante = new ArrayList<>();
     ArrayList<int[]> listeCasePassees = new ArrayList<>();
@@ -78,15 +83,54 @@ public class Plateau {
         }
 
 
-        System.out.println(verifPlateauCorrect(0,1));
-        /*
-        if (!verifPlateauCorrect(0,1)) {
+        if (lignes % 2 == 0){
+            for (int j = 0; j < colonnes; j++){
+                this.cases[lignes - 1][j].setContenuGeneral(new Roche());
+            }
+        }
+        if (colonnes % 2 == 0){
+            for (int i = 0; i < lignes; i++){
+                this.cases[i][colonnes - 1].setContenuGeneral(new Roche());
+            }
+        }
+
+        if (caseSortie[0] == 0 || caseSortie[0] == lignes - 1) {
+            int startRow = Math.max(0, caseSortie[0] - 1);
+            int endRow = Math.min(lignes - 1, caseSortie[0] + 1);
+            int column = caseSortie[1];
+
+            for (int i = startRow; i <= endRow; i++) {
+                this.cases[i][column].setContenuPlante(new Herbe());
+            }
+            if (caseSortie[0] == 0){
+                this.cases[getCaseSortie()[0] + 2][getCaseSortie()[1]].setContenuPlante(new Herbe());
+            } else {
+                this.cases[getCaseSortie()[0] - 2][getCaseSortie()[1]].setContenuPlante(new Herbe());
+            }
+        } else {
+            int row = caseSortie[0];
+            int startColumn = Math.max(0, caseSortie[1] - 1);
+            int endColumn = Math.min(colonnes - 1, caseSortie[1] + 1);
+
+            for (int j = startColumn; j <= endColumn; j++) {
+                this.cases[row][j].setContenuPlante(new Herbe());
+            }
+            if (caseSortie[1] == 0){
+                this.cases[getCaseSortie()[0]][getCaseSortie()[1] + 2].setContenuPlante(new Herbe());
+            } else {
+                this.cases[getCaseSortie()[0]][getCaseSortie()[1] - 2].setContenuPlante(new Herbe());
+            }
+        }
+
+        if (!verifPlateauCorrect()) {
             for (int[] c : casesPlante) {
                 this.cases[c[0]][c[1]].setContenuGeneral(new Roche());
             }
         }
+        System.out.println(verifPlateauCorrect());
 
-         */
+
+
 
     }
 
@@ -138,7 +182,7 @@ public class Plateau {
 
 
 
-    public boolean verifPlateauCorrect(int iSortie, int jSortie){
+    public boolean verifPlateauCorrect(){
         //D'abord on stocke dans une liste toutes les cases passées
         casesPlante.clear();
         listeCasePassees.clear();
@@ -147,8 +191,8 @@ public class Plateau {
         completerListeCasesPlante();
         //On supprime l'autre liste tous les éléments
         //Maintenant on stocke dans une autre liste toutes les cases qui sont passables
-        int iCourant = iSortie;
-        int jCourant = jSortie;
+        int iCourant = this.getCaseSortie()[0];
+        int jCourant = this.getCaseSortie()[1];
 
 
         actionsCaseActuelle(iCourant, jCourant);
@@ -315,6 +359,15 @@ public class Plateau {
         return this.cases[i][j];
     }
 
+    public void setCaseSortie(int i, int j){
+        caseSortie[0] = i;
+        caseSortie[1] = j;
+    }
+
+    public int[] getCaseSortie(){
+        return caseSortie;
+    }
+
 
 
 
@@ -325,6 +378,28 @@ public class Plateau {
 
     public void setLignes(int l){
         this.lignes = l;
+    }
+
+
+    public void sauvegarderPlateau(){
+        FileOutputStream fichier = null;
+        try {
+            fichier = new FileOutputStream("/Sauvegardes/sauvegardePlateau");
+            ObjectOutputStream objetFichier = new ObjectOutputStream(fichier);
+            objetFichier.writeObject(this); // Sauvegarde de l'objet "this" (le plateau)
+            objetFichier.close(); // Fermeture de ObjectOutputStream
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Assurez-vous de fermer le FileOutputStream après utilisation
+            if (fichier != null) {
+                try {
+                    fichier.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 

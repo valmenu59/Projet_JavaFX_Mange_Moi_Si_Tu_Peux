@@ -2,18 +2,19 @@ package jeu;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+
+import menu.Menu;
 
 public class Controleur {
 
-    protected Plateau plateau;
+    //protected Plateau plateau;
     protected Jeu jeu;
+    protected AffichageJeu affichageJeu;
 
     private boolean moutonCree = false;
     private boolean loupCree = false;
@@ -21,12 +22,13 @@ public class Controleur {
     private boolean joue = false;
     private boolean sortieCree = false;
 
-    private int[] caseSortie = new int[2];
 
 
-    public Controleur(Jeu jeu){
-        this.plateau = null;
-        this.jeu = jeu;
+
+    public Controleur(AffichageJeu affichageJeu){
+        //this.plateau = null;
+        this.jeu = new Jeu();
+        this.affichageJeu = affichageJeu;
     }
 
 
@@ -41,92 +43,105 @@ public class Controleur {
                 double x = img.getX();
                 double y = img.getY();
                 //Cette méthode permet de convertir les positions x et y en matrice[i][j]
-                int[] liste = jeu.retrouverPosIetJ(x, y);
+                int[] liste = affichageJeu.retrouverPosIetJ(x, y);
                 int j = liste[0];
                 int i = liste[1];
 
                 //On initie toutes les images à partir de la source
 
-                Image herbe = jeu.creerImage(jeu.getSource("herbe"));
-                Image roche = jeu.creerImage(jeu.getSource("roche"));
-                Image cactus = jeu.creerImage(jeu.getSource("cactus"));
-                Image marguerite = jeu.creerImage(jeu.getSource("marguerite"));
-                Image mouton = jeu.creerImage(jeu.getSource("mouton"));
-                Image loup = jeu.creerImage(jeu.getSource("loup"));
+                Image herbe = affichageJeu.creerImage(affichageJeu.getSource("herbe"));
+                Image roche = affichageJeu.creerImage(affichageJeu.getSource("roche"));
+                Image cactus = affichageJeu.creerImage(affichageJeu.getSource("cactus"));
+                Image marguerite = affichageJeu.creerImage(affichageJeu.getSource("marguerite"));
+                Image mouton = affichageJeu.creerImage(affichageJeu.getSource("mouton"));
+                Image loup = affichageJeu.creerImage(affichageJeu.getSource("loup"));
 
 
 
                 //Ne marche qu'à l'étape n°2
-                if (jeu.getNumeroEtape() == 2 && remplacerRocheParHerbe) {
+                if (affichageJeu.getNumeroEtape() == 2 && remplacerRocheParHerbe) {
                     //si la sortie n'est pas crée
                     if (!(sortieCree)) {
+                        getPlateau().setCaseSortie(i,j);
                         sortieCree = true;
+                        remplacerTypeTerrain(img, true, true);
                         //On remplace l'image roche par une image herbe
                         img.setImage(herbe);
-                        setCaseSortie(i,j);
                         //La case sélectionnée devient de type herbe
-                        Controleur.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
+                        getCase(i,j).setContenuGeneral(new Herbe());
                         //Permet d'activer le bouton valider
-                        jeu.getBoutonValiderEtape().setDisable(false);
+                        affichageJeu.getBoutonValiderEtape().setDisable(false);
                         //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
-                    } else if (sortieCree && plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
+                    } else if (sortieCree && getCase(i,j).getContenu().getNom().equals("Herbe")) {
                         //Même principe qu'au dessus
                         sortieCree = false;
+                        remplacerTypeTerrain(img,true,false);
                         img.setImage(roche);
-                        plateau.cases[i][j].setContenuGeneral(new Roche());
-                        jeu.getBoutonValiderEtape().setDisable(true);
+                        getCase(i,j).setContenuGeneral(new Roche());
+                        affichageJeu.getBoutonValiderEtape().setDisable(true);
                     }
                 }
                 //Ne marche qu'à l'étape n°3
-                else if (jeu.getNumeroEtape() == 3 && !remplacerRocheParHerbe) {
-                    if (Controleur.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")) {
+                else if (affichageJeu.getNumeroEtape() == 3 && !remplacerRocheParHerbe) {
+                    if (getCase(i,j).getContenu().getNom().equals("Herbe")) {
                         img.setImage(cactus);
-                        Controleur.this.plateau.cases[i][j].setContenuGeneral(new Cactus());
-                    } else if (Controleur.this.plateau.cases[i][j].getContenu().getNom().equals("Cactus")) {
+                        getCase(i,j).setContenuGeneral(new Cactus());
+                    } else if (getCase(i,j).getContenu().getNom().equals("Cactus")) {
                         img.setImage(marguerite);
-                        Controleur.this.plateau.cases[i][j].setContenuGeneral(new Marguerite());
-                    } else if (Controleur.this.plateau.cases[i][j].getContenu().getNom().equals("Marguerite")) {
+                        getCase(i,j).setContenuGeneral(new Marguerite());
+                    } else if (getCase(i,j).getContenu().getNom().equals("Marguerite")) {
                         if (isSortie) {
                             img.setImage(herbe);
-                            Controleur.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
+                            getCase(i,j).setContenuGeneral(new Herbe());
                         } else {
                             img.setImage(roche);
-                            Controleur.this.plateau.cases[i][j].setContenuGeneral(new Roche());
+                            getCase(i,j).setContenuGeneral(new Roche());
                         }
                     } else {
                         img.setImage(herbe);
-                        Controleur.this.plateau.cases[i][j].setContenuGeneral(new Herbe());
+                        getCase(i,j).setContenuGeneral(new Herbe());
+                    }
+                    affichageJeu.texteAlerteLabyrintheImparfait();
+
+                    if (getPlateau().verifPlateauCorrect()){
+                        affichageJeu.getBoutonValiderEtape().setDisable(false);
+                        if (affichageJeu.getPanneauSecondaire().getChildren().size() == 6){
+                            affichageJeu.getPanneauSecondaire().getChildren().remove(5);
+                        }
+                    } else {
+                        affichageJeu.getBoutonValiderEtape().setDisable(true);
+                        affichageJeu.getPanneauSecondaire().getChildren().add(affichageJeu.getTexteAlerteLabyrintheImparfait());
                     }
                 }
 
-                else if (jeu.getNumeroEtape() == 4 && !remplacerRocheParHerbe) {
-                    if (Controleur.this.plateau.cases[i][j].getContenu() instanceof Plante){
+                else if (affichageJeu.getNumeroEtape() == 4 && !remplacerRocheParHerbe) {
+                    if (getCase(i,j).getContenu() instanceof Plante){
                         if (!moutonCree && !loupCree) {
                             img.setImage(mouton);
-                            Controleur.this.plateau.cases[i][j].setAnimal(new Mouton());
+                            getCase(i,j).setAnimal(new Mouton());
                             moutonCree = true;
                         }
                         else if (!loupCree) {
                             img.setImage(loup);
-                            Controleur.this.plateau.cases[i][j].setAnimal(new Loup());
+                            getCase(i,j).setAnimal(new Loup());
                             loupCree = true;
-                        } else if (Controleur.this.plateau.cases[i][j].animalPresent()) {
-                            if (Controleur.this.plateau.cases[i][j].getContenu().getNom().equals("Herbe")){
+                        } else if (getCase(i,j).animalPresent()) {
+                            if (getCase(i,j).getContenu().getNom().equals("Herbe")){
                                 img.setImage(herbe);
-                            } else if (Controleur.this.plateau.cases[i][j].getContenu().getNom().equals("Cactus")){
+                            } else if (getCase(i,j).getContenu().getNom().equals("Cactus")){
                                 img.setImage(cactus);
                             } else {
                                 img.setImage(marguerite);
                             }
-                            Controleur.this.plateau.cases[i][j].removeAnimal();
+                            getCase(i,j).removeAnimal();
                         } else if (loupCree && !moutonCree){
                             img.setImage(mouton);
-                            Controleur.this.plateau.cases[i][j].setAnimal(new Mouton());
+                            getCase(i,j).setAnimal(new Mouton());
                             moutonCree = true;
                         }
-                        loupCree = plateau.verifPresenceAnimal("Loup");
-                        moutonCree = plateau.verifPresenceAnimal("Mouton");
-                        jeu.getBoutonValiderEtape().setDisable(!moutonCree || !loupCree);
+                        loupCree = getPlateau().verifPresenceAnimal("Loup");
+                        moutonCree = getPlateau().verifPresenceAnimal("Mouton");
+                        affichageJeu.getBoutonValiderEtape().setDisable(!moutonCree || !loupCree);
                     }
                 }
             }
@@ -143,11 +158,11 @@ public class Controleur {
                 //On supprime tout du panneau principal
                 //jeu.getPanneauPrincipale().getChildren().clear();
                 //On initie un nouveau plateau en mémoire
-                plateau = new Plateau(jeu.getChoixNbLignes(), jeu.getChoixNbColonnes());
+                jeu.plateau = new Plateau(affichageJeu.getChoixNbLignes(), affichageJeu.getChoixNbColonnes());
                 //On crée le plateau
-                plateau.creerPlateau();
+                getPlateau().creerPlateau();
                 //Permet de visualiser le plateau sur JavaFX
-                jeu.afficherPlateauJeu();
+                affichageJeu.afficherPlateauJeu();
                 sortieCree = false;
             }
         });
@@ -160,16 +175,16 @@ public class Controleur {
 
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (jeu.getNumeroEtape() == 1) {
+                if (affichageJeu.getNumeroEtape() == 1) {
                     //Passage à l'étape n°2
-                    jeu.etape2(false);
-                } else if (jeu.getNumeroEtape() == 2) {
+                    affichageJeu.etape2(false);
+                } else if (affichageJeu.getNumeroEtape() == 2) {
                     //Passage à l'étape n°3
-                    jeu.etape3();
-                } else if (jeu.getNumeroEtape() == 3){
-                    jeu.etape4();
-                } else if (jeu.getNumeroEtape() == 4){
-                    //
+                    affichageJeu.etape3();
+                } else if (affichageJeu.getNumeroEtape() == 3){
+                    affichageJeu.etape4();
+                } else if (affichageJeu.getNumeroEtape() == 4){
+                    affichageJeu.etapeJeu();
                 }
             }
         });
@@ -179,9 +194,9 @@ public class Controleur {
         b.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                plateau.creerLabyrinthe();
-                plateau.printMatrices();
-                jeu.mettreAJourAffichagePlateau();
+                getPlateau().creerLabyrinthe();
+                getPlateau().printMatrices();
+                affichageJeu.mettreAJourAffichagePlateau();
             }
         });
     }
@@ -191,33 +206,40 @@ public class Controleur {
         b.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (jeu.getNumeroEtape() == 2){
-                    jeu.etape1(true);
-                } else if (jeu.getNumeroEtape() == 3){
-                    jeu.etape2(true);
-                } else if (jeu.getNumeroEtape() == 4){
-                    jeu.etape3();
+                if (affichageJeu.getNumeroEtape() == 2){
+                    affichageJeu.etape1(true);
+                } else if (affichageJeu.getNumeroEtape() == 3){
+                    affichageJeu.etape2(true);
+                } else if (affichageJeu.getNumeroEtape() == 4){
+                    affichageJeu.etape3();
                 }
             }
         });
     }
 
-    public void setCaseSortie(int i, int j){
-        caseSortie[0] = i;
-        caseSortie[1] = j;
+    public void retournerAuMenu(Button b, Stage stage){
+        b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Menu menu = new Menu(stage);
+                stage.setScene(menu);
+            }
+        });
     }
 
-    public int[] getCaseSortie(){
-        return caseSortie;
-    }
+
 
     public boolean sortieBienCree(){
         return sortieCree;
     }
 
+    public Plateau getPlateau(){
+        return this.jeu.plateau;
+    }
 
-
-
+    public Case getCase(int i, int j){
+        return this.jeu.plateau.cases[i][j];
+    }
 
 
 

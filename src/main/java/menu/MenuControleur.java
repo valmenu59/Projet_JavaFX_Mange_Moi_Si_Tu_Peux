@@ -4,13 +4,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import jeu.Jeu;
+import jeu.AffichageJeu;
 import parametres.Parametres;
 
 public class MenuControleur {
 
     private Menu menu;
-    private Jeu jeu;
+    private AffichageJeu affichageJeu;
 
 
     public MenuControleur(Menu m){
@@ -38,8 +38,8 @@ public class MenuControleur {
             public void handle(ActionEvent actionEvent) {
                 //Jeu jeu = new Jeu();
                 //jeu.getMainStage();
-                Jeu jeu = new Jeu(stage);
-                stage.setScene(jeu);
+                AffichageJeu affichageJeu = new AffichageJeu(stage);
+                stage.setScene(affichageJeu);
             }
         });
     }
