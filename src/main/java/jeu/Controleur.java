@@ -162,7 +162,7 @@ public class Controleur {
                 //On crée le plateau
                 getPlateau().creerPlateau();
                 //Permet de visualiser le plateau sur JavaFX
-                affichageJeu.afficherPlateauJeu();
+                affichageJeu.afficherPlateauJeu(true);
                 sortieCree = false;
             }
         });
@@ -223,6 +223,23 @@ public class Controleur {
             public void handle(ActionEvent actionEvent) {
                 Menu menu = new Menu(stage);
                 stage.setScene(menu);
+            }
+        });
+    }
+
+    public void mettreEnPause(Button b){
+        b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (affichageJeu.estBienEnPause()){
+                    b.setText("Marche");
+                    affichageJeu.mettreEnPauseOuPas(false);
+                    affichageJeu.getBoucleJeu().stop();
+                } else {
+                    b.setText("Pause");
+                    affichageJeu.mettreEnPauseOuPas(true);
+                    affichageJeu.getBoucleJeu().start();
+                }
             }
         });
     }

@@ -1,27 +1,26 @@
 package jeu;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
-public class Plateau {
+public class Plateau implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private int colonnes;
     private int lignes;
 
     protected Case[][] cases;
-    private int[] caseSortie = new int[2];
+    private final int[] caseSortie = new int[2];
 
-    ArrayList<int[]> casesPlante = new ArrayList<>();
-    ArrayList<int[]> listeCasePassees = new ArrayList<>();
-    Stack<int[]> chemin = new Stack<>();
+    private transient ArrayList<int[]> casesPlante = new ArrayList<>();
+    private transient ArrayList<int[]> listeCasePassees = new ArrayList<>();
+    private transient Stack<int[]> chemin = new Stack<>();
 
 
-    public Plateau(int c, int l){
-        this.lignes = c;
-        this.colonnes = l;
+    public Plateau(int l, int c){
+        this.lignes = l;
+        this.colonnes = c;
     }
 
 
@@ -52,7 +51,7 @@ public class Plateau {
                 //if (i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1) {
                    // this.cases[i][j] = new Case(new Roche(), null);
                 if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
-                    this.cases[i][j].setContenuPlante(new Herbe());
+                    this.cases[i][j].setPlanteRandom();
                 } else if (!(i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1)) {
                     this.cases[i][j].setContenuGeneral(new Roche());
                 }
@@ -100,12 +99,12 @@ public class Plateau {
             int column = caseSortie[1];
 
             for (int i = startRow; i <= endRow; i++) {
-                this.cases[i][column].setContenuPlante(new Herbe());
+                this.cases[i][column].setPlanteRandom();
             }
             if (caseSortie[0] == 0){
-                this.cases[getCaseSortie()[0] + 2][getCaseSortie()[1]].setContenuPlante(new Herbe());
+                this.cases[getCaseSortie()[0] + 2][getCaseSortie()[1]].setPlanteRandom();
             } else {
-                this.cases[getCaseSortie()[0] - 2][getCaseSortie()[1]].setContenuPlante(new Herbe());
+                this.cases[getCaseSortie()[0] - 2][getCaseSortie()[1]].setPlanteRandom();
             }
         } else {
             int row = caseSortie[0];
@@ -113,12 +112,12 @@ public class Plateau {
             int endColumn = Math.min(colonnes - 1, caseSortie[1] + 1);
 
             for (int j = startColumn; j <= endColumn; j++) {
-                this.cases[row][j].setContenuPlante(new Herbe());
+                this.cases[row][j].setPlanteRandom();
             }
             if (caseSortie[1] == 0){
-                this.cases[getCaseSortie()[0]][getCaseSortie()[1] + 2].setContenuPlante(new Herbe());
+                this.cases[getCaseSortie()[0]][getCaseSortie()[1] + 2].setPlanteRandom();
             } else {
-                this.cases[getCaseSortie()[0]][getCaseSortie()[1] - 2].setContenuPlante(new Herbe());
+                this.cases[getCaseSortie()[0]][getCaseSortie()[1] - 2].setPlanteRandom();
             }
         }
 
@@ -171,10 +170,10 @@ public class Plateau {
 
     private void supprimerObstacle(int i, int j, char orientation){
         switch (orientation){
-            case 'N' -> this.cases[i-1][j].setContenuGeneral(new Herbe());
-            case 'E' -> this.cases[i][j+1].setContenuGeneral(new Herbe());
-            case 'S' -> this.cases[i+1][j].setContenuGeneral(new Herbe());
-            case 'O' -> this.cases[i][j-1].setContenuGeneral(new Herbe());
+            case 'N' -> this.cases[i-1][j].setPlanteRandom();
+            case 'E' -> this.cases[i][j+1].setPlanteRandom();
+            case 'S' -> this.cases[i+1][j].setPlanteRandom();
+            case 'O' -> this.cases[i][j-1].setPlanteRandom();
         }
     }
 
@@ -335,8 +334,12 @@ public class Plateau {
             for (int j = 0; j < this.colonnes; j++) {
                 if (this.cases[i][j].getContenu().getNom().equals("Roche")) {
                     System.out.print("R" + "\t");
-                } else {
+                } else if (this.cases[i][j].getContenu() instanceof Herbe) {
                     System.out.print("H" + "\t");
+                } else if (this.cases[i][j].getContenu() instanceof Cactus){
+                    System.out.print("C" + "\t");
+                } else {
+                    System.out.print("M" + "\t");
                 }
             }
             System.out.println("");
@@ -368,6 +371,21 @@ public class Plateau {
         return caseSortie;
     }
 
+    /*
+    public void setCases(Case[][] case){
+        this.cases = case;
+    }
+
+     */
+
+
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject(); // Appel de la désérialisation par défaut
+        // Restaurer l'état des variables transitoires
+        cases = (Case[][]) in.readObject();
+    }
+
 
 
 
@@ -380,27 +398,13 @@ public class Plateau {
         this.lignes = l;
     }
 
-
-    public void sauvegarderPlateau(){
-        FileOutputStream fichier = null;
-        try {
-            fichier = new FileOutputStream("/Sauvegardes/sauvegardePlateau");
-            ObjectOutputStream objetFichier = new ObjectOutputStream(fichier);
-            objetFichier.writeObject(this); // Sauvegarde de l'objet "this" (le plateau)
-            objetFichier.close(); // Fermeture de ObjectOutputStream
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            // Assurez-vous de fermer le FileOutputStream après utilisation
-            if (fichier != null) {
-                try {
-                    fichier.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public void setCases(int i, int j, TypeTerrain t, Animal a){
+        this.cases[i][j].setContenuGeneral(t);
+        this.cases[i][j].setAnimal(a);
     }
+
+
+
 
 
 

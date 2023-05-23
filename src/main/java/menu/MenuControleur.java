@@ -38,7 +38,19 @@ public class MenuControleur {
             public void handle(ActionEvent actionEvent) {
                 //Jeu jeu = new Jeu();
                 //jeu.getMainStage();
-                AffichageJeu affichageJeu = new AffichageJeu(stage);
+                AffichageJeu affichageJeu = new AffichageJeu(stage,false);
+                stage.setScene(affichageJeu);
+            }
+        });
+    }
+
+    public void demarrerJeuViaSauvegarde(Button bouton, Stage stage){
+        bouton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                //Jeu jeu = new Jeu();
+                //jeu.getMainStage();
+                AffichageJeu affichageJeu = new AffichageJeu(stage,true);
                 stage.setScene(affichageJeu);
             }
         });

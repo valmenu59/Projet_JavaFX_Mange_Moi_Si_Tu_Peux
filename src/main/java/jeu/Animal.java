@@ -1,6 +1,8 @@
 package jeu;
 
-public abstract class Animal {
+import java.io.Serializable;
+
+public abstract class Animal implements Serializable {
     
     private String nom;
     private boolean passif;

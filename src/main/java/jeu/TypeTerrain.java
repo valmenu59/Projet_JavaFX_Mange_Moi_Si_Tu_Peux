@@ -1,6 +1,8 @@
 package jeu;
 
-public abstract class TypeTerrain {
+import java.io.Serializable;
+
+public abstract class TypeTerrain implements Serializable {
 
     private String nom;
 

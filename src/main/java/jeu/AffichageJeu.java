@@ -53,6 +53,7 @@ public class AffichageJeu extends Scene {
     private Button boutonRetour;
     private Button boutonCreerLabyrinthe;
     private Button boutonRetourMenu;
+    private Button boutonPause;
     private Text texteEtape = null;
     private Text texteExplicationEtape = null;
     private Text texteAlerteLabyrintheImparfait = null;
@@ -64,6 +65,9 @@ public class AffichageJeu extends Scene {
     private double xDepart;
     private double yDepart;
     private Menu menu;
+    private AnimationTimer boucleJeu;
+
+    private boolean estEnPause;
 
     private int numeroEtape;
 
@@ -75,7 +79,7 @@ public class AffichageJeu extends Scene {
 
 
     //public Jeu(Scene mainScene, AnchorPane panneau) {
-    public AffichageJeu(Stage stage){
+    public AffichageJeu(Stage stage, boolean vientDeLaSauvegarde){
         super(new AnchorPane(), 1280,720);
         panneauTemporaire = (AnchorPane) getRoot();
         mainStage = stage;
@@ -88,8 +92,17 @@ public class AffichageJeu extends Scene {
         //Permet de créer la base pour les autres éléments visuels
         creerFenetreJeu(panneauTemporaire);
 
-        //On va vers l'étape n°1
-        etape1(false);
+        //On initie un plateau vide
+        controleur = new Controleur(this);
+
+
+        if (vientDeLaSauvegarde){
+            this.controleur.jeu.reprendreSauvegarde();
+            afficherPlateauJeu(false);
+        } else {
+            //On va vers l'étape n°1
+            etape1(false);
+        }
 
     }
 
@@ -105,8 +118,7 @@ public class AffichageJeu extends Scene {
             Text texte = new Text("Options");
             //Cette méthode permet le texte du jeu
 
-            //On initie un plateau vide
-            controleur = new Controleur(this);
+
             //On rajoute le texte dans panneau2
             panneau2.getChildren().add(texte);
             //Cette méthode permet de créer un menu déroulant avec un chiffre mini, maxi et celui affiché par défaut
@@ -204,7 +216,18 @@ public class AffichageJeu extends Scene {
     }
 
     public void etapeJeu(){
-        getPlateau().sauvegarderPlateau();
+        this.controleur.jeu.sauvegarderPlateau();
+        numeroEtape = 5;
+        texteEtape();
+        panneau2.getChildren().remove(boutonRetour);
+        panneau2.getChildren().remove(boutonValiderEtape);
+        estEnPause = false;
+
+        boutonPause = new Button("Pause");
+        controleur.mettreEnPause(boutonPause);
+        panneau2.getChildren().add(boutonPause);
+
+        boucleJeu();
     }
 
 
@@ -256,7 +279,7 @@ public class AffichageJeu extends Scene {
             listeRectangleRougeTransparant.clear();
             for (int i = 0; i < getPlateau().getLignes(); i++) {
                 for (int j = 0; j < getPlateau().getColonnes(); j++) {
-
+                    //Non fini
                 }
             }
         }
@@ -284,6 +307,9 @@ public class AffichageJeu extends Scene {
             }
         }
     }
+
+
+
 
     public void texteEtape() {
         //Cette méthode permet de créer un texte en fonction du numéro de l'étape
@@ -319,7 +345,22 @@ public class AffichageJeu extends Scene {
             texteEtape.setText("Etape 4 : Placez le loup et le mouton dans le plateau du jeu");
             texteExplicationEtape.setText("Pour cette étape, cliquez sur le plateau du jeu où vous voulez placer votre loup et mouton." +"\n" +
                     "Il faut que ces 2 animaux soient au moins distancés de 4 cases. Une fois cette finie le jeu commencera si vous cliquez sur valider !");
+        } else if (numeroEtape == 5){
+            texteEtape.setText("Jeu en cours...");
+            texteExplicationEtape.setText("Maintenant laissons tourner la simulation !");
         }
+    }
+
+
+
+    public void boucleJeu(){
+        boucleJeu = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                System.out.println("je suis dans la boucle");
+            }
+        };
+        boucleJeu.start();
     }
 
 
@@ -392,7 +433,7 @@ public class AffichageJeu extends Scene {
         return image;
     }
 
-    public void afficherPlateauJeu() {
+    public void afficherPlateauJeu(boolean avecActionUtilisateur) {
         //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
         //Permet d'afficher l'explication de l'étape n°1
         //texteEtape();
@@ -402,30 +443,26 @@ public class AffichageJeu extends Scene {
         listeImages.clear();
         //Permet d'effacer l'Arraylist listrImages
         //Permet de rendre le bouton 'Valider étape' cliquable
-        boutonValiderEtape.setDisable(false);
-        /*
-        Tout ce qui en dessous permet de centrer le plateau du jeu pour que peu importe le nombre de lignes
-        et le nombre de colonnes le plateau soit centré et que la taille des cases s'adaptent pour que tout
-        soit directement visible
-         */
-        double x = (mainScene.getWidth() * 0.8) * 0.05;
-        double y = mainScene.getHeight() * 0.1;
-        if ((mainScene.getWidth() * 0.8 - 2 * x) / getPlateau().getColonnes() <=
-                (mainScene.getHeight() - 2 * y) / getPlateau().getLignes()) {
-            taille = (mainScene.getWidth() * 0.8 - 2 * x) / getPlateau().getColonnes();
-            y = (mainScene.getHeight() - taille * getPlateau().getLignes()) / 2;
-        } else {
-            taille = (mainScene.getHeight() - 2 * y) / getPlateau().getLignes();
-            x = (mainScene.getWidth() * 0.8 - taille * getPlateau().getColonnes()) / 2;
+        if (avecActionUtilisateur) {
+            boutonValiderEtape.setDisable(false);
         }
+
+        double[] position = taillePlateauEcran();
+        double x = position[0];
+        double y = position[1];
+
         xDepart = x;
         y += 50;
         yDepart = y;
 
         //Permet de récupérer les images dans le répertoire
-        Image roche = creerImage(IMG_ROCHER);
-        Image herbe = creerImage(IMG_HERBE);
-
+        Image roche = creerImage(getSource("roche"));
+        Image herbe = creerImage(getSource("herbe"));
+        Image cactus = creerImage(getSource("cactus"));
+        Image marguerite = creerImage(getSource("marguerite"));
+        Image mouton = creerImage(getSource("mouton"));
+        Image loup = creerImage(getSource("loup"));
+        Image terre = creerImage(getSource("terre"));
 
         //Maintenant on fait une double boucle pour créer un "tableau" en fonction du nombre de colonnes et lignes choisies
         for (int i = 0; i < getPlateau().getLignes(); i++) {
@@ -439,34 +476,64 @@ public class AffichageJeu extends Scene {
                 listeCarreNoir.add(carre);
 
                 //On regarde si la case est de type roche
-                if (getPlateau().cases[i][j].getContenu().getNom().equals("Roche")) {
+                if (getPlateau().cases[i][j].getContenu() instanceof Roche) {
                     ImageView imageView = new ImageView(roche); //on créé une image roche
                     imageView.setX(x);
                     imageView.setY(y);
                     //Le but est d'enlever les extrémités
-                    if (!((i == 0 && j == 0) || (i == 0 && j == getPlateau().getColonnes() - 1) ||
-                            (i == getPlateau().getLignes() - 1 && j == 0) || (i == getPlateau().getLignes() - 1 &&
-                            j == getPlateau().getColonnes() - 1))) {
-                        //remplacerRocheHerbe(imageView); //permet de rajouter une action
-                        controleur.remplacerTypeTerrain(imageView,true,false);
+                    if (avecActionUtilisateur) {
+                        if (!((i == 0 && j == 0) || (i == 0 && j == getPlateau().getColonnes() - 1) ||
+                                (i == getPlateau().getLignes() - 1 && j == 0) || (i == getPlateau().getLignes() - 1 &&
+                                j == getPlateau().getColonnes() - 1))) {
+                            //remplacerRocheHerbe(imageView); //permet de rajouter une action
+                            controleur.remplacerTypeTerrain(imageView, true, false);
+                        }
                     }
                     //rajoute imageView dans Arraylist
                     listeImages.add(imageView);
                     panneauPrincipal.getChildren().add(imageView); // on ajoute l'image dans panneauPrincipal
-                } else {
+                } else if (getCase(i,j).getContenu() instanceof Herbe) {
+                    mettreImageViewDansPlateau(x,y,avecActionUtilisateur,herbe);
+                    /*
                     ImageView imageView = new ImageView(herbe);
                     imageView.setX(x);
                     imageView.setY(y);
-                    controleur.remplacerTypeTerrain(imageView, false, false);
+                    if (avecActionUtilisateur) {
+                        controleur.remplacerTypeTerrain(imageView, false, false);
+                    }
                     //rajoute imageView dans Arraylist
                     listeImages.add(imageView);
                     panneauPrincipal.getChildren().add(imageView);
+
+                     */
+                } else if (getCase(i,j).getContenu() instanceof Cactus){
+                    mettreImageViewDansPlateau(x,y,avecActionUtilisateur,cactus);
+                } else if (getCase(i,j).getContenu() instanceof Marguerite){
+                    mettreImageViewDansPlateau(x,y,avecActionUtilisateur,marguerite);
+                }
+                if (getCase(i,j).animalPresent()){
+                    if (getCase(i,j).getAnimal() instanceof Mouton){
+                        mettreImageViewDansPlateau(x,y,avecActionUtilisateur,mouton);
+                    } else {
+                        mettreImageViewDansPlateau(x,y,avecActionUtilisateur,loup);
+                    }
                 }
                 x += taille; //permet d'avoir une cohérance visuelle
             }
             x = xDepart;
             y += taille; //on fait pareil pour l'axe des ordonnées
         }
+    }
+
+    public void mettreImageViewDansPlateau(double x, double y, boolean avecActionUtilisateur, Image objet){
+        ImageView imageView = new ImageView(objet);
+        imageView.setX(x);
+        imageView.setY(y);
+        if (avecActionUtilisateur) {
+            controleur.remplacerTypeTerrain(imageView, false, false);
+        }
+        listeImages.add(imageView);
+        panneauPrincipal.getChildren().add(imageView);
     }
 
 
@@ -504,6 +571,28 @@ public class AffichageJeu extends Scene {
                 }
             }
         }
+    }
+
+    public double[] taillePlateauEcran(){
+        /*
+        Tout ce qui en dessous permet de centrer le plateau du jeu pour que peu importe le nombre de lignes
+        et le nombre de colonnes le plateau soit centré et que la taille des cases s'adaptent pour que tout
+        soit directement visible
+         */
+        double[] tableau = new double[2];
+        double x = (mainScene.getWidth() * 0.8) * 0.05;
+        double y = mainScene.getHeight() * 0.1;
+        if ((mainScene.getWidth() * 0.8 - 2 * x) / getPlateau().getColonnes() <=
+                (mainScene.getHeight() - 2 * y) / getPlateau().getLignes()) {
+            taille = (mainScene.getWidth() * 0.8 - 2 * x) / getPlateau().getColonnes();
+            y = (mainScene.getHeight() - taille * getPlateau().getLignes()) / 2;
+        } else {
+            taille = (mainScene.getHeight() - 2 * y) / getPlateau().getLignes();
+            x = (mainScene.getWidth() * 0.8 - taille * getPlateau().getColonnes()) / 2;
+        }
+        tableau[0] = x;
+        tableau[1] = y;
+        return tableau;
     }
 
 
@@ -592,6 +681,18 @@ public class AffichageJeu extends Scene {
 
     public Text getTexteAlerteLabyrintheImparfait(){
         return this.texteAlerteLabyrintheImparfait;
+    }
+
+    public AnimationTimer getBoucleJeu(){
+        return this.boucleJeu;
+    }
+
+    public boolean estBienEnPause(){
+        return estEnPause;
+    }
+
+    public void mettreEnPauseOuPas(boolean b){
+        this.estEnPause = b;
     }
 
 

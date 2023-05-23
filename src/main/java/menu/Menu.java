@@ -12,6 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import jeu.Jeu;
 
 public class Menu extends Scene {
     private AnchorPane panneau;
@@ -34,7 +35,18 @@ public class Menu extends Scene {
         //demarrer = this.demarrerJeu(demarrer, panneau, mainScene);
         menuControleur.demarrerJeu(demarrer,stage);
         panneau.getChildren().add(demarrer);
-        Button parametre = this.bouton("Paramètres", 100.0, 350.0, Color.rgb(115, 115, 115));
+
+
+        Button reprendreSauvegarde = this.bouton("Reprendre la sauvegarde", 100.0, 350.0, Color.rgb(115,115,155));
+        menuControleur.demarrerJeuViaSauvegarde(reprendreSauvegarde, stage);
+        Jeu jeu = new Jeu();
+        panneau.getChildren().add(reprendreSauvegarde);
+        if (!jeu.cheminDaccesExisteBien()){
+            System.out.println("iciiiiiiiiii");
+            reprendreSauvegarde.setDisable(true);
+        }
+
+        Button parametre = this.bouton("Paramètres", 100.0, 500.0, Color.rgb(115, 115, 115));
         menuControleur.parametreJeu(parametre,stage);
         panneau.getChildren().add(parametre);
     }
