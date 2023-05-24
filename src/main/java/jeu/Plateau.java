@@ -374,11 +374,25 @@ public class Plateau implements Serializable {
         return caseSortie;
     }
 
+    public int[] getCaseMouton(){
+        for (int i =0; i < lignes; i++){
+            for (int j =0; j < colonnes; j++){
+                if (this.cases[i][j].animalPresent()){
+                    if (this.cases[i][j].getAnimal() instanceof Mouton){
+                        return new int[]{i,j};
+                    }
+                }
+            }
+        }
+        return new int[2];
+    }
+
 
 
     public int moutonMangePlante(int i, int j){
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
             if (this.cases[i][j].getContenu() instanceof Herbe){
+                System.out.println("icciiiiiiiiiiiiiiiiiiiiiiiiii");
                 this.cases[i][j].setContenuPlante(new Terre());
                 return 2;
             } else if (this.cases[i][j].getContenu() instanceof Cactus) {
@@ -422,14 +436,9 @@ public class Plateau implements Serializable {
         // mouton ont une distance Manhattan > 5
         if (animal.equals("Mouton")) {
             deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton());
-            if (jeu.getDeplacementMouton() == 0){
-                moutonMangePlante(posAnimal[0],posAnimal[1]);
-            }
         } else {
             deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup());
         }
-
-
     }
 
 

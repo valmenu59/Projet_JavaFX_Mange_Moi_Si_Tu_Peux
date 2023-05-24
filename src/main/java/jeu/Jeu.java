@@ -20,32 +20,32 @@ public class Jeu {
     public Jeu(){
         this.plateau = null;
         this.tours = null;
-        deplacementMouton = 3;
-        deplacementLoup = 2;
+        deplacementMouton = 2;
+        deplacementLoup = 3;
     }
 
 
     public void boucleJeu() {
 
-        int deplacementMouton = 2;
-        int deplacementLoup = 3;
 
         if (auTourDuMouton) {
             while (deplacementMouton > 0) {
-                this.plateau.deplacerAnimal("Mouton");
                 deplacementMouton--;
+                this.plateau.deplacerAnimal("Mouton");
                 if (deplacementMouton == 0) {
-                    deplacementMouton = 2;
+                    int[] caseM = plateau.getCaseMouton();
+                    int nbr = plateau.moutonMangePlante(caseM[0],caseM[1]);
+                    setDeplacementMouton(nbr);
                     auTourDuMouton = false;
                     break;
                 }
             }
         } else {
             while (deplacementLoup > 0) {
-                this.plateau.deplacerAnimal("Loup");
                 deplacementLoup--;
+                this.plateau.deplacerAnimal("Loup");
                 if (deplacementLoup == 0) {
-                    deplacementLoup = 3;
+                    reinitialiserDeplacementLoup();
                     auTourDuMouton = true;
                     break;
                 }
@@ -54,6 +54,7 @@ public class Jeu {
     }
 
     public int getDeplacementMouton(){
+        System.out.println("le déplacement du mouton est de :"+deplacementMouton);
         return this.deplacementMouton;
     }
 
@@ -61,8 +62,16 @@ public class Jeu {
         return this.deplacementLoup;
     }
 
-    public void reinitialiserDeplacementMouton(){
-        //à faire
+    public void setDeplacementMouton(int nbr){
+        this.deplacementMouton = nbr;
+    }
+
+    public void reinitialiserDeplacementLoup(){
+        this.deplacementLoup = 2;
+    }
+
+    public void estBienAuTourDuMouton(boolean b){
+        this.auTourDuMouton = b;
     }
 
 
