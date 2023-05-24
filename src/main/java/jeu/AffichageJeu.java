@@ -357,7 +357,15 @@ public class AffichageJeu extends Scene {
         boucleJeu = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                System.out.println("je suis dans la boucle");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    System.out.println("je suis dans la boucle");
+                    AffichageJeu.this.controleur.jeu.boucleJeu();
+                    mettreAJourAffichagePlateau();
+                }
             }
         };
         boucleJeu.start();

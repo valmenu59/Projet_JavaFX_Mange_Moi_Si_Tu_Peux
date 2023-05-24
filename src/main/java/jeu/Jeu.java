@@ -8,11 +8,61 @@ public class Jeu {
     protected Plateau plateau;
     protected NbTour tours;
 
+    private boolean auTourDuMouton = true;
+
+    private int deplacementMouton;
+    private int deplacementLoup;
+
+
+
 
 
     public Jeu(){
         this.plateau = null;
         this.tours = null;
+        deplacementMouton = 3;
+        deplacementLoup = 2;
+    }
+
+
+    public void boucleJeu() {
+
+        int deplacementMouton = 2;
+        int deplacementLoup = 3;
+
+        if (auTourDuMouton) {
+            while (deplacementMouton > 0) {
+                this.plateau.deplacerAnimal("Mouton");
+                deplacementMouton--;
+                if (deplacementMouton == 0) {
+                    deplacementMouton = 2;
+                    auTourDuMouton = false;
+                    break;
+                }
+            }
+        } else {
+            while (deplacementLoup > 0) {
+                this.plateau.deplacerAnimal("Loup");
+                deplacementLoup--;
+                if (deplacementLoup == 0) {
+                    deplacementLoup = 3;
+                    auTourDuMouton = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    public int getDeplacementMouton(){
+        return this.deplacementMouton;
+    }
+
+    public int getDeplacementLoup(){
+        return this.deplacementLoup;
+    }
+
+    public void reinitialiserDeplacementMouton(){
+        //à faire
     }
 
 

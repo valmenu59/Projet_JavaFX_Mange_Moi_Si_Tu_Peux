@@ -11,6 +11,7 @@ public class Plateau implements Serializable {
     private int lignes;
 
     protected Case[][] cases;
+    protected Jeu jeu;
     private final int[] caseSortie = new int[2];
 
     private transient ArrayList<int[]> casesPlante = new ArrayList<>();
@@ -21,6 +22,7 @@ public class Plateau implements Serializable {
     public Plateau(int l, int c){
         this.lignes = l;
         this.colonnes = c;
+        this.jeu = new Jeu();
     }
 
 
@@ -257,6 +259,7 @@ public class Plateau implements Serializable {
         for (int i=0; i < arr.size(); i++){
             if (l[0] == arr.get(i)[0] && l[1] == arr.get(i)[1]){
                 arr.remove(i);
+                break;
             }
         }
     }
@@ -371,37 +374,99 @@ public class Plateau implements Serializable {
         return caseSortie;
     }
 
-    /*
-    public void setCases(Case[][] case){
-        this.cases = case;
+
+
+    public int moutonMangePlante(int i, int j){
+        if (!(this.cases[i][j].getContenu() instanceof Terre)){
+            if (this.cases[i][j].getContenu() instanceof Herbe){
+                this.cases[i][j].setContenuPlante(new Terre());
+                return 2;
+            } else if (this.cases[i][j].getContenu() instanceof Cactus) {
+                this.cases[i][j].setContenuPlante(new Terre());
+                return 1;
+            } else {
+                this.cases[i][j].setContenuPlante(new Terre());
+                return 3;
+            }
+        } else {
+            return 2;
+        }
     }
 
-     */
-
-
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject(); // Appel de la désérialisation par défaut
-        // Restaurer l'état des variables transitoires
-        cases = (Case[][]) in.readObject();
-    }
 
 
 
 
 
-    public void setColonnes(int c){
-        this.lignes = c;
-    }
-
-    public void setLignes(int l){
-        this.lignes = l;
-    }
 
     public void setCases(int i, int j, TypeTerrain t, Animal a){
         this.cases[i][j].setContenuGeneral(t);
         this.cases[i][j].setAnimal(a);
     }
+
+
+    public void deplacerAnimal(String animal){
+        int[] posAnimal = new int[2];
+        //Détection de l'animal
+        for (int i = 0; i < lignes; i++){
+            for (int j = 0; j < colonnes; j++){
+                if (this.cases[i][j].animalPresent()){
+                    if (this.cases[i][j].getAnimal().getNom().equals(animal)){
+                        posAnimal[0] = i;
+                        posAnimal[1] = j;
+                    }
+                }
+            }
+        }
+        // Méthode qui permet de vérifier si le loup et
+        // mouton ont une distance Manhattan > 5
+        if (animal.equals("Mouton")) {
+            deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton());
+            if (jeu.getDeplacementMouton() == 0){
+                moutonMangePlante(posAnimal[0],posAnimal[1]);
+            }
+        } else {
+            deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup());
+        }
+
+
+    }
+
+
+    public void deplacementAnimalPassif(int i, int j, Animal a){
+        ArrayList<int[]> casesPossibles = new ArrayList<>();
+        if (this.cases[i][j-1].getContenu() instanceof Plante){
+            casesPossibles.add(new int[]{i,j-1});
+        }
+        if (this.cases[i-1][j].getContenu() instanceof Plante){
+            casesPossibles.add(new int[]{i-1,j});
+        }
+        if (this.cases[i][j+1].getContenu() instanceof Plante){
+            casesPossibles.add(new int[]{i,j+1});
+        }
+        if (this.cases[i+1][j].getContenu() instanceof Plante){
+            casesPossibles.add(new int[]{i+1,j});
+        }
+        System.out.println(casesPossibles.size());
+        Random random = new Random();
+        int position = random.nextInt(casesPossibles.size());
+        int[] deplacementChoisi = casesPossibles.get(position);
+        this.cases[i][j].removeAnimal();
+        this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
+    }
+
+    public void orientationAnimalADeplacement(int i, int j, char orientation){
+        switch (orientation){
+            case 'N' -> this.cases[i-1][j].setPlanteRandom();
+            case 'E' -> this.cases[i][j+1].setPlanteRandom();
+            case 'S' -> this.cases[i+1][j].setPlanteRandom();
+            case 'O' -> this.cases[i][j-1].setPlanteRandom();
+        }
+    }
+
+
+
+
 
 
 
