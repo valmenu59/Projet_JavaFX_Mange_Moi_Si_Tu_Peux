@@ -12,6 +12,7 @@ public class Jeu {
 
     private int deplacementMouton;
     private int deplacementLoup;
+    private int nbTour;
 
 
 
@@ -22,13 +23,18 @@ public class Jeu {
         this.tours = null;
         deplacementMouton = 2;
         deplacementLoup = 3;
+        this.nbTour = 0;
     }
 
 
+    /*
     public void boucleJeu() {
 
 
         if (auTourDuMouton) {
+            nbTour++;
+            System.out.println("Tour n°"+nbTour);
+            this.plateau.planteQuiPousse();
             while (deplacementMouton > 0) {
                 deplacementMouton--;
                 this.plateau.deplacerAnimal("Mouton");
@@ -53,6 +59,30 @@ public class Jeu {
         }
     }
 
+     */
+
+    public void boucleJeu(){
+        if (auTourDuMouton){
+            deplacementMouton--;
+            this.plateau.deplacerAnimal("Mouton");
+            if (deplacementMouton == 0) {
+                int[] caseM = plateau.getCaseMouton();
+                int nbr = plateau.moutonMangePlante(caseM[0],caseM[1]);
+                setDeplacementMouton(nbr);
+                auTourDuMouton = false;
+            }
+        } else {
+            deplacementLoup--;
+            this.plateau.deplacerAnimal("Loup");
+            if (deplacementLoup == 0) {
+                reinitialiserDeplacementLoup();
+                auTourDuMouton = true;
+                nbTour++;
+                this.plateau.planteQuiPousse();
+            }
+        }
+    }
+
     public int getDeplacementMouton(){
         System.out.println("le déplacement du mouton est de :"+deplacementMouton);
         return this.deplacementMouton;
@@ -67,7 +97,7 @@ public class Jeu {
     }
 
     public void reinitialiserDeplacementLoup(){
-        this.deplacementLoup = 2;
+        this.deplacementLoup = 3;
     }
 
     public void estBienAuTourDuMouton(boolean b){

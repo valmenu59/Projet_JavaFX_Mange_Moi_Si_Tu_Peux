@@ -227,7 +227,7 @@ public class AffichageJeu extends Scene {
         controleur.mettreEnPause(boutonPause);
         panneau2.getChildren().add(boutonPause);
 
-        boucleJeu();
+        boucleAffichageJeu();
     }
 
 
@@ -352,17 +352,37 @@ public class AffichageJeu extends Scene {
     }
 
 
-
-    public void boucleJeu(){
+/*
+    public void boucleAffichageJeu(){
         boucleJeu = new AnimationTimer() {
             @Override
             public void handle(long l) {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(750);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 } finally {
                     System.out.println("je suis dans la boucle");
+                    AffichageJeu.this.controleur.jeu.boucleJeu();
+                    mettreAJourAffichagePlateau();
+                }
+            }
+        };
+        boucleJeu.start();
+    }
+
+ */
+
+    public void boucleAffichageJeu(){
+        boucleJeu = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                try {
+                    Thread.sleep(750);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    System.out.println("Je suis dans la boucle");
                     AffichageJeu.this.controleur.jeu.boucleJeu();
                     mettreAJourAffichagePlateau();
                 }
@@ -701,6 +721,10 @@ public class AffichageJeu extends Scene {
 
     public void mettreEnPauseOuPas(boolean b){
         this.estEnPause = b;
+    }
+
+    public Jeu getJeu(){
+        return this.controleur.jeu;
     }
 
 

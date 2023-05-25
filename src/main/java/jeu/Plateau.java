@@ -7,8 +7,8 @@ public class Plateau implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private int colonnes;
-    private int lignes;
+    private final int colonnes;
+    private final int lignes;
 
     protected Case[][] cases;
     protected Jeu jeu;
@@ -140,6 +140,7 @@ public class Plateau implements Serializable {
 
 
     /*
+    //POUR TESTER
     public void creerPlateau() {
         this.cases = new Case[9][9];
         lignes = 9;
@@ -345,7 +346,7 @@ public class Plateau implements Serializable {
                     System.out.print("M" + "\t");
                 }
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 
@@ -387,6 +388,19 @@ public class Plateau implements Serializable {
         return new int[2];
     }
 
+    public void planteQuiPousse(){
+        for (int i = 0; i < lignes; i++){
+            for (int j = 0; j < colonnes; j++){
+                if (this.cases[i][j].getContenu() instanceof Terre){
+                    ((Terre) this.cases[i][j].getContenu()).pasDePlantePlusUnJour();
+                    if (((Terre) this.cases[i][j].getContenu()).getNbJourPasDePlante() > 2){
+                        this.cases[i][j].setPlanteRandom();
+                    }
+                }
+            }
+        }
+    }
+
 
 
     public int moutonMangePlante(int i, int j){
@@ -400,7 +414,7 @@ public class Plateau implements Serializable {
                 return 1;
             } else {
                 this.cases[i][j].setContenuPlante(new Terre());
-                return 3;
+                return 4;
             }
         } else {
             return 2;
@@ -444,16 +458,16 @@ public class Plateau implements Serializable {
 
     public void deplacementAnimalPassif(int i, int j, Animal a){
         ArrayList<int[]> casesPossibles = new ArrayList<>();
-        if (this.cases[i][j-1].getContenu() instanceof Plante){
+        if (this.cases[i][j-1].getContenu() instanceof Plante && j - 1 > 0){
             casesPossibles.add(new int[]{i,j-1});
         }
-        if (this.cases[i-1][j].getContenu() instanceof Plante){
+        if (this.cases[i-1][j].getContenu() instanceof Plante && i - 1 > 0){
             casesPossibles.add(new int[]{i-1,j});
         }
-        if (this.cases[i][j+1].getContenu() instanceof Plante){
+        if (this.cases[i][j+1].getContenu() instanceof Plante && j + 1 < colonnes - 1){
             casesPossibles.add(new int[]{i,j+1});
         }
-        if (this.cases[i+1][j].getContenu() instanceof Plante){
+        if (this.cases[i+1][j].getContenu() instanceof Plante && i + 1 < lignes - 1){
             casesPossibles.add(new int[]{i+1,j});
         }
         System.out.println(casesPossibles.size());
@@ -464,14 +478,7 @@ public class Plateau implements Serializable {
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
     }
 
-    public void orientationAnimalADeplacement(int i, int j, char orientation){
-        switch (orientation){
-            case 'N' -> this.cases[i-1][j].setPlanteRandom();
-            case 'E' -> this.cases[i][j+1].setPlanteRandom();
-            case 'S' -> this.cases[i+1][j].setPlanteRandom();
-            case 'O' -> this.cases[i][j-1].setPlanteRandom();
-        }
-    }
+
 
 
 
