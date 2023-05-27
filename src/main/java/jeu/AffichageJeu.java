@@ -32,11 +32,11 @@ public class AffichageJeu extends Scene {
     //Récupère la source des images
     private static final String IMG_CACTUS = "/ElementsJeu/CactusColors.png";
     private static final String IMG_HERBE = "/ElementsJeu/HerbeColors.png";
-    private static final String IMG_LOUP = "/ElementsJeu/LoupColors.png";
+    private static final String IMG_LOUP = "/ElementsJeu/loup.png";
     private static final String IMG_MARGUERITE = "/ElementsJeu/MargueColors.png";
     private static final String IMG_MOUTON = "/ElementsJeu/MoutonColors.png";
     private static final String IMG_ROCHER = "/ElementsJeu/RocherColors.png";
-    private static final String IMG_TERRE = "/ElementsJeu/vide.png";
+    private static final String IMG_TERRE = "/ElementsJeu/terre.png";
     private AnchorPane panneauTemporaire;
     private AnchorPane panneauPrincipal;
     //private SplitPane separateur;
@@ -258,7 +258,7 @@ public class AffichageJeu extends Scene {
         //on rajoute à la racine le splitPane
         mainScene.setRoot(splitPane);
         //Permet de définir le style de panneau2
-        panneau2.setStyle("-fx-background-color: rgb(220,241,196)");
+        panneau2.setStyle("-fx-background-color: rgb(161,236,158)");
 
     }
 
