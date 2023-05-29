@@ -1,9 +1,7 @@
 package fx;
 
-import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
 public class ImageJeu extends Image {
     private String url;

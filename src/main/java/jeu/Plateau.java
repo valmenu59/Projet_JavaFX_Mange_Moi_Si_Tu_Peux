@@ -57,9 +57,7 @@ public class Plateau implements Serializable {
 
 
     public void creerLabyrinthe() {
-        //this.cases = new Case[lignes][colonnes];
-
-        // Initialisation du labyrinthe avec des roches en bordure et de l'herbe à l'intérieur
+                // Initialisation du labyrinthe avec des roches en bordure et de l'herbe à l'intérieur
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
                 if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
@@ -259,7 +257,7 @@ public class Plateau implements Serializable {
 
 
 
-    private boolean presentDansLaListe(Collection<int[]> liste, int[] position){
+    public boolean presentDansLaListe(Collection<int[]> liste, int[] position){
         for (int[] l : liste){
             if (l[0] == position[0] && l[1] == position[1]){
                 return true;
@@ -552,7 +550,7 @@ public class Plateau implements Serializable {
 
     public boolean manhattan(){
         //trouver la case loup et case mouton
-        //initialiser un compter
+        //initialiser un compteur
         //parcours en longueur ??
         return true;
     }
