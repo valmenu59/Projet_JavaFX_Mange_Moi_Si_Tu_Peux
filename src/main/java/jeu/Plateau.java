@@ -140,9 +140,6 @@ public class Plateau implements Serializable {
         }
         System.out.println(verifPlateauCorrect());
 
-
-
-
     }
 
 
