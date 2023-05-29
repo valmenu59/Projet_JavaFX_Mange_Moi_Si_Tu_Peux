@@ -37,7 +37,7 @@ public class AffichageJeu extends Scene {
     private static final String IMG_TERRE = "/ElementsJeu/terre.png";
     private static final String IMG_LOUP_MENACANT = "/ElementsJeu/loup2.png";
     private static final String IMG_MOUTON_MENACE = "/ElementsJeu/mouton2.png";
-    private AnchorPane panneauTemporaire;
+    private final AnchorPane panneauTemporaire;
     private AnchorPane panneauPrincipal;
     //private SplitPane separateur;
     private Stage mainStage;
@@ -57,9 +57,7 @@ public class AffichageJeu extends Scene {
     private Text texteEtape = null;
     private Text texteExplicationEtape = null;
     private Text texteAlerteLabyrintheImparfait = null;
-    //private final ArrayList<Label> listeLabel = new ArrayList<>();
-    //private final ArrayList<ChoiceBox<Integer>> listeDeListeDeroulant = new ArrayList<>();
-    private final ArrayList<Rectangle> listeRectangleRougeTransparant = new ArrayList<>();
+
     private final ArrayList<Rectangle> listeCarreNoir = new ArrayList<>();
     private final ArrayList<ImageView> listeImages = new ArrayList<>();
     private double xDepart;
@@ -71,6 +69,7 @@ public class AffichageJeu extends Scene {
     private int numeroEtape;
 
     private boolean vientSauvegarde;
+    private Text texteJeu;
 
 
 
@@ -152,7 +151,6 @@ public class AffichageJeu extends Scene {
             panneau2.getChildren().add(boutonRetourMenu);
 
         } else {
-            panneauPrincipal.getChildren().removeAll(listeRectangleRougeTransparant);
             panneau2.getChildren().addAll(1,listeMenuDeroulantetLabelEtape1);
             panneau2.getChildren().add(5,boutonCreerPlateau);
             boutonValiderEtape.setDisable(false);
@@ -213,7 +211,6 @@ public class AffichageJeu extends Scene {
     }
 
     public void etapeJeu(){
-        this.controleur.jeu.sauvegarderPlateau();
         numeroEtape = 5;
         texteEtape();
         panneau2.getChildren().remove(boutonRetour);
@@ -225,6 +222,8 @@ public class AffichageJeu extends Scene {
         boutonPause = new Button("Pause");
         controleur.mettreEnPause(boutonPause);
         panneau2.getChildren().add(boutonPause);
+
+        texteJeu(true);
 
         mettreAJourAffichagePlateau();
         boucleAffichageJeu();
@@ -328,6 +327,33 @@ public class AffichageJeu extends Scene {
         }
     }
 
+    public void texteJeu(boolean nouveau){
+        Font font = Font.font("Segoe UI", 15);
+        String nomAnimal;
+        if (getJeu().isAuTourDuMouton()){
+            nomAnimal = "mouton";
+        } else {
+            nomAnimal = "loup";
+        }
+        if (nouveau){
+            texteJeu = new Text("Tour n°"+getJeu().getNbTour()+"\n"+
+                    "Nombre de plantes mangées : "+getPlateau().getNbrPlanteMangee()+"\n"+
+                    "Au tour du "+nomAnimal+"\n"+
+                    "Nombre tour(s) restant pour le mouton : "+getJeu().getDeplacementMouton()+"\n"+
+                    "Nombre tour(s) restant pour le loup : "+getJeu().getDeplacementLoup());
+            texteJeu.setFont(font);
+            texteJeu.setX(500);
+            texteJeu.setY(30);
+            panneauPrincipal.getChildren().add(texteJeu);
+        } else {
+            texteJeu.setText("Tour n°"+getJeu().getNbTour()+"\n"+
+                    "Nombre de plantes mangées : "+getPlateau().getNbrPlanteMangee()+"\n"+
+                    "Au tour du "+nomAnimal+"\n"+
+                    "Nombre tour(s) restant pour le mouton : "+getJeu().getDeplacementMouton()+"\n"+
+                    "Nombre tour(s) restant pour le loup : "+getJeu().getDeplacementLoup());
+        }
+    }
+
 
 
 
@@ -335,13 +361,22 @@ public class AffichageJeu extends Scene {
         boucleJeu = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    AffichageJeu.this.controleur.jeu.boucleJeu();
-                    mettreAJourAffichagePlateau();
+                if (!estEnPause) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        AffichageJeu.this.controleur.jeu.boucleJeu();
+                        mettreAJourAffichagePlateau();
+                        texteJeu(false);
+                        //if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
+                            /*
+                            Ici ça sera pour la sae 202 pour afficher un message de fin de jeu
+                            et mettre boucleJeu.stop() pour arrêter la boucle
+                             */
+                        //}
+                    }
                 }
             }
         };

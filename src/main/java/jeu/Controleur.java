@@ -2,7 +2,10 @@ package jeu;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -184,6 +187,23 @@ public class Controleur {
                 } else if (affichageJeu.getNumeroEtape() == 3){
                     affichageJeu.etape4();
                 } else if (affichageJeu.getNumeroEtape() == 4){
+                    Alert sauvegarderJeu = new Alert(Alert.AlertType.CONFIRMATION);
+                    sauvegarderJeu.setHeaderText("Voulez-vous sauvegarder le plateau ?");
+                    sauvegarderJeu.setContentText("");
+
+                    //Pour modifier les boutons
+                    ButtonType boutonOui = new ButtonType("Oui", ButtonBar.ButtonData.YES);
+                    ButtonType boutonNon = new ButtonType("Non", ButtonBar.ButtonData.NO);
+                    sauvegarderJeu.getButtonTypes().setAll(boutonOui, boutonNon);
+
+                    sauvegarderJeu.showAndWait();
+                    if (sauvegarderJeu.getResult().getButtonData().equals(ButtonBar.ButtonData.YES)){
+                        jeu.sauvegarderPlateau();
+                        Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
+                        confirmation.setHeaderText("Plateau sauvegardé avec succès");
+                        confirmation.setContentText("");
+                        confirmation.showAndWait();
+                    }
                     affichageJeu.etapeJeu();
                 }
             }
@@ -235,11 +255,9 @@ public class Controleur {
                 if (affichageJeu.estBienEnPause()){
                     b.setText("Marche");
                     affichageJeu.mettreEnPauseOuPas(false);
-                    affichageJeu.getBoucleJeu().stop();
                 } else {
                     b.setText("Pause");
                     affichageJeu.mettreEnPauseOuPas(true);
-                    affichageJeu.getBoucleJeu().start();
                 }
             }
         });

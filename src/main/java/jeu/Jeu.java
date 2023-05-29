@@ -7,14 +7,15 @@ import java.io.*;
 public class Jeu {
 
 
-    protected Plateau plateau = null;
-    private boolean auTourDuMouton = true;
-    private int deplacementMouton = 2;
-    private int deplacementLoup = 3;
-    private int planteDeplacementMouton = 2;
-    private int nbTour = -1;
-    private int planteMangee = 0;
-    private boolean moutonEnDanger = false;
+    protected Plateau plateau;
+    private boolean auTourDuMouton;
+    private int deplacementMouton;
+    private int deplacementLoup;
+    private int planteDeplacementMouton;
+    private int nbTour;
+    private boolean moutonEnDanger = false; //pour la sae 202
+    private boolean partiePerdue = false; //pour la sae 202
+    private boolean partieGagne = false; //pour la sae 202
     private final DossierSauvegarde sauvegarde = new DossierSauvegarde();
 
 
@@ -22,6 +23,13 @@ public class Jeu {
 
 
     public Jeu(){
+        plateau = null;
+        auTourDuMouton = true;
+        deplacementMouton = 2;
+        deplacementLoup = 3;
+        planteDeplacementMouton = 2;
+        nbTour = -1;
+
     }
 
 
@@ -33,7 +41,6 @@ public class Jeu {
                 this.nbTour++;
                 this.plateau.planteQuiPousse();
             }
-
             deplacementMouton--;
             plateau.deplacerAnimal("Mouton");
             if (deplacementMouton == 0) {
@@ -61,25 +68,38 @@ public class Jeu {
         this.deplacementLoup = 3;
     }
 
-    public int getNbPlanteMangee() {
-        return this.planteMangee;
-    }
 
-    public void estBienAuTourDuMouton(boolean b) {
-        this.auTourDuMouton = b;
+
+    public boolean isAuTourDuMouton() {
+        return auTourDuMouton;
     }
 
     public boolean isMoutonEnDanger() {
         return this.moutonEnDanger;
     }
 
+    public boolean isPartiePerdue(){
+        return this.partiePerdue;
+    }
+
+    public boolean isPartieGagne(){
+        return this.partieGagne;
+    }
+
     public int getNbTour() {
         return this.nbTour;
     }
 
-    public void moutonAMangePlante(){
-        this.planteMangee++;
+    public int getDeplacementLoup(){
+        return this.deplacementLoup;
     }
+
+    public int getDeplacementMouton(){
+        return this.deplacementMouton;
+    }
+
+
+
 
 
 

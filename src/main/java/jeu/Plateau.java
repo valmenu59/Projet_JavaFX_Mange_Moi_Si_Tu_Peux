@@ -17,12 +17,15 @@ public class Plateau implements Serializable {
     private transient ArrayList<int[]> casesPlante = new ArrayList<>();
     private transient ArrayList<int[]> listeCasePassees = new ArrayList<>();
     private transient Stack<int[]> chemin = new Stack<>();
+    private int planteMangee;
 
 
     public Plateau(int l, int c){
         this.lignes = l;
         this.colonnes = c;
         this.jeu = new Jeu();
+        this.planteMangee = 0;
+
     }
 
 
@@ -134,7 +137,13 @@ public class Plateau implements Serializable {
     }
 
 
+    public int getNbrPlanteMangee() {
+        return this.planteMangee;
+    }
 
+    public void moutonAMangePlante(){
+        this.planteMangee++;
+    }
 
 
     /*
@@ -403,7 +412,7 @@ public class Plateau implements Serializable {
 
     public int moutonMangePlante(int i, int j){
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
-            jeu.moutonAMangePlante();
+            moutonAMangePlante();
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 return 2;
@@ -475,122 +484,6 @@ public class Plateau implements Serializable {
         this.cases[i][j].removeAnimal();
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    public void creerPlateau(){
-        this.cases = new Case[this.lignes][this.colonnes];
-        // Étape 1 : Initialisation du labyrinthe avec des murs partout
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
-                this.cases[i][j] = new Case(new Roche(), null);
-            }
-        }
-
-// Étape 2 : Choix d'une case de départ
-        int startRow = 1;
-        int startCol = 1;
-        this.cases[startRow][startCol] = new Case(new Herbe(), null);
-
-// Étape 3 : Liste des cases frontières
-        ArrayList<int[]> frontierCells = new ArrayList<>();
-        frontierCells.add(new int[]{startRow, startCol});
-
-// Étape 4 : Expansion du labyrinthe
-        while (!frontierCells.isEmpty()) {
-            // Sélection aléatoire d'une case frontière
-            int randomIndex = (int) (Math.random() * frontierCells.size());
-            int[] currentCell = frontierCells.get(randomIndex);
-            frontierCells.remove(randomIndex);
-
-            int row = currentCell[0];
-            int col = currentCell[1];
-
-            // Vérification des cases voisines
-            ArrayList<int[]> neighbors = new ArrayList<>();
-            if (row >= 2) neighbors.add(new int[]{row - 2, col});
-            if (col >= 2) neighbors.add(new int[]{row, col - 2});
-            if (row < lignes - 3) neighbors.add(new int[]{row + 2, col});
-            if (col < colonnes - 3) neighbors.add(new int[]{row, col + 2});
-
-            for (int[] neighbor : neighbors) {
-                int nRow = neighbor[0];
-                int nCol = neighbor[1];
-
-                if (this.cases[nRow][nCol].getContenu() instanceof Roche) {
-                    // Suppression du mur entre la case courante et la case voisine
-                    this.cases[nRow][nCol] = new Case(new Herbe(), null);
-                    this.cases[nRow + (row - nRow) / 2][nCol + (col - nCol) / 2] = new Case(new Herbe(), null);
-
-                    // Ajout de la case voisine à la liste des cases frontières
-                    frontierCells.add(new int[]{nRow, nCol});
-                }
-            }
-        }
-
-// Étape 5 : Suppression des obstacles aléatoires à l'intérieur du labyrinthe
-        ArrayList<Integer> listeColonnes = new ArrayList<>();
-        for (int i = 1; i < lignes - 1; i++) {
-            for (int j = 1; j < colonnes - 1; j++) {
-                if (i % 2 == 1 || j % 2 == 1) {
-                    System.out.println(i + "" + j + "" + this.cases[i][j].getContenu().getNom());
-                    double random = Math.random();
-                    if (random <= 0.5) {
-                        if (j != colonnes - 2) {
-                            listeColonnes.add(j);
-                            supprimerObstacle(i, j, 'E');
-                        } else {
-                            if (i != lignes - 2) {
-                                listeColonnes.add(j);
-                                Collections.shuffle(listeColonnes);
-                                supprimerObstacle(i, listeColonnes.get(0), 'S');
-                                listeColonnes.clear();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
- */
 
 
 
