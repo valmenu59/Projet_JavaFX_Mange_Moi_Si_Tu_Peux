@@ -13,11 +13,20 @@ public class Plateau implements Serializable {
     protected Case[][] cases;
     protected Jeu jeu;
     private final int[] caseSortie = new int[2];
+    //Pour parcourir le labyrinthe :
+    private final transient ArrayList<int[]> casesPlante = new ArrayList<>();
+    //transient permet de ne pas sauvegarder l'attribut lors de la sauvegarde
+    private final transient ArrayList<int[]> listeCasePassees = new ArrayList<>();
+    private final transient Stack<int[]> chemin = new Stack<>();
 
-    private transient ArrayList<int[]> casesPlante = new ArrayList<>();
-    private transient ArrayList<int[]> listeCasePassees = new ArrayList<>();
-    private transient Stack<int[]> chemin = new Stack<>();
-    private int planteMangee;
+    //Pour garder en mémoire les cases précédentes :
+    private final transient ArrayList<int[]> casesLoupPassees = new ArrayList<>();
+    private final transient ArrayList<int[]> casesMoutonPassees = new ArrayList<>();
+
+
+
+
+    private transient int planteMangee;
 
 
     public Plateau(int l, int c){
@@ -205,7 +214,7 @@ public class Plateau implements Serializable {
 
 
         actionsCaseActuelle(iCourant, jCourant);
-
+        //parcours en profondeur
         while (!casesPlante.isEmpty()) {
             // Vérifier les cases voisines de la case courante
             boolean deplacementPossible = false;
@@ -411,8 +420,9 @@ public class Plateau implements Serializable {
 
 
     public int moutonMangePlante(int i, int j){
+        //Permet d'obtenir le nombre de déplacement du mouton en fonction de la case
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
-            moutonAMangePlante();
+            moutonAMangePlante(); //permet d'augmenter le nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 return 2;
@@ -455,34 +465,116 @@ public class Plateau implements Serializable {
         }
         // Méthode qui permet de vérifier si le loup et
         // mouton ont une distance Manhattan > 5
+        //saé 202
         if (animal.equals("Mouton")) {
-            deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton());
+            if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton())){
+                deplacerAnimal("Mouton");
+            }
         } else {
-            deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup());
+            if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())){
+                deplacerAnimal("Loup");
+            }
         }
     }
 
 
-    public void deplacementAnimalPassif(int i, int j, Animal a){
+    public boolean deplacementAnimalPassif(int i, int j, Animal a){
+        ArrayList<int[]> listeCasePasses;
+        if (a.getNom().equals("Mouton")){
+            listeCasePasses = casesMoutonPassees;
+        } else {
+            listeCasePasses = casesLoupPassees;
+        }
         ArrayList<int[]> casesPossibles = new ArrayList<>();
-        if (this.cases[i][j-1].getContenu() instanceof Plante && j - 1 > 0){
+        if (this.cases[i][j-1].getContenu() instanceof Plante && j - 1 > 0 &&
+                !presentDansLaListe(listeCasePasses, new int[]{i,j-1})){
+
             casesPossibles.add(new int[]{i,j-1});
+            if (a.getNom().equals("Mouton")){
+                casesMoutonPassees.add(new int[]{i,j-1});
+            } else {
+                casesLoupPassees.add(new int[]{i,j-1});
+            }
         }
-        if (this.cases[i-1][j].getContenu() instanceof Plante && i - 1 > 0){
+        if (this.cases[i-1][j].getContenu() instanceof Plante && i - 1 > 0 &&
+                !presentDansLaListe(listeCasePasses, new int[]{i-1,j})){
+
             casesPossibles.add(new int[]{i-1,j});
+            if (a.getNom().equals("Mouton")){
+                casesMoutonPassees.add(new int[]{i-1,j});
+            } else {
+                casesLoupPassees.add(new int[]{i-1,j});
+            }
         }
-        if (this.cases[i][j+1].getContenu() instanceof Plante && j + 1 < colonnes - 1){
+        if (this.cases[i][j+1].getContenu() instanceof Plante && j + 1 < colonnes - 1 &&
+                !presentDansLaListe(listeCasePasses, new int[]{i,j+1})){
+
             casesPossibles.add(new int[]{i,j+1});
+            if (a.getNom().equals("Mouton")){
+                casesMoutonPassees.add(new int[]{i,j+1});
+            } else {
+                casesLoupPassees.add(new int[]{i,j+1});
+            }
         }
-        if (this.cases[i+1][j].getContenu() instanceof Plante && i + 1 < lignes - 1){
+        if (this.cases[i+1][j].getContenu() instanceof Plante && i + 1 < lignes - 1 && j + 1 < colonnes - 1 &&
+                !presentDansLaListe(listeCasePasses, new int[]{i+1,j})){
+
             casesPossibles.add(new int[]{i+1,j});
+            if (a.getNom().equals("Mouton")){
+                casesMoutonPassees.add(new int[]{i+1,j});
+            } else {
+                casesLoupPassees.add(new int[]{i+1,j});
+            }
         }
-        System.out.println(casesPossibles.size());
+        if (casesPossibles.isEmpty()){
+            //Dans le cas où il n'y a plus aucun déplacement possible
+            if (a.getNom().equals("Mouton")){
+                casesMoutonPassees.clear();
+            } else {
+                casesLoupPassees.clear();
+            }
+            return false;
+        }
         Random random = new Random();
         int position = random.nextInt(casesPossibles.size());
         int[] deplacementChoisi = casesPossibles.get(position);
         this.cases[i][j].removeAnimal();
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
+        return true;
+    }
+
+
+    /*
+    Différentes méthodes pour la saé 202 :
+    Manhattan pour détecter que le mouton et loup sont bien à 5 cases de distances de manhattan
+    parcours en largeur
+    parcours en profondeur
+    A*
+    Dijkstra
+     */
+
+    public boolean manhattan(){
+        //trouver la case loup et case mouton
+        //initialiser un compter
+        //parcours en longueur ??
+        return true;
+    }
+
+    public void parcoursLargeur(){
+
+    }
+
+    public void parcoursProfondeur(){
+
+    }
+
+    public void aStar(){
+
+    }
+
+    //Optionnel
+    public void dijkstra(){
+
     }
 
 

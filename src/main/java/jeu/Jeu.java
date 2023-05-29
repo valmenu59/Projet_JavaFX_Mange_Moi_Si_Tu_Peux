@@ -113,10 +113,9 @@ public class Jeu {
             objetFichier.writeInt(this.plateau.getColonnes()); // Sauvegarde du nombre de colonnes
             objetFichier.writeInt(this.plateau.getLignes());
 
-            //objetFichier.writeObject(this.plateau.cases); // Sauvegarde de l'objet plateau
             for (int i = 0; i < this.plateau.getLignes(); i++){
                 for (int j = 0; j < this.plateau.getColonnes(); j++){
-                    objetFichier.writeObject(this.plateau.cases[i][j]);
+                    objetFichier.writeObject(this.plateau.cases[i][j]); // Sauvegarde de l'objet case[i][j]
                 }
             }
 
@@ -125,7 +124,7 @@ public class Jeu {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            // Assurez-vous de fermer le FileOutputStream après utilisation
+            // permet de fermer le FileOutputStream après utilisation
             if (fichier != null) {
                 try {
                     fichier.close();
@@ -151,7 +150,7 @@ public class Jeu {
 
             for (int i = 0; i < lignes; i++){
                 for (int j = 0; j < colonnes; j++){
-                    plateau.cases[i][j] = (Case) objectInputStream.readObject();
+                    plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
                 }
             }
             System.out.println("Fichier récupé avec succès !");
@@ -159,7 +158,4 @@ public class Jeu {
             e.printStackTrace();
         }
     }
-
-
-
 }
