@@ -384,6 +384,7 @@ public class AffichageJeu extends Scene {
     }
 
 
+
     public ChoiceBox<Integer> creerMenuDeroulant(String texte, int nbMin, int nbMax, int nbDefaut) {
         //Cette méthode permet de créer un menu déroulant à partir de différents paramètres
         //D'abord on crée un label avec texte comme paramètre
@@ -397,8 +398,6 @@ public class AffichageJeu extends Scene {
         //Permet d'afficher la valeur par défaut
         choix.setValue(nbDefaut);
         //On rajoute le label et la choiceBox dans une arraylist (pour les supprimer ensuite)
-        //listeLabel.add(lab);
-        //listeDeListeDeroulant.add(choix);
         listeMenuDeroulantetLabelEtape1.add(lab);
         listeMenuDeroulantetLabelEtape1.add(choix);
         //On ajoute les 2 dans le panneau2

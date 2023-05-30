@@ -287,7 +287,7 @@ public class Plateau implements Serializable {
         }
     }
 
-    private boolean aBien4CasesVoisinesPlantes(int i, int j){
+    public boolean aBien4CasesVoisinesPlantes(int i, int j){
         /*
         Cette méthode permet de vérifier qu'il y a 4 voisins de type plante ET
         qu'il y a au moins 2 roches.

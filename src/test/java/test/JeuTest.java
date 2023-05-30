@@ -98,11 +98,75 @@ class JeuTest {
         assertFalse(plateau.presentDansLaListe(arr,new int[]{-10,12}),"Cette méthode est fonctionnelle");
     }
 
+    @Test
+    void testMethodeABien4CasesVoisinesPlantes(){
+        assertFalse(plateau.aBien4CasesVoisinesPlantes(3,3), "Cette case n'a pas aux alentours de lui" +
+                "4 cases voisines et plantes ET 2 cases roches aux extrémités");
+    }
+
+    @Test
+    void testMethodeABien4CasesVoisinesPlantes2(){
+        plateau.getCase(2,4).setContenuGeneral(new Roche());
+        plateau.getCase(2,2).setContenuGeneral(new Roche());
+        assertTrue(plateau.aBien4CasesVoisinesPlantes(3,3), "Cette case a bien aux alentours de lui" +
+                "4 cases voisines et plantes ET 2 cases roches aux extrémités");
+    }
 
 
+    @Test
+    void testVerifPresenceAnimal(){
+        plateau.getCase(2,2).setAnimal(new Loup());
+        assertFalse(plateau.verifPresenceAnimal("Mouton"), "Le plateau ne contient pas de mouton");
+    }
+
+    @Test
+    void testVerifPresenceAnimal2(){
+        plateau.getCase(2,2).setAnimal(new Mouton());
+        assertTrue(plateau.verifPresenceAnimal("Mouton"), "Le plateau ne contient pas de mouton");
+    }
 
 
+    @Test
+    void testCaseSortie(){
+        ArrayList<int[]> arr =  new ArrayList<>();
+        plateau.setCaseSortie(0,1);
+        arr.add(plateau.getCaseSortie());
+        assertTrue(plateau.presentDansLaListe(arr,new int[]{0,1}), "Envoie vrai");
+    }
 
+    @Test
+    void testMoutonMangePlante(){
+        int i,j;
+        //Remplacement de toutes les cases herbes par une case marguerite
+        for (i = 0; i < plateau.getLignes(); i++){
+            for (j = 0; j < plateau.getColonnes(); j++){
+                if (plateau.getCase(i,j).getContenu() instanceof Herbe){
+                    plateau.getCase(i,j).setContenuPlante(new Marguerite());
+                }
+            }
+        }
+        //ajout du mouton
+        plateau.getCase(3,3).setAnimal(new Mouton());
+        assertEquals(4,plateau.moutonMangePlante(3,3),"Le mouton a bien mangé " +
+                "une marguerite et donc renvoie la valeur 4");
+    }
+
+    @Test
+    void testMoutonMangePlante2(){
+        int i,j;
+        //Remplacement de toutes les cases herbes par une case cactus
+        for (i = 0; i < plateau.getLignes(); i++){
+            for (j = 0; j < plateau.getColonnes(); j++){
+                if (plateau.getCase(i,j).getContenu() instanceof Herbe){
+                    plateau.getCase(i,j).setContenuPlante(new Cactus());
+                }
+            }
+        }
+        //ajout du mouton
+        plateau.getCase(3,3).setAnimal(new Mouton());
+        assertNotEquals(4,plateau.moutonMangePlante(3,3),"Le mouton a bien mangé " +
+                "une marguerite et donc renvoie la valeur 4");
+    }
 
 
 
