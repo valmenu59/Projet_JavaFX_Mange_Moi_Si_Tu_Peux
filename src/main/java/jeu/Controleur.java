@@ -8,14 +8,18 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import menu.Menu;
+import sauvegarde.DossierSauvegarde;
+
+import java.util.Optional;
 
 public class Controleur {
 
-    //protected Plateau plateau;
     protected Jeu jeu;
     protected AffichageJeu affichageJeu;
 
@@ -29,7 +33,6 @@ public class Controleur {
 
 
     public Controleur(AffichageJeu affichageJeu){
-        //this.plateau = null;
         this.jeu = new Jeu();
         this.affichageJeu = affichageJeu;
     }
@@ -171,9 +174,21 @@ public class Controleur {
         });
     }
 
+    /**
+     *
+     * @param b : bouton à appliquer l'action
+     *          Cette méthode permet de passer d'une étape vers une autre dans l'ordre croissant (1,2,3,4,5)
+     *          Par contre au bout de l'étape 4 le jeu affiche différents boîtes de dialogues :
+     *          Si l'utilisateur clique sur oui, une sauvegarde est effectuée et affiche une autre boîte de dialogue
+     *          de confirmation. L'utilisateur peut copier le chemin d'accès et s'il clique sur Ok la fenêtre se ferme
+     *          et passe à l'étape 5.
+     *          S'il clique sur non le jeu passe à l'étape 5 sans se sauvegarder.
+     */
+
 
     public void validerEtape(Button b) {
         //Le but de cette étape est de rajouter une action Valider au bouton
+        DossierSauvegarde sauvegarde = new DossierSauvegarde();
         b.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -198,11 +213,35 @@ public class Controleur {
 
                     sauvegarderJeu.showAndWait();
                     if (sauvegarderJeu.getResult().getButtonData().equals(ButtonBar.ButtonData.YES)){
+
                         jeu.sauvegarderPlateau();
                         Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
                         confirmation.setHeaderText("Plateau sauvegardé avec succès");
-                        confirmation.setContentText("");
-                        confirmation.showAndWait();
+                        confirmation.setContentText("Source du fichier : "+"\n"+
+                                sauvegarde.getCheminFichier()+"\n"+"\n"+
+                                "Si vous voulez absolument conserver votre plateau, copier le fichier vers un autre dossier puis renommez-le");
+
+                        ButtonType boutonCopier = new ButtonType("Copier le chemin d'accès", ButtonBar.ButtonData.APPLY);
+                        ButtonType boutonOk = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+                        confirmation.getButtonTypes().setAll(boutonOk, boutonCopier);
+
+                        // Récupérer le bouton "Copier"
+                        Button copierButton = (Button) confirmation.getDialogPane().lookupButton(boutonCopier);
+                        copierButton.addEventFilter(ActionEvent.ACTION, event -> {
+                            event.consume(); // Consommer l'événement pour empêcher la fermeture de la fenêtre
+                            Clipboard clipboard = Clipboard.getSystemClipboard();
+                            ClipboardContent contenu = new ClipboardContent();
+                            contenu.putString(sauvegarde.getCheminFichier());
+                            clipboard.setContent(contenu);
+                        });
+
+                        Optional<ButtonType> resultat = confirmation.showAndWait();
+
+                        if (resultat.isPresent() && resultat.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                            // Le bouton "Ok" a été cliqué, l'alerte se ferme
+                            confirmation.close();
+                        }
+
                     }
                     affichageJeu.etapeJeu();
                 }

@@ -14,12 +14,12 @@ public class DossierSauvegarde {
         if (os.contains("win")) {
             String userHome = System.getProperty("user.home");
             String appData = userHome + File.separator + "AppData" + File.separator + "Roaming" + File.separator + "jeuSaeJavaFX";
-            sourceFichierSauvegarde = appData + File.separator + "sauvegardePlateau";
+            sourceFichierSauvegarde = appData + File.separator + "sauvegardePlateau.sae";
         } else if (os.contains("mac")) {
-            sourceFichierSauvegarde = System.getProperty("user.home") + "/Library/Application Support/jeuSaeJavaFX/sauvegardePlateau";
+            sourceFichierSauvegarde = System.getProperty("user.home") + "/Library/Application Support/jeuSaeJavaFX/sauvegardePlateau.sae";
         } else {
             String var10000 = System.getProperty("user.home");
-            sourceFichierSauvegarde = var10000 + File.separator + "jeuSaeJavaFX" + File.separator + ".sauvegardePlateau";
+            sourceFichierSauvegarde = var10000 + File.separator + "jeuSaeJavaFX" + File.separator + ".sauvegardePlateau.sae";
         }
 
         File directory = (new File(sourceFichierSauvegarde)).getParentFile();
@@ -28,6 +28,20 @@ public class DossierSauvegarde {
         }
 
         return sourceFichierSauvegarde;
+    }
+
+
+    public String getCheminFichier() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            String userHome = System.getProperty("user.home");
+            return userHome + File.separator + "AppData" + File.separator + "Roaming" + File.separator + "jeuSaeJavaFX";
+        } else if (os.contains("mac")) {
+            return System.getProperty("user.home") + "/Library/Application Support/jeuSaeJavaFX/";
+        } else {
+            String var10000 = System.getProperty("user.home");
+            return var10000 + File.separator + "jeuSaeJavaFX";
+        }
     }
 
     public boolean cheminDaccesExisteBien() {
