@@ -548,12 +548,182 @@ public class Plateau implements Serializable {
     Dijkstra
      */
 
+
+    /*
     public boolean manhattan(){
-        //trouver la case loup et case mouton
-        //initialiser un compteur
-        //parcours en longueur ??
-        return true;
+        int[][] casesNumero = new int[lignes][colonnes];
+        for (int i = 0; i < lignes; i++){
+            for (int j = 0; j < colonnes; j++){
+                casesNumero[i][j] = -1;
+            }
+        }
+        int[] posMouton = getCaseMouton();
+        int posI = posMouton[0];
+        int posJ = posMouton[1];
+        casesNumero[posI][posJ] = 0;
+        //ArrayList<int[]> casePasses = new ArrayList<>();
+        Queue<int[]> file = new ArrayDeque<>();
+
+        //casePasses.add(posMouton);
+        file.add(posMouton);
+        while (!file.isEmpty()) {
+            int[] posActuelle = file.poll();
+            int I = posActuelle[0];
+            int J = posActuelle[1];
+
+            if (I - 1 >= 0 &&
+                    getCase(I - 1, J).getContenu() instanceof Plante &&
+                    casesNumero[I - 1][J] == -1) {
+                file.add(new int[]{I - 1, J});
+                casesNumero[I - 1][J] = casesNumero[I][J] + 1;
+                if (getCase(I - 1, J).getAnimal() instanceof Loup) {
+                    return casesNumero[I][J - 1] <= 5;
+                }
+            }
+
+            // Vérification des autres directions
+            // Bas
+            if (I + 1 < lignes - 1 &&
+                    getCase(I + 1, J).getContenu() instanceof Plante &&
+                    casesNumero[I + 1][J] == -1) {
+                file.add(new int[]{I + 1, J});
+                casesNumero[I + 1][J] = casesNumero[I][J] + 1;
+                if (getCase(I + 1, J).getAnimal() instanceof Loup) {
+                    return casesNumero[I][J - 1] <= 5;
+                }
+            }
+
+            // Gauche
+            if (J - 1 >= 0 &&
+                    getCase(I, J - 1).getContenu() instanceof Plante &&
+                    casesNumero[I][J - 1] == -1) {
+                file.add(new int[]{I, J - 1});
+                casesNumero[I][J - 1] = casesNumero[I][J] + 1;
+                if (getCase(I, J - 1).getAnimal() instanceof Loup) {
+                    return casesNumero[I][J - 1] <= 5;
+                }
+            }
+
+            // Droite
+            if (J + 1 < colonnes - 1 &&
+                    getCase(I, J + 1).getContenu() instanceof Plante &&
+                    casesNumero[I][J + 1] == -1) {
+                file.add(new int[]{I, J + 1});
+                casesNumero[I][J + 1] = casesNumero[I][J] + 1;
+                if (getCase(I, J + 1).getAnimal() instanceof Loup) {
+                    return casesNumero[I][J - 1] <= 5;
+                }
+            }
+        }
+        return false;
     }
+
+     */
+
+    public boolean manhattan() {
+        int[][] casesNumero = new int[lignes][colonnes];
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+                casesNumero[i][j] = -1;
+            }
+        }
+        int[] posMouton = getCaseMouton();
+        int posI = posMouton[0];
+        int posJ = posMouton[1];
+        casesNumero[posI][posJ] = 0;
+        Queue<int[]> file = new ArrayDeque<>();
+        file.add(posMouton);
+
+        while (!file.isEmpty()) {
+            int[] posActuelle = file.poll();
+            int I = posActuelle[0];
+            int J = posActuelle[1];
+
+            if (I - 1 > 0 &&
+                    getCase(I - 1, J).getContenu() instanceof Plante &&
+                    casesNumero[I - 1][J] == -1) {
+                file.add(new int[]{I - 1, J});
+                casesNumero[I - 1][J] = casesNumero[I][J] + 1;
+                if (getCase(I - 1, J).getAnimal() instanceof Loup) {
+                    for (int i = 0; i < lignes; i++) {
+                        for (int j = 0; j < colonnes; j++) {
+                            String numero = String.format("%2d", casesNumero[i][j]);
+                            System.out.print(numero + "\t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                    System.out.println();
+                    return casesNumero[I - 1][J] <= 5;
+                }
+            }
+
+            // Vérification des autres directions
+            // Bas
+            if (I + 1 < lignes - 1 &&
+                    getCase(I + 1, J).getContenu() instanceof Plante &&
+                    casesNumero[I + 1][J] == -1) {
+                file.add(new int[]{I + 1, J});
+                casesNumero[I + 1][J] = casesNumero[I][J] + 1;
+                if (getCase(I + 1, J).getAnimal() instanceof Loup) {
+                    for (int i = 0; i < lignes; i++) {
+                        for (int j = 0; j < colonnes; j++) {
+                            String numero = String.format("%2d", casesNumero[i][j]);
+                            System.out.print(numero + "\t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                    System.out.println();
+                    return casesNumero[I + 1][J] < 5;
+                }
+            }
+
+            // Gauche
+            if (J - 1 > 0 &&
+                    getCase(I, J - 1).getContenu() instanceof Plante &&
+                    casesNumero[I][J - 1] == -1) {
+                file.add(new int[]{I, J - 1});
+                casesNumero[I][J - 1] = casesNumero[I][J] + 1;
+                if (getCase(I, J - 1).getAnimal() instanceof Loup) {
+                    for (int i = 0; i < lignes; i++) {
+                        for (int j = 0; j < colonnes; j++) {
+                            String numero = String.format("%2d", casesNumero[i][j]);
+                            System.out.print(numero + "\t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                    System.out.println();
+                    return casesNumero[I][J - 1] <= 5;
+                }
+            }
+
+            // Droite
+            if (J + 1 < colonnes - 1 &&
+                    getCase(I, J + 1).getContenu() instanceof Plante &&
+                    casesNumero[I][J + 1] == -1) {
+                file.add(new int[]{I, J + 1});
+                casesNumero[I][J + 1] = casesNumero[I][J] + 1;
+                if (getCase(I, J + 1).getAnimal() instanceof Loup) {
+                    for (int i = 0; i < lignes; i++) {
+                        for (int j = 0; j < colonnes; j++) {
+                            String numero = String.format("%2d", casesNumero[i][j]);
+                            System.out.print(numero + "\t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                    System.out.println();
+                    return casesNumero[I][J + 1] <= 5;
+                }
+            }
+
+        }
+
+        return false;
+    }
+
 
     public void parcoursLargeur(){
 

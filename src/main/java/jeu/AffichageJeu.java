@@ -1,13 +1,11 @@
 package jeu;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -21,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import menu.Menu;
+import menuSelectionPlateau.MenuSelectionAffichage;
 
 public class AffichageJeu extends Scene {
     //Reprend les classes du jeu
@@ -111,6 +110,48 @@ public class AffichageJeu extends Scene {
         }
 
     }
+
+    public AffichageJeu(Stage stage, String adressePlateau){
+        super(new AnchorPane(), 1280,720);
+        panneauTemporaire = (AnchorPane) getRoot();
+        mainStage = stage;
+        vientSauvegarde = true;
+        //Permet de créer la base pour les autres éléments visuels
+        creerFenetreJeu();
+        //On initie les actions utilisateurs
+        controleur = new Controleur(this);
+        try {
+            this.controleur.jeu.reprendreSauvegarde(adressePlateau);
+        } catch (IOException e) {
+            String texte = "Erreur de lecture : "+"\n"+"" +
+                    "Impossible de lire le fichier de sauvegarde.";
+            messageAlerte(e, texte, stage);
+        } catch (ClassNotFoundException e) {
+            String texte = "Erreur de chargement : "+"\n"+
+                    "Impossible de charger les données de sauvegarde.";
+            messageAlerte(e, texte, stage);
+        }  catch (Exception e){
+            messageAlerte(e,"Erreur !", stage);
+        }
+        boutonRetourMenu = new Button("Retourner au menu");
+        controleur.retournerAuMenu(boutonRetourMenu, mainStage);
+        panneau2.getChildren().add(boutonRetourMenu);
+        afficherPlateauJeu(false);
+        getJeu().plateau.printMatrices();
+        etapeJeu();
+    }
+
+    public void messageAlerte(Exception e, String texte, Stage stage){
+        e.printStackTrace();
+        Alert alerte = new Alert(Alert.AlertType.ERROR);
+        alerte.setHeaderText(texte);
+        alerte.setContentText(e.toString());
+        alerte.showAndWait();
+        MenuSelectionAffichage menuSelection = new MenuSelectionAffichage(stage);
+        stage.setScene(menuSelection);
+    }
+
+
 
 
 

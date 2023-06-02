@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import jeu.AffichageJeu;
+import menuSelectionPlateau.MenuSelectionAffichage;
 import parametres.Parametres;
 
 public class MenuControleur {
@@ -50,6 +51,18 @@ public class MenuControleur {
             }
         });
     }
+
+    public void demarrerMenuSelection(Button bouton, Stage stage){
+        bouton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                MenuSelectionAffichage menuSelection = new MenuSelectionAffichage(stage);
+                stage.setScene(menuSelection);
+            }
+        });
+    }
+
+
 
 
 }

@@ -21,14 +21,14 @@ import sauvegarde.DossierSauvegarde;
 public class Menu extends Scene {
     private BorderPane panneau = (BorderPane)this.getRoot();
     private Intro intro;
-    private MenuControleur menuControleur;
+    private final MenuControleur menuControleur;
     private static final String IMG_LOGO = "/logoJeu2.png";
 
     public Menu(Stage stage) {
         super(new BorderPane(), 1280.0, 720.0);
         menuControleur = new MenuControleur();
         VBox vBox = new VBox();
-        vBox.setSpacing(30.0);
+        vBox.setSpacing(20.0);
         this.panneau.setTop(vBox);
         vBox.setAlignment(Pos.CENTER);
         DossierSauvegarde sauvegarde = new DossierSauvegarde();
@@ -39,12 +39,17 @@ public class Menu extends Scene {
         BoutonJeu demarrer = new BoutonJeu("Démarrer", Color.rgb(200, 130, 100));
         this.menuControleur.demarrerJeu(demarrer, stage);
         vBox.getChildren().add(demarrer);
+
         BoutonJeu reprendreSauvegarde = new BoutonJeu("Reprendre la sauvegarde", Color.rgb(200, 130, 100));
         this.menuControleur.demarrerJeuViaSauvegarde(reprendreSauvegarde, stage);
         vBox.getChildren().add(reprendreSauvegarde);
         if (!sauvegarde.cheminDaccesExisteBien()) {
             reprendreSauvegarde.setDisable(true);
         }
+
+        BoutonJeu recupererSauvegarde = new BoutonJeu("Récupérer une sauvegarde",Color.rgb(200,130,100));
+        this.menuControleur.demarrerMenuSelection(recupererSauvegarde, stage);
+        vBox.getChildren().add(recupererSauvegarde);
 
         BoutonJeu parametre = new BoutonJeu("Paramètres", Color.rgb(200, 130, 100));
         this.menuControleur.parametreJeu(parametre, stage);
