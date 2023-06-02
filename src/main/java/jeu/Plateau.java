@@ -22,11 +22,13 @@ public class Plateau implements Serializable {
     //Pour garder en mémoire les cases précédentes :
     private final transient ArrayList<int[]> casesLoupPassees = new ArrayList<>();
     private final transient ArrayList<int[]> casesMoutonPassees = new ArrayList<>();
-
-
-
-
     private transient int planteMangee;
+
+    /**
+     * @param l : nombre de lignes
+     * @param c : nombre de colonnes
+     * Constructeur du plateau
+     */
 
 
     public Plateau(int l, int c){
@@ -36,6 +38,51 @@ public class Plateau implements Serializable {
         this.planteMangee = 0;
 
     }
+
+    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET, SET, IS//////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+    public int getColonnes(){
+        return this.colonnes;
+    }
+
+    public int getLignes(){
+        return this.lignes;
+    }
+
+
+    public Case getCase(int i, int j){
+        //sert uniquement pour les tests
+        return this.cases[i][j];
+    }
+
+    public void setCaseSortie(int i, int j){
+        caseSortie[0] = i;
+        caseSortie[1] = j;
+    }
+
+    public int[] getCaseSortie(){
+        return caseSortie;
+    }
+
+    public int getNbrPlanteMangee() {
+        return this.planteMangee;
+    }
+
+    public void moutonAMangePlante(){
+        this.planteMangee++;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////FIN GET, SET, IS////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * Méthode permettant de créer un plateau vierge où toutes les extrémités sont des roches et le reste
+     * des herbes
+     */
 
 
     public void creerPlateau(){
@@ -53,11 +100,16 @@ public class Plateau implements Serializable {
     }
 
 
-
+    /**
+     * Méthode permettant de créer un labyrinthe parfait très aléatoire donnant beaucoup de possibilité de
+     * déplacement pour les animaux
+     */
 
 
     public void creerLabyrinthe() {
-                // Initialisation du labyrinthe avec des roches en bordure et de l'herbe à l'intérieur
+        // Etape 1 :
+        // Initialisation du plateau avec les cases des positions I et J impairs sont des plantes, OU que
+        // I et J sont à l'avant-dernier lignes ou colonnes
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
                 if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
@@ -68,30 +120,30 @@ public class Plateau implements Serializable {
             }
         }
 
-        printMatrices();
-
+        //Etape 2 :
+        // Suppression de l'obstacle EST ou SUD à partir de la case actuelle (en boucle)
         ArrayList<Integer> listeColonnes = new ArrayList<>();
         for (int i = 1; i < lignes - 1; i++) {
             for (int j = 1; j < colonnes -1; j++) {
-                System.out.println(i+""+j+""+this.cases[i][j].getContenu().getNom());
                 double random = Math.random();
                 if (random <= 0.5){
                     if (j != colonnes - 2) {
-                        listeColonnes.add(j);
-                        supprimerObstacle(i, j, 'E');
+                        listeColonnes.add(j); //ajout dans la liste
+                        supprimerObstacle(i, j, 'E'); //suppression de l'obstacle EST à la position i,j
                     }
                 } else {
                     if (i != lignes - 2) {
                         listeColonnes.add(j);
-                        Collections.shuffle(listeColonnes);
+                        Collections.shuffle(listeColonnes); //mélange de la liste
+                        //suppression de l'obstacle SUD à la position i, élément 0 de la liste mélangée
                         supprimerObstacle(i, listeColonnes.get(0), 'S');
-                        listeColonnes.clear();
+                        listeColonnes.clear(); // effacement des positions de la liste
                     }
                 }
             }
         }
 
-
+        //Ajout des roches si le nombre de lignes ou/et de colonnes est pair
         if (lignes % 2 == 0){
             for (int j = 0; j < colonnes; j++){
                 this.cases[lignes - 1][j].setContenuGeneral(new Roche());
@@ -103,13 +155,15 @@ public class Plateau implements Serializable {
             }
         }
 
+        //Etape 3 :
+        //Libération des cases aux alentours de la sortie
         if (caseSortie[0] == 0 || caseSortie[0] == lignes - 1) {
-            int startRow = Math.max(0, caseSortie[0] - 1);
-            int endRow = Math.min(lignes - 1, caseSortie[0] + 1);
-            int column = caseSortie[1];
+            int depart = Math.max(0, caseSortie[0] - 1);
+            int arrivee = Math.min(lignes - 1, caseSortie[0] + 1);
+            int colonne = caseSortie[1];
 
-            for (int i = startRow; i <= endRow; i++) {
-                this.cases[i][column].setPlanteRandom();
+            for (int i = depart; i <= arrivee; i++) {
+                this.cases[i][colonne].setPlanteRandom();
             }
             if (caseSortie[0] == 0){
                 this.cases[getCaseSortie()[0] + 2][getCaseSortie()[1]].setPlanteRandom();
@@ -117,12 +171,12 @@ public class Plateau implements Serializable {
                 this.cases[getCaseSortie()[0] - 2][getCaseSortie()[1]].setPlanteRandom();
             }
         } else {
-            int row = caseSortie[0];
-            int startColumn = Math.max(0, caseSortie[1] - 1);
-            int endColumn = Math.min(colonnes - 1, caseSortie[1] + 1);
+            int depart = caseSortie[0];
+            int colonneDepart = Math.max(0, caseSortie[1] - 1);
+            int colonneArrivee = Math.min(colonnes - 1, caseSortie[1] + 1);
 
-            for (int j = startColumn; j <= endColumn; j++) {
-                this.cases[row][j].setPlanteRandom();
+            for (int j = colonneDepart; j <= colonneArrivee; j++) {
+                this.cases[depart][j].setPlanteRandom();
             }
             if (caseSortie[1] == 0){
                 this.cases[getCaseSortie()[0]][getCaseSortie()[1] + 2].setPlanteRandom();
@@ -131,58 +185,24 @@ public class Plateau implements Serializable {
             }
         }
 
+        //Etape 4
+        //Si labyrinthe imparfait (très rare) remplacement des cases non visitées par de la roche
         if (!verifPlateauCorrect()) {
             for (int[] c : casesPlante) {
                 this.cases[c[0]][c[1]].setContenuGeneral(new Roche());
             }
         }
-        System.out.println(verifPlateauCorrect());
-
     }
 
 
-    public int getNbrPlanteMangee() {
-        return this.planteMangee;
-    }
-
-    public void moutonAMangePlante(){
-        this.planteMangee++;
-    }
-
-
-    /*
-    //POUR TESTER
-    public void creerPlateau() {
-        this.cases = new Case[9][9];
-        lignes = 9;
-        colonnes = 9;
-        for (int i = 0; i < lignes ; i++) {
-            for (int j = 0; j < colonnes ; j++) {
-                if (i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1) {
-                    this.cases[i][j] = new Case(new Roche(), null);
-                } else if ((i % 2 == 1 || j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
-                    this.cases[i][j] = new Case(new Herbe(), null);
-                } else {
-                    this.cases[i][j] = new Case(new Roche(), null);
-                }
-
-            }
-        }
-        this.cases[0][2].setContenuGeneral(new Herbe());
-        this.cases[7][6].setContenuGeneral(new Roche());
-        this.cases[6][7].setContenuGeneral(new Roche());
-        System.out.println(verifPlateauCorrect(0,2));
-        for (int[] c : casesPlante){
-            System.out.println(c[0]+" "+c[1]);
-        }
-        System.out.println();
-    }
-
+    /**
+     * @param i : position i du plateau
+     * @param j : position j du plateau
+     * @param orientation : orientation choisie (N, S, E ou O)
+     * Cette méthode permet supprimer une roche afin de la remplacer par une plante aléatoire
      */
 
-
-
-    private void supprimerObstacle(int i, int j, char orientation){
+    public void supprimerObstacle(int i, int j, char orientation){
         switch (orientation){
             case 'N' -> this.cases[i-1][j].setPlanteRandom();
             case 'E' -> this.cases[i][j+1].setPlanteRandom();
@@ -191,7 +211,17 @@ public class Plateau implements Serializable {
         }
     }
 
-
+    /**
+     * @return : renvoie vrai si le labyrinthe est parfait, sinon renvoie faux
+     * Cette méthode permet de vérifier si le plateau est un labyrinthe est porfait ou pas
+     * Cette méthode contient 2 arraylists : un qui contient les cases plantes, l'autre le marqueur
+     * Contient aussi une pile (parcours en profondeur) contenant le chemin
+     * Tant qu'on a pas visité toutes les cases plantes, vérifie les 4 positions si :
+     * la case est bien une plante ET n'est pas à l'extrémité ET n'est pas marquée
+     * Si aucune des 4 positions n'est possible, on reprend le dernier élément de chemin et on recommence
+     * Si la pile est vide, renvoie faux car labyrinthe est imparfait
+     * Si l'algorithme a visité toutes les cases plantes, renvoie vrai car labyrinthe parfait
+     */
 
 
 
@@ -201,6 +231,7 @@ public class Plateau implements Serializable {
         listeCasePassees.clear();
         chemin.clear();
 
+        //On complète la liste des cases plantes
         completerListeCasesPlante();
         //On supprime l'autre liste tous les éléments
         //Maintenant on stocke dans une autre liste toutes les cases qui sont passables
@@ -216,25 +247,29 @@ public class Plateau implements Serializable {
 
 
             //Correspond à gauche
-            if (jCourant - 1 > 0 && this.cases[iCourant][jCourant - 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant-1})) {
+            if (jCourant - 1 > 0 && this.cases[iCourant][jCourant - 1].getContenu() instanceof Plante &&
+                    !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant-1})) {
                 jCourant--;
                 actionsCaseActuelle(iCourant, jCourant);
                 deplacementPossible = true;
             }
             //Correspond à haut
-            else if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
+            else if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante &&
+                    !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
                 iCourant--;
                 actionsCaseActuelle(iCourant, jCourant);
                 deplacementPossible = true;
             }
             //Correspond à droite
-            else if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
+            else if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante &&
+                    !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
                 jCourant++;
                 actionsCaseActuelle(iCourant, jCourant);
                 deplacementPossible = true;
             }
             //Correspond à bas
-            else if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante && !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
+            else if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante &&
+                    !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
                 iCourant++;
                 actionsCaseActuelle(iCourant, jCourant);
                 deplacementPossible = true;
@@ -255,7 +290,12 @@ public class Plateau implements Serializable {
         return true;
     }
 
-
+    /**
+     * @param liste : la collection choisie
+     * @param position : un tableau de la position actuelle
+     * @return : renvoie vrai si la collection contient les mêmes valeurs que les 2 premières valeurs du tableau,
+     * sinon renvoie faux
+     */
 
     public boolean presentDansLaListe(Collection<int[]> liste, int[] position){
         for (int[] l : liste){
@@ -266,8 +306,15 @@ public class Plateau implements Serializable {
         return false;
     }
 
+    /**
+     * @param arr : une Arraylist choisie
+     * @param l : un tableau d'entier
+     *          Cette méthode permet de supprimer une valeur dans l'arraylist si elle correspond aux mêmes valeurs
+     *          du tableau contenant 2 entiers (spécifique à ce programme)
+     */
 
-    private void supprimerTableauArrayList(ArrayList<int[]> arr, int[] l){
+
+    public void supprimerTableauArrayList(ArrayList<int[]> arr, int[] l){
         for (int i=0; i < arr.size(); i++){
             if (l[0] == arr.get(i)[0] && l[1] == arr.get(i)[1]){
                 arr.remove(i);
@@ -276,6 +323,9 @@ public class Plateau implements Serializable {
         }
     }
 
+    /**
+     * Méthode qui permet une liste contenant la position des cases plantes
+     */
 
     private void completerListeCasesPlante(){
         for (int i = 1; i < lignes-1; i++){
@@ -286,6 +336,14 @@ public class Plateau implements Serializable {
             }
         }
     }
+
+    /**
+     * @param i : position i du plateau
+     * @param j : position j du plateau
+     * @return : renvoie vrai si la case actuelle a 4 voisins de type plante ET qu'il y a au moins 2 roches.
+     * En effet, le parcours en profondeur a pour défaut que s'il y a 4 cases possibles
+     * il ne fait au maximum que 2 cases au mieux de 3
+     */
 
     public boolean aBien4CasesVoisinesPlantes(int i, int j){
         /*
@@ -314,7 +372,14 @@ public class Plateau implements Serializable {
         return cmpt == 4 && roche >= 2;
     }
 
-    private void actionsCaseActuelle(int i, int j){
+    /**
+     * @param i : position i du plateau
+     * @param j : position j du plateau
+     * Méthode qui permet de supprimer la position actuelle de la liste casesPlantes
+     * Ajoute la position à la liste des cases passées et push 1 ou 2 fois le chemin
+     */
+
+    public void actionsCaseActuelle(int i, int j){
         int[] caseActuelle = new int[]{i, j};
         supprimerTableauArrayList(casesPlante, caseActuelle);
         listeCasePassees.add(caseActuelle);
@@ -326,6 +391,11 @@ public class Plateau implements Serializable {
             chemin.push(caseActuelle);
         }
     }
+
+    /**
+     * @param n : Nom de l'animal
+     * @return : renvoie vrai si l'animal choisi est présent, sinon renvoie faux
+     */
 
 
     public boolean verifPresenceAnimal(String n){
@@ -342,12 +412,15 @@ public class Plateau implements Serializable {
     }
 
 
-
+    /**
+     * Méthode qui permet d'afficher à la console un plateau représentant une lettre en fonction
+     * du type de terrain
+     */
 
     public void printMatrices () {
         for (int i = 0; i < this.lignes; i++) {
             for (int j = 0; j < this.colonnes; j++) {
-                if (this.cases[i][j].getContenu().getNom().equals("Roche")) {
+                if (this.cases[i][j].getContenu() instanceof Roche) {
                     System.out.print("R" + "\t");
                 } else if (this.cases[i][j].getContenu() instanceof Herbe) {
                     System.out.print("H" + "\t");
@@ -363,28 +436,12 @@ public class Plateau implements Serializable {
 
 
 
-    public int getColonnes(){
-        return this.colonnes;
-    }
-
-    public int getLignes(){
-        return this.lignes;
-    }
 
 
-    public Case getCase(int i, int j){
-        //sert uniquement pour les tests
-        return this.cases[i][j];
-    }
-
-    public void setCaseSortie(int i, int j){
-        caseSortie[0] = i;
-        caseSortie[1] = j;
-    }
-
-    public int[] getCaseSortie(){
-        return caseSortie;
-    }
+    /**
+     * @return : renvoie la case du mouton en un tableau de 2 entiers
+     * Méthode qui permet d'obtenir la position du mouton
+     */
 
     public int[] getCaseMouton(){
         for (int i =0; i < lignes; i++){
@@ -399,6 +456,11 @@ public class Plateau implements Serializable {
         return new int[2];
     }
 
+    /**
+     * Méthode qui permet d'augmenter la valeur du nombre de jours où la case est de type terre et si la valeur
+     * est supérieure à 2 permet de faire pousser une nouvelle plante aléatoire
+     */
+
     public void planteQuiPousse(){
         for (int i = 0; i < lignes; i++){
             for (int j = 0; j < colonnes; j++){
@@ -412,12 +474,18 @@ public class Plateau implements Serializable {
         }
     }
 
-
+    /**
+     * @param i : position i du plateau
+     * @param j : position j du plateau
+     * @return : retourne un entier en fonction de la plante où le mouton arrête son tour
+     * Renvoie 4 si c'est une marguerite, 2 si c'est une terre ou une herbe, 1 si c'est un cactus
+     * Si c'est n'importe quelle plante sauf de la terre, le mouton la mange et crée une case de type terre
+     */
 
     public int moutonMangePlante(int i, int j){
         //Permet d'obtenir le nombre de déplacement du mouton en fonction de la case
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
-            moutonAMangePlante(); //permet d'augmenter le nombre de plantes mangées
+            moutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 return 2;
@@ -435,19 +503,16 @@ public class Plateau implements Serializable {
 
 
 
-
-
-
-
-    public void setCases(int i, int j, TypeTerrain t, Animal a){
-        this.cases[i][j].setContenuGeneral(t);
-        this.cases[i][j].setAnimal(a);
-    }
+    /**
+     * @param animal : Nom de l'animal choisi
+     * Méthode qui permet de détecter la case de l'animal choisi et le déplace avec un algorithme choisi
+     * s'il y est menacé/menaçant, sinon le déplacer aléatoirement
+     */
 
 
     public void deplacerAnimal(String animal){
         int[] posAnimal = new int[2];
-        //Détection de l'animal
+        //Détection de la case de l'animal chosi
         for (int i = 0; i < lignes; i++){
             for (int j = 0; j < colonnes; j++){
                 if (this.cases[i][j].animalPresent()){
@@ -467,20 +532,36 @@ public class Plateau implements Serializable {
             }
         } else {
             if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())){
-                deplacerAnimal("Loup");
+                deplacerAnimal("Loup"); //Une erreur a été détectée ici quand le loup est à côté de la case de sortie
             }
         }
     }
 
+    /**
+     *
+     * @param i : position i du plateau
+     * @param j : position j du plateau
+     * @param a : animal actuel : loup ou mouton
+     * @return : renvoie vrai si le déplacement est possible, sinon renvoie faux
+     * Le but de cette méthode est de regarder les 4 positions possibles de déplacement
+     * Une liste prend les cases auquel l'animal peut se déplacer ET qu'il n'est pas passé dessus dernièrement
+     * (sauf dans le cas où aucun déplacement n'était possible, permet de favoriser le déplacement des animaux)
+     * Si déplacement possible, prend une des cases possibles au hasard et déplace l'animal vers cette case
+     */
 
     public boolean deplacementAnimalPassif(int i, int j, Animal a){
+        //Reprise d'une arraylist déjà créée
         ArrayList<int[]> listeCasePasses;
         if (a.getNom().equals("Mouton")){
             listeCasePasses = casesMoutonPassees;
         } else {
             listeCasePasses = casesLoupPassees;
         }
+        //Création d'une liste stockant les cases possibles
         ArrayList<int[]> casesPossibles = new ArrayList<>();
+        //Regarde la position gauche
+        //casesPossibles prend la valeur si la case est une plante ET n'est pas présent dans la liste
+        //des cases passées
         if (this.cases[i][j-1].getContenu() instanceof Plante && j - 1 > 0 &&
                 !presentDansLaListe(listeCasePasses, new int[]{i,j-1})){
 
@@ -491,6 +572,7 @@ public class Plateau implements Serializable {
                 casesLoupPassees.add(new int[]{i,j-1});
             }
         }
+        //Position haut
         if (this.cases[i-1][j].getContenu() instanceof Plante && i - 1 > 0 &&
                 !presentDansLaListe(listeCasePasses, new int[]{i-1,j})){
 
@@ -501,6 +583,7 @@ public class Plateau implements Serializable {
                 casesLoupPassees.add(new int[]{i-1,j});
             }
         }
+        //Position droite
         if (this.cases[i][j+1].getContenu() instanceof Plante && j + 1 < colonnes - 1 &&
                 !presentDansLaListe(listeCasePasses, new int[]{i,j+1})){
 
@@ -511,6 +594,7 @@ public class Plateau implements Serializable {
                 casesLoupPassees.add(new int[]{i,j+1});
             }
         }
+        //Position bas
         if (this.cases[i+1][j].getContenu() instanceof Plante && i + 1 < lignes - 1 && j + 1 < colonnes - 1 &&
                 !presentDansLaListe(listeCasePasses, new int[]{i+1,j})){
 
@@ -521,18 +605,23 @@ public class Plateau implements Serializable {
                 casesLoupPassees.add(new int[]{i+1,j});
             }
         }
+        //Si aucune possibilité
         if (casesPossibles.isEmpty()){
-            //Dans le cas où il n'y a plus aucun déplacement possible
+            //On efface l'une des 2 listes en fonction de l'animal
             if (a.getNom().equals("Mouton")){
                 casesMoutonPassees.clear();
             } else {
                 casesLoupPassees.clear();
             }
-            return false;
+            return false; //retourne faux
         }
+        //Sinon, on initialise une méthode Random
         Random random = new Random();
+        //On prend la taille de la liste
         int position = random.nextInt(casesPossibles.size());
+        //Choisi une case aléatoirement
         int[] deplacementChoisi = casesPossibles.get(position);
+        //Supprime l'animal à la case initiale et déplace l'animal en fonction de la sélection
         this.cases[i][j].removeAnimal();
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
         return true;
@@ -548,180 +637,104 @@ public class Plateau implements Serializable {
     Dijkstra
      */
 
-
-    /*
-    public boolean manhattan(){
-        int[][] casesNumero = new int[lignes][colonnes];
-        for (int i = 0; i < lignes; i++){
-            for (int j = 0; j < colonnes; j++){
-                casesNumero[i][j] = -1;
-            }
-        }
-        int[] posMouton = getCaseMouton();
-        int posI = posMouton[0];
-        int posJ = posMouton[1];
-        casesNumero[posI][posJ] = 0;
-        //ArrayList<int[]> casePasses = new ArrayList<>();
-        Queue<int[]> file = new ArrayDeque<>();
-
-        //casePasses.add(posMouton);
-        file.add(posMouton);
-        while (!file.isEmpty()) {
-            int[] posActuelle = file.poll();
-            int I = posActuelle[0];
-            int J = posActuelle[1];
-
-            if (I - 1 >= 0 &&
-                    getCase(I - 1, J).getContenu() instanceof Plante &&
-                    casesNumero[I - 1][J] == -1) {
-                file.add(new int[]{I - 1, J});
-                casesNumero[I - 1][J] = casesNumero[I][J] + 1;
-                if (getCase(I - 1, J).getAnimal() instanceof Loup) {
-                    return casesNumero[I][J - 1] <= 5;
-                }
-            }
-
-            // Vérification des autres directions
-            // Bas
-            if (I + 1 < lignes - 1 &&
-                    getCase(I + 1, J).getContenu() instanceof Plante &&
-                    casesNumero[I + 1][J] == -1) {
-                file.add(new int[]{I + 1, J});
-                casesNumero[I + 1][J] = casesNumero[I][J] + 1;
-                if (getCase(I + 1, J).getAnimal() instanceof Loup) {
-                    return casesNumero[I][J - 1] <= 5;
-                }
-            }
-
-            // Gauche
-            if (J - 1 >= 0 &&
-                    getCase(I, J - 1).getContenu() instanceof Plante &&
-                    casesNumero[I][J - 1] == -1) {
-                file.add(new int[]{I, J - 1});
-                casesNumero[I][J - 1] = casesNumero[I][J] + 1;
-                if (getCase(I, J - 1).getAnimal() instanceof Loup) {
-                    return casesNumero[I][J - 1] <= 5;
-                }
-            }
-
-            // Droite
-            if (J + 1 < colonnes - 1 &&
-                    getCase(I, J + 1).getContenu() instanceof Plante &&
-                    casesNumero[I][J + 1] == -1) {
-                file.add(new int[]{I, J + 1});
-                casesNumero[I][J + 1] = casesNumero[I][J] + 1;
-                if (getCase(I, J + 1).getAnimal() instanceof Loup) {
-                    return casesNumero[I][J - 1] <= 5;
-                }
-            }
-        }
-        return false;
-    }
-
+    /**
+     * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
+     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
+     * Utilise l'algorithme de parcours en largeur
      */
 
     public boolean manhattan() {
+        //Création d'une matrice ayant des entiers : -1 pour les plantes -2 pour les roches
+        //Sert pour le marquage
         int[][] casesNumero = new int[lignes][colonnes];
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
-                casesNumero[i][j] = -1;
+                if (getCase(i,j).getContenu() instanceof Plante) {
+                    casesNumero[i][j] = -1;
+                } else {
+                    casesNumero[i][j] = -2;
+                }
             }
         }
+        //Récupération de la case mouton
         int[] posMouton = getCaseMouton();
         int posI = posMouton[0];
         int posJ = posMouton[1];
+        //Valeur de la case mouton = 0
         casesNumero[posI][posJ] = 0;
+
+        //Création d'une file (parcours en largeur)
         Queue<int[]> file = new ArrayDeque<>();
+        //Ajout de la position mouton
         file.add(posMouton);
 
         while (!file.isEmpty()) {
-            int[] posActuelle = file.poll();
+            int[] posActuelle = file.poll(); //Récupération et suppression de la 1ère valeur de la file
+            //I et J : valeur prise de la file
             int I = posActuelle[0];
             int J = posActuelle[1];
 
-            if (I - 1 > 0 &&
-                    getCase(I - 1, J).getContenu() instanceof Plante &&
-                    casesNumero[I - 1][J] == -1) {
+            //Vérification en haut
+            if (I - 1 >= 0 && casesNumero[I - 1][J] == -1) {
                 file.add(new int[]{I - 1, J});
                 casesNumero[I - 1][J] = casesNumero[I][J] + 1;
+                //Si la case possède un loup
                 if (getCase(I - 1, J).getAnimal() instanceof Loup) {
-                    for (int i = 0; i < lignes; i++) {
-                        for (int j = 0; j < colonnes; j++) {
-                            String numero = String.format("%2d", casesNumero[i][j]);
-                            System.out.print(numero + "\t");
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-                    System.out.println();
-                    return casesNumero[I - 1][J] <= 5;
+                    printNumeroCase(casesNumero); //Permet d'afficher dans la console
+                    return casesNumero[I - 1][J] <= 5; //Retourne vrai ou faux en fonction de la valeur
                 }
             }
 
             // Vérification des autres directions
             // Bas
-            if (I + 1 < lignes - 1 &&
-                    getCase(I + 1, J).getContenu() instanceof Plante &&
-                    casesNumero[I + 1][J] == -1) {
+            if (I + 1 < lignes && casesNumero[I + 1][J] == -1) {
                 file.add(new int[]{I + 1, J});
                 casesNumero[I + 1][J] = casesNumero[I][J] + 1;
                 if (getCase(I + 1, J).getAnimal() instanceof Loup) {
-                    for (int i = 0; i < lignes; i++) {
-                        for (int j = 0; j < colonnes; j++) {
-                            String numero = String.format("%2d", casesNumero[i][j]);
-                            System.out.print(numero + "\t");
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-                    System.out.println();
+                    printNumeroCase(casesNumero);
                     return casesNumero[I + 1][J] < 5;
                 }
             }
 
             // Gauche
-            if (J - 1 > 0 &&
-                    getCase(I, J - 1).getContenu() instanceof Plante &&
-                    casesNumero[I][J - 1] == -1) {
+            if (J - 1 >= 0 && casesNumero[I][J - 1] == -1) {
                 file.add(new int[]{I, J - 1});
                 casesNumero[I][J - 1] = casesNumero[I][J] + 1;
                 if (getCase(I, J - 1).getAnimal() instanceof Loup) {
-                    for (int i = 0; i < lignes; i++) {
-                        for (int j = 0; j < colonnes; j++) {
-                            String numero = String.format("%2d", casesNumero[i][j]);
-                            System.out.print(numero + "\t");
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-                    System.out.println();
+                    printNumeroCase(casesNumero);
                     return casesNumero[I][J - 1] <= 5;
                 }
             }
 
             // Droite
-            if (J + 1 < colonnes - 1 &&
-                    getCase(I, J + 1).getContenu() instanceof Plante &&
-                    casesNumero[I][J + 1] == -1) {
+            if (J + 1 < colonnes && casesNumero[I][J + 1] == -1) {
                 file.add(new int[]{I, J + 1});
                 casesNumero[I][J + 1] = casesNumero[I][J] + 1;
                 if (getCase(I, J + 1).getAnimal() instanceof Loup) {
-                    for (int i = 0; i < lignes; i++) {
-                        for (int j = 0; j < colonnes; j++) {
-                            String numero = String.format("%2d", casesNumero[i][j]);
-                            System.out.print(numero + "\t");
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-                    System.out.println();
+                    printNumeroCase(casesNumero);
                     return casesNumero[I][J + 1] <= 5;
                 }
             }
-
         }
-
+        //Ne devrait jamais arriver ici
         return false;
+    }
+
+    /**
+     * Méthode privée permettant de visualiser la distance des cases par rapport à la position du mouton en
+     * distance de Manhattan
+     * -1 représente les cases non visitées, -2 représente les roches
+     */
+
+    private void printNumeroCase(int[][] plateau){
+        System.out.println("Manhanttan : ");
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+                String numero = String.format("%2d", plateau[i][j]); //Permet de décaler s'il y a un seul caractère
+                System.out.print(numero + "\t");
+            }
+            System.out.println();
+        }
     }
 
 

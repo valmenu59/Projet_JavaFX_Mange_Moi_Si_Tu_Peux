@@ -61,7 +61,6 @@ public class AffichageJeu extends Scene {
     private final ArrayList<ImageView> listeImages = new ArrayList<>();
     private double xDepart;
     private double yDepart;
-    private Menu menu;
 
     private boolean estEnPause;
 

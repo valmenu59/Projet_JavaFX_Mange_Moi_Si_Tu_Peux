@@ -280,7 +280,9 @@ public class Controleur {
         b.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                affichageJeu.getBoucleJeu().stop();
+                if (affichageJeu.getNumeroEtape() == 5) {
+                    affichageJeu.getBoucleJeu().stop();
+                }
                 Menu menu = new Menu(stage);
                 stage.setScene(menu);
             }
