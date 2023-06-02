@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 public abstract class Animal implements Serializable {
     
-    private String nom;
+    private final String nom;
+
     public Animal(String n){
         this.nom = n;
     }

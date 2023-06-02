@@ -19,7 +19,9 @@ public class Jeu {
     private final DossierSauvegarde sauvegarde = new DossierSauvegarde();
 
 
-
+    /**
+     * Constructeur de la classe jeu
+     */
 
 
     public Jeu(){
@@ -32,34 +34,9 @@ public class Jeu {
 
     }
 
-
-
-
-    public void boucleJeu() {
-        System.out.println("Loup menaçant "+ plateau.manhattan());
-        if (auTourDuMouton) {
-            if (deplacementMouton == planteDeplacementMouton) {
-                this.nbTour++;
-                this.plateau.planteQuiPousse();
-            }
-            deplacementMouton--;
-            plateau.deplacerAnimal("Mouton");
-            if (deplacementMouton == 0) {
-                int[] caseM = plateau.getCaseMouton();
-                int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
-                setDeplacementMouton(nbr);
-                planteDeplacementMouton = nbr;
-                auTourDuMouton = false;
-            }
-        } else {
-            deplacementLoup--;
-            plateau.deplacerAnimal("Loup");
-            if (deplacementLoup == 0) {
-                reinitialiserDeplacementLoup();
-                auTourDuMouton = true;
-            }
-        }
-    }
+    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET, SET, IS//////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
     public void setDeplacementMouton(int nbr) {
         this.deplacementMouton = nbr;
@@ -68,7 +45,6 @@ public class Jeu {
     public void reinitialiserDeplacementLoup() {
         this.deplacementLoup = 3;
     }
-
 
 
     public boolean isAuTourDuMouton() {
@@ -101,8 +77,45 @@ public class Jeu {
 
 
 
+    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////FIN GET, SET, IS////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Permet de faire une boucle en déplaçant les animaux, et de vérifier si la partie est terminée ou pas
+     */
 
 
+    public void boucleJeu() {
+        System.out.println("Loup menaçant "+ plateau.manhattan());
+        if (auTourDuMouton) {
+            if (deplacementMouton == planteDeplacementMouton) {
+                this.nbTour++;
+                this.plateau.planteQuiPousse();
+            }
+            deplacementMouton--;
+            plateau.deplacerAnimal("Mouton");
+            if (deplacementMouton == 0) {
+                int[] caseM = plateau.getCaseMouton();
+                int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
+                setDeplacementMouton(nbr);
+                planteDeplacementMouton = nbr;
+                auTourDuMouton = false;
+            }
+        } else {
+            deplacementLoup--;
+            plateau.deplacerAnimal("Loup");
+            if (deplacementLoup == 0) {
+                reinitialiserDeplacementLoup();
+                auTourDuMouton = true;
+            }
+        }
+    }
+
+    /**
+     * Méthode permettant de sauvegarder l'état du plateau créé
+     * Créer un fichier binaire
+     */
 
 
     public void sauvegarderPlateau(){
@@ -112,7 +125,7 @@ public class Jeu {
             ObjectOutputStream objetFichier = new ObjectOutputStream(fichier);
 
             objetFichier.writeInt(this.plateau.getColonnes()); // Sauvegarde du nombre de colonnes
-            objetFichier.writeInt(this.plateau.getLignes());
+            objetFichier.writeInt(this.plateau.getLignes()); // Sauvegarde du nombre de lignes
 
             for (int i = 0; i < this.plateau.getLignes(); i++){
                 for (int j = 0; j < this.plateau.getColonnes(); j++){
@@ -136,7 +149,10 @@ public class Jeu {
         }
     }
 
-
+    /**
+     * Méthode permettant de reprendre l'état du plateau venant d'un fichier binaire à partir
+     * d'un emplacement précis
+     */
 
 
     public void reprendreSauvegarde() {
@@ -159,6 +175,12 @@ public class Jeu {
             e.printStackTrace();
         }
     }
+
+    /**
+     * @param adresse : donne l'adresse du fichier binaire
+     * Méthode permettant de reprendre l'état du plateau venant d'un fichier binaire à partir
+     * d'un emplacement choisi
+     */
 
     public void reprendreSauvegarde(String adresse) throws Exception {
         try (FileInputStream fileInputStream = new FileInputStream(adresse);

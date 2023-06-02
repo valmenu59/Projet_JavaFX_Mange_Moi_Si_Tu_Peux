@@ -18,7 +18,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import menu.Menu;
 import menuSelectionPlateau.MenuSelectionAffichage;
 
 public class AffichageJeu extends Scene {
@@ -140,6 +139,108 @@ public class AffichageJeu extends Scene {
         etapeJeu();
     }
 
+    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET, SET, IS//////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+    public int getChoixNbLignes() {
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return choixNblignes.getValue();
+    }
+
+    public int getChoixNbColonnes() {
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return choixNbColonnes.getValue();
+    }
+
+    public Button getBoutonValiderEtape(){
+        return this.boutonValiderEtape;
+    }
+
+    public int getNumeroEtape(){
+        return this.numeroEtape;
+    }
+
+
+
+    public VBox getPanneauSecondaire(){
+        return this.panneau2;
+    }
+
+
+    public Plateau getPlateau(){
+        return this.controleur.jeu.plateau;
+    }
+
+    public Case getCase(int i, int j){
+        return this.controleur.jeu.plateau.cases[i][j];
+    }
+
+    public String getSource (String element){
+        switch (element){
+            case "roche" -> {
+                return IMG_ROCHER;
+            }
+            case "herbe" -> {
+                return IMG_HERBE;
+            }
+            case "marguerite" -> {
+                return IMG_MARGUERITE;
+            }
+            case "cactus" -> {
+                return IMG_CACTUS;
+            }
+            case "mouton" -> {
+                return IMG_MOUTON;
+            }
+            case "loup" -> {
+                return IMG_LOUP;
+            }
+            case "terre" -> {
+                return IMG_TERRE;
+            }
+            case "mouton2" -> {
+                return IMG_MOUTON_MENACE;
+            }
+            case "loup2" -> {
+                return IMG_LOUP_MENACANT;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    public ImageView getImageView(int i, int j){
+        return listeImages.get(i * getPlateau().getColonnes() + j );
+    }
+
+    public Text getTexteAlerteLabyrintheImparfait(){
+        return this.texteAlerteLabyrintheImparfait;
+    }
+
+    public AnimationTimer getBoucleJeu(){
+        return this.boucleJeu;
+    }
+
+    public boolean isEstEnPause(){
+        return estEnPause;
+    }
+
+    public void setMettreEnPause(boolean b){
+        this.estEnPause = b;
+    }
+
+    public Jeu getJeu(){
+        return this.controleur.jeu;
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////FIN GET, SET, IS////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+
     public void messageAlerte(Exception e, String texte, Stage stage){
         e.printStackTrace();
         Alert alerte = new Alert(Alert.AlertType.ERROR);
@@ -148,6 +249,35 @@ public class AffichageJeu extends Scene {
         alerte.showAndWait();
         MenuSelectionAffichage menuSelection = new MenuSelectionAffichage(stage);
         stage.setScene(menuSelection);
+    }
+
+
+    public void creerFenetreJeu() {
+        mainScene = panneauTemporaire.getScene();
+        //On va à la racine
+        Pane parentPane = (Pane) mainScene.getRoot();
+        //On supprime l'AnchorPane de Menu
+        parentPane.getChildren().remove(panneauTemporaire);
+
+        //Création du VBox à la partie gauche qui prend 20% de la scène
+        this.panneau2 = new VBox();
+        panneau2.setPrefWidth(mainScene.getWidth() * 0.20);
+
+        // Création de l'AnchorPane pour la partie droite
+        this.panneauPrincipal = new AnchorPane();
+
+        // Création du SplitPane
+        SplitPane splitPane = new SplitPane(panneau2,panneauPrincipal);
+        //Permet de diviser les deux parties à 20% de la taille de la scène
+        splitPane.setDividerPositions(0.20);
+        //Permet de ne plus redimensionner les panneaux
+        panneau2.maxWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
+        panneau2.minWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
+        //on rajoute à la racine le splitPane
+        mainScene.setRoot(splitPane);
+        //Permet de définir le style de panneau2
+        panneau2.setStyle("-fx-background-color: rgb(161,236,158)");
+
     }
 
 
@@ -208,7 +338,7 @@ public class AffichageJeu extends Scene {
         boutonRetour.setDisable(false);
         //Permet d'afficher le texte sur le panneau principal
         texteEtape();
-        if (controleur.sortieBienCree()) {
+        if (controleur.isSortieCree()) {
             boutonValiderEtape.setDisable(false);
         } else {
             boutonValiderEtape.setDisable(true);
@@ -270,33 +400,7 @@ public class AffichageJeu extends Scene {
     }
 
 
-    public void creerFenetreJeu() {
-        mainScene = panneauTemporaire.getScene();
-        //On va à la racine
-        Pane parentPane = (Pane) mainScene.getRoot();
-        //On supprime l'AnchorPane de Menu
-        parentPane.getChildren().remove(panneauTemporaire);
 
-        //Création du VBox à la partie gauche qui prend 20% de la scène
-        this.panneau2 = new VBox();
-        panneau2.setPrefWidth(mainScene.getWidth() * 0.20);
-
-        // Création de l'AnchorPane pour la partie droite
-        this.panneauPrincipal = new AnchorPane();
-
-        // Création du SplitPane
-        SplitPane splitPane = new SplitPane(panneau2,panneauPrincipal);
-        //Permet de diviser les deux parties à 20% de la taille de la scène
-        splitPane.setDividerPositions(0.20);
-        //Permet de ne plus redimensionner les panneaux
-        panneau2.maxWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
-        panneau2.minWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
-        //on rajoute à la racine le splitPane
-        mainScene.setRoot(splitPane);
-        //Permet de définir le style de panneau2
-        panneau2.setStyle("-fx-background-color: rgb(161,236,158)");
-
-    }
 
 
     public void changerActionCaseSortie(){
@@ -465,22 +569,7 @@ public class AffichageJeu extends Scene {
         return l;
     }
 
-    public int getChoixNbLignes() {
-        //Permet de récupérer la valeur choisie du menu déroulant
-        return choixNblignes.getValue();
-    }
 
-    public int getChoixNbColonnes() {
-        //Permet de récupérer la valeur choisie du menu déroulant
-        return choixNbColonnes.getValue();
-    }
-
-
-
-
-    public Button getBoutonValiderEtape(){
-        return this.boutonValiderEtape;
-    }
 
 
 
@@ -583,7 +672,7 @@ public class AffichageJeu extends Scene {
         for (int i=0; i < getPlateau().getLignes(); i++){
             for (int j=0; j < getPlateau().getColonnes(); j++){
                 ImageView img = getImageView(i,j);
-                if (this.getPlateau().cases[i][j].animalPresent()) {
+                if (this.getPlateau().cases[i][j].isAnimalPresent()) {
                     if (!this.getJeu().isMoutonEnDanger()) {
                         if (this.getPlateau().cases[i][j].getAnimal() instanceof Loup) {
                             img.setImage(loup);
@@ -650,85 +739,6 @@ public class AffichageJeu extends Scene {
     }
 
 
-    public int getNumeroEtape(){
-        return this.numeroEtape;
-    }
-
-
-
-    public VBox getPanneauSecondaire(){
-        return this.panneau2;
-    }
-
-
-
-    public Plateau getPlateau(){
-        return this.controleur.jeu.plateau;
-    }
-
-    public Case getCase(int i, int j){
-        return this.controleur.jeu.plateau.cases[i][j];
-    }
-
-    public String getSource (String element){
-        switch (element){
-            case "roche" -> {
-                return IMG_ROCHER;
-            }
-            case "herbe" -> {
-                return IMG_HERBE;
-            }
-            case "marguerite" -> {
-                return IMG_MARGUERITE;
-            }
-            case "cactus" -> {
-                return IMG_CACTUS;
-            }
-            case "mouton" -> {
-                return IMG_MOUTON;
-            }
-            case "loup" -> {
-                return IMG_LOUP;
-            }
-            case "terre" -> {
-                return IMG_TERRE;
-            }
-            case "mouton2" -> {
-                return IMG_MOUTON_MENACE;
-            }
-            case "loup2" -> {
-                return IMG_LOUP_MENACANT;
-            }
-            default -> {
-                return null;
-            }
-        }
-    }
-
-    public ImageView getImageView(int i, int j){
-        return listeImages.get(i * getPlateau().getColonnes() + j );
-    }
-
-
-    public Text getTexteAlerteLabyrintheImparfait(){
-        return this.texteAlerteLabyrintheImparfait;
-    }
-
-    public AnimationTimer getBoucleJeu(){
-        return this.boucleJeu;
-    }
-
-    public boolean estBienEnPause(){
-        return estEnPause;
-    }
-
-    public void mettreEnPauseOuPas(boolean b){
-        this.estEnPause = b;
-    }
-
-    public Jeu getJeu(){
-        return this.controleur.jeu;
-    }
 
 
 }

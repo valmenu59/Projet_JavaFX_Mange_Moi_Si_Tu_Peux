@@ -1,12 +1,8 @@
 package parametres;
 
 import fx.BoutonJeu;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -34,7 +30,7 @@ public class Parametres extends Scene {
         DossierSauvegarde sauvegarde = new DossierSauvegarde();
         BoutonJeu boutonSupprimerSauvegarde = new BoutonJeu("Supprimer la sauvegarde", Color.rgb(200, 20, 20));
         boutonSupprimerSauvegarde.setTextFill(Color.WHITE);
-        boutonSupprimerSauvegarde.setDisable(!sauvegarde.cheminDaccesExisteBien());
+        boutonSupprimerSauvegarde.setDisable(!sauvegarde.isCheminExisteBien());
         this.parametresControleur.supprimerSauvegarde(boutonSupprimerSauvegarde);
         vBox.getChildren().add(boutonSupprimerSauvegarde);
         BoutonJeu menuPrincipal = new BoutonJeu("Menu Principal", Color.rgb(115, 115, 115));

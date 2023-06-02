@@ -5,8 +5,7 @@ import java.io.File;
 public class DossierSauvegarde {
 
 
-    public DossierSauvegarde() {
-    }
+    public DossierSauvegarde() {}
 
     public String getCheminDaccesSauvegarde() {
         String os = System.getProperty("os.name").toLowerCase();
@@ -44,12 +43,12 @@ public class DossierSauvegarde {
         }
     }
 
-    public boolean cheminDaccesExisteBien() {
+    public boolean isCheminExisteBien() {
         File fichier = new File(this.getCheminDaccesSauvegarde());
         return fichier.exists();
     }
 
-    public boolean effacerSauvegarde() {
+    public boolean removeSauvegarde() {
         File fichier = new File(this.getCheminDaccesSauvegarde());
         fichier.delete();
         return !fichier.exists();

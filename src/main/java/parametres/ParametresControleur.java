@@ -2,10 +2,8 @@ package parametres;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import menu.Menu;
 import sauvegarde.DossierSauvegarde;
@@ -30,7 +28,7 @@ public class ParametresControleur {
     public void supprimerSauvegarde(final Button b) {
         b.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent actionEvent) {
-                boolean resu = sauvegarde.effacerSauvegarde();
+                boolean resu = sauvegarde.removeSauvegarde();
                 Alert alerte = new Alert(Alert.AlertType.INFORMATION);
                 alerte.setTitle("INFORMATION");
                 alerte.setContentText("");

@@ -13,6 +13,10 @@ public class Case implements Serializable {
         this.animal = animal;
     }
 
+    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET, SET, IS//////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
     public TypeTerrain getContenu(){
         return this.contenu;
     }
@@ -24,6 +28,11 @@ public class Case implements Serializable {
     public void setContenuPlante(Plante p){
         this.contenu = p;
     }
+
+    /**
+     * Méthode permettant de donner une nouvelle plante :
+     * 50% de chance que ce soit de l'herbe, 25% de chance que ce soit un cactus ou une marguerite
+     */
 
     public void setPlanteRandom(){
         double alea = Math.random();
@@ -40,7 +49,7 @@ public class Case implements Serializable {
         return this.animal;
     }
 
-    public boolean animalPresent(){
+    public boolean isAnimalPresent(){
         return this.animal != null;
     }
 
@@ -53,9 +62,9 @@ public class Case implements Serializable {
     }
 
 
-
-
-
+    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////FIN GET, SET, IS////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
 
 }

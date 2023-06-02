@@ -3,10 +3,8 @@ package menu;
 import demarrage.Intro;
 import fx.BoutonJeu;
 import fx.ImageJeu;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -15,7 +13,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import jeu.Jeu;
 import sauvegarde.DossierSauvegarde;
 
 public class Menu extends Scene {
@@ -43,7 +40,7 @@ public class Menu extends Scene {
         BoutonJeu reprendreSauvegarde = new BoutonJeu("Reprendre la sauvegarde", Color.rgb(200, 130, 100));
         this.menuControleur.demarrerJeuViaSauvegarde(reprendreSauvegarde, stage);
         vBox.getChildren().add(reprendreSauvegarde);
-        if (!sauvegarde.cheminDaccesExisteBien()) {
+        if (!sauvegarde.isCheminExisteBien()) {
             reprendreSauvegarde.setDisable(true);
         }
 

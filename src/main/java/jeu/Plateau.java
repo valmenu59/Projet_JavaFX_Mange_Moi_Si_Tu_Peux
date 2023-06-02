@@ -401,7 +401,7 @@ public class Plateau implements Serializable {
     public boolean verifPresenceAnimal(String n){
         for (int i = 0; i < this.getLignes(); i++) {
             for (int j = 0; j < this.getColonnes(); j++) {
-                if (this.cases[i][j].animalPresent()) {
+                if (this.cases[i][j].isAnimalPresent()) {
                     if (this.cases[i][j].getAnimal().getNom().equals(n)) {
                         return true;
                     }
@@ -446,7 +446,7 @@ public class Plateau implements Serializable {
     public int[] getCaseMouton(){
         for (int i =0; i < lignes; i++){
             for (int j =0; j < colonnes; j++){
-                if (this.cases[i][j].animalPresent()){
+                if (this.cases[i][j].isAnimalPresent()){
                     if (this.cases[i][j].getAnimal() instanceof Mouton){
                         return new int[]{i,j};
                     }
@@ -515,7 +515,7 @@ public class Plateau implements Serializable {
         //Détection de la case de l'animal chosi
         for (int i = 0; i < lignes; i++){
             for (int j = 0; j < colonnes; j++){
-                if (this.cases[i][j].animalPresent()){
+                if (this.cases[i][j].isAnimalPresent()){
                     if (this.cases[i][j].getAnimal().getNom().equals(animal)){
                         posAnimal[0] = i;
                         posAnimal[1] = j;

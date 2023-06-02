@@ -30,15 +30,30 @@ public class Controleur {
     private boolean sortieCree = false;
 
 
-
-
     public Controleur(AffichageJeu affichageJeu){
         this.jeu = new Jeu();
         this.affichageJeu = affichageJeu;
     }
 
+    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET, SET, IS//////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
+    public boolean isSortieCree(){
+        return sortieCree;
+    }
 
+    public Plateau getPlateau(){
+        return this.jeu.plateau;
+    }
+
+    public Case getCase(int i, int j){
+        return this.jeu.plateau.cases[i][j];
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////FIN GET, SET, IS////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
 
     public void remplacerTypeTerrain(ImageView img, boolean remplacerRocheParHerbe, boolean isSortie){
@@ -131,7 +146,7 @@ public class Controleur {
                             img.setImage(loup);
                             getCase(i,j).setAnimal(new Loup());
                             loupCree = true;
-                        } else if (getCase(i,j).animalPresent()) {
+                        } else if (getCase(i,j).isAnimalPresent()) {
                             if (getCase(i,j).getContenu().getNom().equals("Herbe")){
                                 img.setImage(herbe);
                             } else if (getCase(i,j).getContenu().getNom().equals("Cactus")){
@@ -293,12 +308,12 @@ public class Controleur {
         b.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (affichageJeu.estBienEnPause()){
+                if (affichageJeu.isEstEnPause()){
                     b.setText("Marche");
-                    affichageJeu.mettreEnPauseOuPas(false);
+                    affichageJeu.setMettreEnPause(false);
                 } else {
                     b.setText("Pause");
-                    affichageJeu.mettreEnPauseOuPas(true);
+                    affichageJeu.setMettreEnPause(true);
                 }
             }
         });
@@ -306,17 +321,7 @@ public class Controleur {
 
 
 
-    public boolean sortieBienCree(){
-        return sortieCree;
-    }
 
-    public Plateau getPlateau(){
-        return this.jeu.plateau;
-    }
-
-    public Case getCase(int i, int j){
-        return this.jeu.plateau.cases[i][j];
-    }
 
 
 
