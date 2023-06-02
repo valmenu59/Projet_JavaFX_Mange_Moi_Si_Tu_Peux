@@ -15,7 +15,7 @@ import menu.Menu;
 
 public class Intro extends Scene {
 
-    private BorderPane panneau;
+    private final BorderPane panneau;
     private static final String IMAGE_INTRO = "/UPHF_logo.svg.png";
 
     public Intro(Stage stage) {
@@ -26,6 +26,7 @@ public class Intro extends Scene {
         panneau.setCenter(imageView);
         Timer timer = new Timer();
 
+        //Permet d'aller au menu au bout de 2 secondes
         timer.schedule(new TimerTask() {
             @Override
             public void run () {

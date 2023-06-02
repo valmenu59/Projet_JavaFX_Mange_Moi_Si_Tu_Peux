@@ -65,7 +65,7 @@ public class AffichageJeu extends Scene {
 
     private int numeroEtape;
 
-    private boolean vientSauvegarde;
+    private final boolean vientSauvegarde;
     private Text texteJeu;
 
 

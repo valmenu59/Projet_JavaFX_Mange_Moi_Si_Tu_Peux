@@ -16,44 +16,53 @@ import javafx.stage.Stage;
 import sauvegarde.DossierSauvegarde;
 
 public class Menu extends Scene {
-    private BorderPane panneau = (BorderPane)this.getRoot();
+    private BorderPane panneau;
     private Intro intro;
     private final MenuControleur menuControleur;
     private static final String IMG_LOGO = "/logoJeu2.png";
+    private final VBox vBox;
 
     public Menu(Stage stage) {
         super(new BorderPane(), 1280.0, 720.0);
+        panneau = (BorderPane)this.getRoot();
         menuControleur = new MenuControleur();
-        VBox vBox = new VBox();
+        vBox = new VBox();
         vBox.setSpacing(20.0);
         this.panneau.setTop(vBox);
         vBox.setAlignment(Pos.CENTER);
         DossierSauvegarde sauvegarde = new DossierSauvegarde();
-        ImageView logo = (new ImageJeu("/logoJeu2.png")).afficherImage();
+        ImageView logo = (new ImageJeu(IMG_LOGO)).afficherImage();
         logo.setPreserveRatio(true);
         logo.setFitHeight(300.0);
         vBox.getChildren().add(logo);
-        BoutonJeu demarrer = new BoutonJeu("Démarrer", Color.rgb(200, 130, 100));
-        this.menuControleur.demarrerJeu(demarrer, stage);
-        vBox.getChildren().add(demarrer);
 
-        BoutonJeu reprendreSauvegarde = new BoutonJeu("Reprendre la sauvegarde", Color.rgb(200, 130, 100));
+
+        BoutonJeu demarrer = creerBoutonMenu("Créer votre propre plateau");
+        this.menuControleur.demarrerJeu(demarrer, stage);
+
+        BoutonJeu reprendreSauvegarde = creerBoutonMenu("Reprendre la dernière sauvegarde");
         this.menuControleur.demarrerJeuViaSauvegarde(reprendreSauvegarde, stage);
-        vBox.getChildren().add(reprendreSauvegarde);
         if (!sauvegarde.isCheminExisteBien()) {
             reprendreSauvegarde.setDisable(true);
         }
 
-        BoutonJeu recupererSauvegarde = new BoutonJeu("Récupérer une sauvegarde",Color.rgb(200,130,100));
+        BoutonJeu recupererSauvegarde = creerBoutonMenu("Plateaux supplémentaires");
         this.menuControleur.demarrerMenuSelection(recupererSauvegarde, stage);
-        vBox.getChildren().add(recupererSauvegarde);
 
-        BoutonJeu parametre = new BoutonJeu("Paramètres", Color.rgb(200, 130, 100));
+        BoutonJeu parametre = creerBoutonMenu("Paramètres");
         this.menuControleur.parametreJeu(parametre, stage);
-        vBox.getChildren().add(parametre);
-        Text texteCredit = new Text("Créé généreusement par :\nMENU Valentin, FONTAINE Valentin, FAES Hugo !");
+
+
+        Text texteCredit = new Text("Créé généreusement par :\n" +
+                "MENU Valentin, FONTAINE Valentin, FAES Hugo !");
         texteCredit.setTextAlignment(TextAlignment.CENTER);
         texteCredit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20.0));
         vBox.getChildren().add(texteCredit);
+    }
+
+    public BoutonJeu creerBoutonMenu(String texte){
+        BoutonJeu bouton = new BoutonJeu(texte, Color.rgb(200, 130, 100));
+        vBox.getChildren().add(bouton);
+        return bouton;
     }
 }

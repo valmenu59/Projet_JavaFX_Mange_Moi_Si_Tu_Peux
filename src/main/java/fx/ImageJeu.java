@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class ImageJeu extends Image {
-    private String url;
+    private final String url;
 
     public ImageJeu(String url) {
         super(url);

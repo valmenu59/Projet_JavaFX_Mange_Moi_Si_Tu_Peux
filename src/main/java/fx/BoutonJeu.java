@@ -10,7 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class BoutonJeu extends Button {
-    private String texte;
+
 
     public BoutonJeu(String texte, double X, double Y, Color couleur) {
         super(texte);
