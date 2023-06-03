@@ -17,24 +17,30 @@ public class Parametres extends Scene {
     public Parametres(Stage stage) {
         super(new BorderPane(), 1280.0, 720.0);
         BorderPane panneau = (BorderPane)this.getRoot();
+
         VBox vBox = new VBox();
         vBox.setSpacing(30.0);
         panneau.setTop(vBox);
         vBox.setAlignment(Pos.CENTER);
+
         this.parametresControleur = new ParametresControleur();
+        DossierSauvegarde sauvegarde = new DossierSauvegarde();
+
         Text texte = new Text("Paramètres ");
         texte.setX(100.0);
         texte.setY(100.0);
         texte.setFont(Font.font("Segoe UI", FontWeight.BOLD, 50.0));
         vBox.getChildren().add(texte);
-        DossierSauvegarde sauvegarde = new DossierSauvegarde();
+
+
         BoutonJeu boutonSupprimerSauvegarde = new BoutonJeu("Supprimer la sauvegarde", Color.rgb(200, 20, 20));
         boutonSupprimerSauvegarde.setTextFill(Color.WHITE);
         boutonSupprimerSauvegarde.setDisable(!sauvegarde.isCheminExisteBien());
         this.parametresControleur.supprimerSauvegarde(boutonSupprimerSauvegarde);
         vBox.getChildren().add(boutonSupprimerSauvegarde);
+
         BoutonJeu menuPrincipal = new BoutonJeu("Menu Principal", Color.rgb(115, 115, 115));
         vBox.getChildren().add(menuPrincipal);
-        this.parametresControleur.demarrerJeu(menuPrincipal, stage);
+        this.parametresControleur.allerAuMenu(menuPrincipal, stage);
     }
 }

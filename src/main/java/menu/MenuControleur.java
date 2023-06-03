@@ -10,14 +10,14 @@ import parametres.Parametres;
 
 public class MenuControleur {
 
-    private Menu menu;
-    private AffichageJeu affichageJeu;
 
+    public MenuControleur(){}
 
-    public MenuControleur(){
-    }
-
-
+    /**
+     * @param bouton : le bouton à donner l'action
+     * @param stage : la classe à afficher via une fenêtre
+     * Méthode qui permet d'aller dans les paramètres
+     */
 
     public void parametreJeu(Button bouton, Stage stage){
         bouton.setOnAction(new EventHandler<ActionEvent>() {
@@ -30,7 +30,11 @@ public class MenuControleur {
         });
     }
 
-
+    /**
+     * @param bouton : le bouton à donner l'action
+     * @param stage : la classe à afficher via une fenêtre
+     * Méthode qui permet dans le jeu afin de créer un plateau
+     */
 
     public void demarrerJeu(Button bouton, Stage stage){
         bouton.setOnAction(new EventHandler<ActionEvent>() {
@@ -42,6 +46,12 @@ public class MenuControleur {
         });
     }
 
+    /**
+     * @param bouton : le bouton à donner l'action
+     * @param stage : la classe à afficher via une fenêtre
+     * Méthode qui permet de démarrer la simulation via la dernière sauvegarde
+     */
+
     public void demarrerJeuViaSauvegarde(Button bouton, Stage stage){
         bouton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -51,6 +61,13 @@ public class MenuControleur {
             }
         });
     }
+
+    /**
+     * @param bouton : le bouton à donner l'action
+     * @param stage : la classe à afficher via une fenêtre
+     * Méthode qui permet dans le menu de sélection de plateaux préétablis ou d'ouvrir l'explorateur
+     * de fichier afin de sélection un plateau déjà créé
+     */
 
     public void demarrerMenuSelection(Button bouton, Stage stage){
         bouton.setOnAction(new EventHandler<ActionEvent>() {

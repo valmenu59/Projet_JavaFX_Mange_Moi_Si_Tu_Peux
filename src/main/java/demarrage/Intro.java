@@ -19,12 +19,13 @@ public class Intro extends Scene {
     private static final String IMAGE_INTRO = "/UPHF_logo.svg.png";
 
     public Intro(Stage stage) {
+        //Création de la scène
         super(new BorderPane(),1280,720);
-        panneau = (BorderPane) getRoot();
+        panneau = (BorderPane) getRoot(); //Récupération borderPane
         ImageView imageView = (new ImageJeu("/UPHF_logo.svg.png", this.getWidth() / 1.5,
-                this.getHeight() / 1.5)).afficherImage();
-        panneau.setCenter(imageView);
-        Timer timer = new Timer();
+                this.getHeight() / 1.5)).afficherImage(); // création de l'image au format choisi
+        panneau.setCenter(imageView); //Mettre l'image au centre
+        Timer timer = new Timer(); //Mise en place d'un chronomètre
 
         //Permet d'aller au menu au bout de 2 secondes
         timer.schedule(new TimerTask() {
