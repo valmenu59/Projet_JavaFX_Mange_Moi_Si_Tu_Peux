@@ -2,6 +2,9 @@ package jeu;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import fx.PoliceJeu;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -14,15 +17,19 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import menuSelectionPlateau.MenuSelectionAffichage;
 
 public class AffichageJeu extends Scene {
-    //Reprend les classes du jeu
+    //Reprend la classe controleur
     protected Controleur controleur;
+
+    //Création de 3 polices différentes
+    private static final Font POLICE_PRINCIPALE = PoliceJeu.creerPolice(25, true);
+    private static final Font POLICE_SECONDAIRE = PoliceJeu.creerPolice(15, false);
+    private static final Font POLICE_ALERTE = PoliceJeu.creerPolice(12, true);
 
 
     //Récupère la source des images
@@ -35,47 +42,48 @@ public class AffichageJeu extends Scene {
     private static final String IMG_TERRE = "/ElementsJeu/terre.png";
     private static final String IMG_LOUP_MENACANT = "/ElementsJeu/loup2.png";
     private static final String IMG_MOUTON_MENACE = "/ElementsJeu/mouton2.png";
+
+    //Rassemblement des styles d'affichage
     private final AnchorPane panneauTemporaire;
     private AnchorPane panneauPrincipal;
     //private SplitPane separateur;
     private Stage mainStage;
     private Scene mainScene;
     private VBox panneau2;
-    private double taille;
+
+    //Panneaux déroulants
     private ChoiceBox<Integer> choixNblignes;
     private ChoiceBox<Integer> choixNbColonnes;
-    private final ArrayList<Node> listeMenuDeroulantetLabelEtape1 = new ArrayList<>();
-    private AnimationTimer boucleJeu;
+
+    //Boutons
     private Button boutonCreerPlateau;
     private Button boutonValiderEtape;
     private Button boutonRetour;
     private Button boutonCreerLabyrinthe;
     private Button boutonRetourMenu;
     private Button boutonPause;
-    private Text texteEtape = null;
-    private Text texteExplicationEtape = null;
-    private Text texteAlerteLabyrintheImparfait = null;
 
-    private final ArrayList<Rectangle> listeCarreNoir = new ArrayList<>();
-    private final ArrayList<ImageView> listeImages = new ArrayList<>();
-    private double xDepart;
-    private double yDepart;
-
-    private boolean estEnPause;
-
-    private int numeroEtape;
-
-    private final boolean vientSauvegarde;
+    //Textes
+    private Text texteEtape;
+    private Text texteExplicationEtape;
+    private Text texteAlerteLabyrintheImparfait;
     private Text texteJeu;
 
+    //Listes d'éléments
+    private final ArrayList<Node> listeMenuDeroulantetLabelEtape1 = new ArrayList<>();
+    private final ArrayList<Rectangle> listeCarreNoir = new ArrayList<>();
+    private final ArrayList<ImageView> listeImages = new ArrayList<>();
+
+    //Autres
+    private AnimationTimer boucleJeu;
+    private double taille;
+    private double xDepart;
+    private double yDepart;
+    private boolean estEnPause;
+    private int numeroEtape;
+    private final boolean vientSauvegarde;
 
 
-
-
-
-
-
-    //public Jeu(Scene mainScene, AnchorPane panneau) {
     public AffichageJeu(Stage stage, boolean vientDeLaSauvegarde){
         super(new AnchorPane(), 1280,720);
         panneauTemporaire = (AnchorPane) getRoot();
@@ -401,8 +409,6 @@ public class AffichageJeu extends Scene {
 
 
 
-
-
     public void changerActionCaseSortie(){
         for (int i = 0; i < getPlateau().getLignes(); i++) {
             for (int j = 0; j < getPlateau().getColonnes(); j++) {
@@ -417,23 +423,19 @@ public class AffichageJeu extends Scene {
     }
 
 
-
-
     public void texteEtape() {
         //Cette méthode permet de créer un texte en fonction du numéro de l'étape
-        Font font = Font.font("Segoe UI", FontWeight.BOLD, 25); //Permet de modifier la police
-        Font font1 = Font.font("Segoe UI", 15);
         if (numeroEtape == 1) {
             if (texteEtape == null) {
                 texteEtape = new Text("Etape 1 : Choisissez la taille de votre plateau");
                 texteEtape.setX(50);
                 texteEtape.setY(50);
-                texteEtape.setFont(font);
+                texteEtape.setFont(POLICE_PRINCIPALE);
                 texteExplicationEtape = new Text("Pour cette étape, choisissez votre nombre de lignes et de colonnes que vous souhaitez à la partie gauche de l'écran." + "\n" +
                         "Cliquez sur 'Créer votre votre plateau' pour créer un plateau sur l'écran puis cliquez sur 'Valider cette étape' pour passer à l'étape n°2");
                 texteExplicationEtape.setX(50);
                 texteExplicationEtape.setY(75);
-                texteExplicationEtape.setFont(font1);
+                texteExplicationEtape.setFont(POLICE_SECONDAIRE);
                 panneauPrincipal.getChildren().addAll(texteEtape, texteExplicationEtape);
             } else {
                 texteEtape.setText("Etape 1 : Choisissez la taille de votre plateau");
@@ -461,18 +463,17 @@ public class AffichageJeu extends Scene {
                 texteEtape = new Text("Jeu en cours...");
                 texteEtape.setX(50);
                 texteEtape.setY(50);
-                texteEtape.setFont(font);
+                texteEtape.setFont(POLICE_PRINCIPALE);
                 texteExplicationEtape = new Text("Maintenant laissons tourner la simulation !");
                 texteExplicationEtape.setX(50);
                 texteExplicationEtape.setY(75);
-                texteExplicationEtape.setFont(font1);
+                texteExplicationEtape.setFont(POLICE_SECONDAIRE);
                 panneauPrincipal.getChildren().addAll(texteEtape, texteExplicationEtape);
             }
         }
     }
 
     public void texteJeu(boolean nouveau){
-        Font font = Font.font("Segoe UI", 15);
         String nomAnimal;
         if (getJeu().isAuTourDuMouton()){
             nomAnimal = "mouton";
@@ -485,7 +486,7 @@ public class AffichageJeu extends Scene {
                     "Au tour du "+nomAnimal+"\n"+
                     "Nombre tour(s) restant pour le mouton : "+getJeu().getDeplacementMouton()+"\n"+
                     "Nombre tour(s) restant pour le loup : "+getJeu().getDeplacementLoup());
-            texteJeu.setFont(font);
+            texteJeu.setFont(POLICE_SECONDAIRE);
             texteJeu.setX(500);
             texteJeu.setY(30);
             panneauPrincipal.getChildren().add(texteJeu);
@@ -672,25 +673,25 @@ public class AffichageJeu extends Scene {
         for (int i=0; i < getPlateau().getLignes(); i++){
             for (int j=0; j < getPlateau().getColonnes(); j++){
                 ImageView img = getImageView(i,j);
-                if (this.getPlateau().cases[i][j].isAnimalPresent()) {
+                if (getCase(i,j).isAnimalPresent()) {
                     if (!this.getJeu().isMoutonEnDanger()) {
-                        if (this.getPlateau().cases[i][j].getAnimal() instanceof Loup) {
+                        if (getCase(i,j).getAnimal() instanceof Loup) {
                             img.setImage(loup);
                         } else {
                             img.setImage(mouton);
                         }
-                    } else if (this.getPlateau().cases[i][j].getAnimal() instanceof Loup) {
+                    } else if (getCase(i,j).getAnimal() instanceof Loup) {
                         img.setImage(loupMenacant);
                     } else {
                         img.setImage(moutonDanger);
                     }
-                } else if (this.getPlateau().cases[i][j].getContenu() instanceof Roche) {
+                } else if (getCase(i,j).getContenu() instanceof Roche) {
                     img.setImage(roche);
-                } else if (this.getPlateau().cases[i][j].getContenu() instanceof Herbe) {
+                } else if (getCase(i,j).getContenu() instanceof Herbe) {
                     img.setImage(herbe);
-                } else if (this.getPlateau().cases[i][j].getContenu() instanceof Cactus) {
+                } else if (getCase(i,j).getContenu() instanceof Cactus) {
                     img.setImage(cactus);
-                } else if (this.getPlateau().cases[i][j].getContenu() instanceof Marguerite) {
+                } else if (getCase(i,j).getContenu() instanceof Marguerite) {
                     img.setImage(marguerite);
                 } else {
                     img.setImage(terre);
@@ -723,7 +724,6 @@ public class AffichageJeu extends Scene {
 
 
     public void texteAlerteLabyrintheImparfait(){
-        Font font = Font.font("Segoe UI", FontWeight.BOLD, 12);
         texteAlerteLabyrintheImparfait = new Text("Attention labyrinthe imparfait !"+"\n"+
                 "Vous ne pouvez pas valider cette étape "+"\n"+
                 "tant que : "+"\n"+
@@ -733,7 +733,7 @@ public class AffichageJeu extends Scene {
                 "Veuillez modifier la/les case(s) "+"\n"+
                 "correspondantes en type herbe");
         texteAlerteLabyrintheImparfait.setFill(Color.RED);
-        texteAlerteLabyrintheImparfait.setFont(font);
+        texteAlerteLabyrintheImparfait.setFont(POLICE_ALERTE);
         texteAlerteLabyrintheImparfait.setX(10);
         texteAlerteLabyrintheImparfait.setY(20);
     }

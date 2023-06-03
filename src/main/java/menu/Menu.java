@@ -1,15 +1,15 @@
 package menu;
 
-import demarrage.Intro;
 import fx.BoutonJeu;
 import fx.ImageJeu;
+import fx.PoliceJeu;
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -18,8 +18,10 @@ import sauvegarde.DossierSauvegarde;
 public class Menu extends Scene {
     private BorderPane panneau;
     private final MenuControleur menuControleur;
-    private static final String IMG_LOGO = "/logoJeu2.png";
     private final VBox vBox;
+    private static final String IMG_LOGO = "/logoJeu2.png";
+    private static final Font POLICE = PoliceJeu.creerPolice(20, true);
+
 
     public Menu(Stage stage) {
         //Création de la scène
@@ -64,7 +66,7 @@ public class Menu extends Scene {
         Text texteCredit = new Text("Créé généreusement par :\n" +
                 "MENU Valentin, FONTAINE Valentin, FAES Hugo !");
         texteCredit.setTextAlignment(TextAlignment.CENTER);
-        texteCredit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20.0));
+        texteCredit.setFont(POLICE);
         vBox.getChildren().add(texteCredit);
     }
 

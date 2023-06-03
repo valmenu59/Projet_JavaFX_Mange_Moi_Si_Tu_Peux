@@ -7,14 +7,15 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 public class BoutonJeu extends Button {
+
+    private static final Font POLICE = PoliceJeu.creerPolice(40., false);
 
 
     public BoutonJeu(String texte, double X, double Y, Color couleur) {
         super(texte);
-        this.setFont(Font.font("Segoe UI", (FontWeight)null, 40.0));
+        this.setFont(POLICE);
         this.setTextFill(Color.BLACK);
         this.setLayoutX(X);
         this.setLayoutY(Y);
@@ -25,7 +26,7 @@ public class BoutonJeu extends Button {
 
     public BoutonJeu(String texte, Color couleur) {
         super(texte);
-        this.setFont(Font.font("Segoe UI", (FontWeight)null, 40.0));
+        this.setFont(POLICE);
         this.setTextFill(Color.BLACK);
         BackgroundFill fondType = new BackgroundFill(couleur, (CornerRadii)null, new Insets(5.0));
         Background fond = new Background(new BackgroundFill[]{fondType});

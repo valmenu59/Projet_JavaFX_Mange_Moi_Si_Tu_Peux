@@ -22,11 +22,8 @@ public class Controleur {
 
     protected Jeu jeu;
     protected AffichageJeu affichageJeu;
-
     private boolean moutonCree = false;
     private boolean loupCree = false;
-
-    private boolean joue = false;
     private boolean sortieCree = false;
 
 
@@ -193,7 +190,7 @@ public class Controleur {
      *
      * @param b : bouton à appliquer l'action
      *          Cette méthode permet de passer d'une étape vers une autre dans l'ordre croissant (1,2,3,4,5)
-     *          Par contre au bout de l'étape 4 le jeu affiche différents boîtes de dialogues :
+     *          Par contre au bout de l'étape 4 le jeu affiche différentes boîtes de dialogues :
      *          Si l'utilisateur clique sur oui, une sauvegarde est effectuée et affiche une autre boîte de dialogue
      *          de confirmation. L'utilisateur peut copier le chemin d'accès et s'il clique sur Ok la fenêtre se ferme
      *          et passe à l'étape 5.
