@@ -80,8 +80,6 @@ public class MenuSelectionAffichage extends Scene {
         controleur.retourMenu(boutonMenu, stage);
         vBox.getChildren().add(boutonMenu);
 
-
-
     }
 
 
