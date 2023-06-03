@@ -117,7 +117,7 @@ public class AffichageJeu extends Scene {
 
     }
 
-    public AffichageJeu(Stage stage, String adressePlateau){
+    public AffichageJeu(Stage stage, String adressePlateau, boolean sauvegardeVientDuFichierResources){
         super(new AnchorPane(), 1280,720);
         panneauTemporaire = (AnchorPane) getRoot();
         mainStage = stage;
@@ -127,8 +127,11 @@ public class AffichageJeu extends Scene {
         //On initie les actions utilisateurs
         controleur = new Controleur(this);
         try {
-            //this.controleur.jeu.reprendreSauvegarde(adressePlateau);
-            this.controleur.jeu.reprendreSauvegarde2(adressePlateau);
+            if (sauvegardeVientDuFichierResources){
+                this.controleur.jeu.reprendreSauvegardeViaFichierResources(adressePlateau);
+            } else {
+                this.controleur.jeu.reprendreSauvegarde(adressePlateau);
+            }
         } catch (IOException e) {
             String texte = "Erreur de lecture : "+"\n"+"" +
                     "Impossible de lire le fichier de sauvegarde.";

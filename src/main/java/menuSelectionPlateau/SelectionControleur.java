@@ -54,7 +54,7 @@ public class SelectionControleur {
                 //Si l'utilisateur a ouvert un fichier
                 if (fichier != null){
                     //Affiche visuellement le plateau
-                    AffichageJeu affichageJeu = new AffichageJeu(stage,fichier.getAbsolutePath());
+                    AffichageJeu affichageJeu = new AffichageJeu(stage,fichier.getAbsolutePath(), false);
                     stage.setScene(affichageJeu);
                 }
 
@@ -68,7 +68,7 @@ public class SelectionControleur {
         l.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                AffichageJeu affichageJeu = new AffichageJeu(stage,url);
+                AffichageJeu affichageJeu = new AffichageJeu(stage,url, true);
                 stage.setScene(affichageJeu);
             }
         });

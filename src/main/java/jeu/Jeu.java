@@ -205,9 +205,9 @@ public class Jeu {
         }
     }
 
-    public void reprendreSauvegarde2(String adresse) throws Exception {
-        try (FileInputStream fileInputStream = new FileInputStream(getClass().getResource(adresse).toExternalForm());
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+    public void reprendreSauvegardeViaFichierResources(String adresse) throws Exception {
+        try (InputStream inputStream = getClass().getResourceAsStream(adresse);
+             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             int colonnes = objectInputStream.readInt();
             int lignes = objectInputStream.readInt();
             plateau = new Plateau(lignes,colonnes);
@@ -227,4 +227,6 @@ public class Jeu {
             throw new Exception("Autre erreur !");
         }
     }
+
+
 }
