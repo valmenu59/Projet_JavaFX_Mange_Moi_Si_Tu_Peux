@@ -22,8 +22,8 @@ public class Intro extends Scene {
         //Création de la scène
         super(new BorderPane(),1280,720);
         panneau = (BorderPane) getRoot(); //Récupération borderPane
-        ImageView imageView = (new ImageJeu("/UPHF_logo.svg.png", this.getWidth() / 1.5,
-                this.getHeight() / 1.5)).afficherImage(); // création de l'image au format choisi
+        ImageView imageView = new ImageJeu(IMAGE_INTRO, this.getWidth() / 1.5,
+                this.getHeight() / 1.5).afficherImage(); // création de l'image au format choisi
         panneau.setCenter(imageView); //Mettre l'image au centre
         Timer timer = new Timer(); //Mise en place d'un chronomètre
 

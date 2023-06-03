@@ -127,7 +127,8 @@ public class AffichageJeu extends Scene {
         //On initie les actions utilisateurs
         controleur = new Controleur(this);
         try {
-            this.controleur.jeu.reprendreSauvegarde(adressePlateau);
+            //this.controleur.jeu.reprendreSauvegarde(adressePlateau);
+            this.controleur.jeu.reprendreSauvegarde2(adressePlateau);
         } catch (IOException e) {
             String texte = "Erreur de lecture : "+"\n"+"" +
                     "Impossible de lire le fichier de sauvegarde.";

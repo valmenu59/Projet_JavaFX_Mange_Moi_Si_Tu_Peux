@@ -204,4 +204,27 @@ public class Jeu {
             throw new Exception("Autre erreur !");
         }
     }
+
+    public void reprendreSauvegarde2(String adresse) throws Exception {
+        try (FileInputStream fileInputStream = new FileInputStream(getClass().getResource(adresse).toExternalForm());
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            int colonnes = objectInputStream.readInt();
+            int lignes = objectInputStream.readInt();
+            plateau = new Plateau(lignes,colonnes);
+            plateau.creerPlateau();
+
+            for (int i = 0; i < lignes; i++){
+                for (int j = 0; j < colonnes; j++){
+                    plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
+                }
+            }
+            System.out.println("Fichier récupé avec succès !");
+        } catch (IOException e) {
+            throw new IOException("Impossible de lire le fichier de sauvegarde.", e);
+        } catch (ClassNotFoundException e) {
+            throw new ClassNotFoundException("Impossible de charger les données de sauvegarde.", e);
+        } catch (Exception e){
+            throw new Exception("Autre erreur !");
+        }
+    }
 }
