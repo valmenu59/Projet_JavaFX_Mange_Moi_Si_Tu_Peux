@@ -88,13 +88,14 @@ public class Jeu {
 
     public void boucleJeu() {
         System.out.println("Loup menaçant "+ plateau.manhattan());
+        moutonEnDanger = plateau.manhattan();
         if (auTourDuMouton) {
             if (deplacementMouton == planteDeplacementMouton) {
                 this.nbTour++;
                 this.plateau.planteQuiPousse();
             }
             deplacementMouton--;
-            plateau.deplacerAnimal("Mouton");
+            plateau.deplacerAnimal("Mouton", moutonEnDanger);
             if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
                 int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
@@ -104,7 +105,7 @@ public class Jeu {
             }
         } else {
             deplacementLoup--;
-            plateau.deplacerAnimal("Loup");
+            plateau.deplacerAnimal("Loup", moutonEnDanger);
             if (deplacementLoup == 0) {
                 reinitialiserDeplacementLoup();
                 auTourDuMouton = true;

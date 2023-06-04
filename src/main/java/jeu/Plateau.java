@@ -12,7 +12,7 @@ public class Plateau implements Serializable {
 
     protected Case[][] cases;
     protected Jeu jeu;
-    private final int[] caseSortie = new int[2];
+    private int[] caseSortie = new int[2];
     //Pour parcourir le labyrinthe :
     private final transient ArrayList<int[]> casesPlante = new ArrayList<>();
     //transient permet de ne pas sauvegarder l'attribut lors de la sauvegarde
@@ -62,9 +62,25 @@ public class Plateau implements Serializable {
         caseSortie[1] = j;
     }
 
+    public int[] setCaseSortie(){
+        caseSortie = new int[2];
+        for (int i = 0; i < lignes; i++){
+            for (int j = 0; j < colonnes; j++) {
+                if (i == 0 || j == 0 || i == lignes - 1 || j == colonnes - 1){
+                    if (getCase(i,j).getContenu() instanceof Plante){
+                        caseSortie[0] = i;
+                        caseSortie[1] = j;
+                    }
+                }
+            }
+        }
+        return caseSortie;
+    }
+
     public int[] getCaseSortie(){
         return caseSortie;
     }
+
 
     public int getNbrPlanteMangee() {
         return this.planteMangee;
@@ -73,6 +89,44 @@ public class Plateau implements Serializable {
     public void moutonAMangePlante(){
         this.planteMangee++;
     }
+
+    /**
+     * @return : renvoie la case du mouton en un tableau de 2 entiers
+     * Méthode qui permet d'obtenir la position du mouton
+     */
+
+    public int[] getCaseMouton(){
+        for (int i =0; i < lignes; i++){
+            for (int j =0; j < colonnes; j++){
+                if (this.cases[i][j].isAnimalPresent()){
+                    if (this.cases[i][j].getAnimal() instanceof Mouton){
+                        return new int[]{i,j};
+                    }
+                }
+            }
+        }
+        return new int[2];
+    }
+
+    /**
+     * @return : renvoie la case du mouton en un tableau de 2 entiers
+     * Méthode qui permet d'obtenir la position du mouton
+     */
+
+    public int[] getCaseLoup(){
+        for (int i =0; i < lignes; i++){
+            for (int j =0; j < colonnes; j++){
+                if (this.cases[i][j].isAnimalPresent()){
+                    if (this.cases[i][j].getAnimal() instanceof Loup){
+                        return new int[]{i,j};
+                    }
+                }
+            }
+        }
+        return new int[2];
+    }
+
+
 
     /////////////////////////////////////////////////////////////////////////////
     /////////////////////////////FIN GET, SET, IS////////////////////////////////
@@ -438,23 +492,7 @@ public class Plateau implements Serializable {
 
 
 
-    /**
-     * @return : renvoie la case du mouton en un tableau de 2 entiers
-     * Méthode qui permet d'obtenir la position du mouton
-     */
 
-    public int[] getCaseMouton(){
-        for (int i =0; i < lignes; i++){
-            for (int j =0; j < colonnes; j++){
-                if (this.cases[i][j].isAnimalPresent()){
-                    if (this.cases[i][j].getAnimal() instanceof Mouton){
-                        return new int[]{i,j};
-                    }
-                }
-            }
-        }
-        return new int[2];
-    }
 
     /**
      * Méthode qui permet d'augmenter la valeur du nombre de jours où la case est de type terre et si la valeur
@@ -483,7 +521,7 @@ public class Plateau implements Serializable {
      */
 
     public int moutonMangePlante(int i, int j){
-        //Permet d'obtenir le nombre de déplacement du mouton en fonction de la case
+        //Permet d'obtenir le nombre de déplacements du mouton en fonction de la case
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
             moutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
@@ -510,29 +548,27 @@ public class Plateau implements Serializable {
      */
 
 
-    public void deplacerAnimal(String animal){
-        int[] posAnimal = new int[2];
-        //Détection de la case de l'animal chosi
-        for (int i = 0; i < lignes; i++){
-            for (int j = 0; j < colonnes; j++){
-                if (this.cases[i][j].isAnimalPresent()){
-                    if (this.cases[i][j].getAnimal().getNom().equals(animal)){
-                        posAnimal[0] = i;
-                        posAnimal[1] = j;
-                    }
+    public void deplacerAnimal(String animal, boolean danger){
+        int[] posAnimal;
+        if (!danger) {
+            if (animal.equals("Mouton")) {
+                posAnimal = getCaseMouton();
+                if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton())) {
+                    deplacerAnimal("Mouton", false);
+                }
+            } else {
+                posAnimal = getCaseLoup();
+                if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())) {
+                    deplacerAnimal("Loup", false); //Une erreur a été détectée ici quand le loup est à côté de la case de sortie
+                    //Pareil pour le mouton
                 }
             }
-        }
-        // Méthode qui permet de vérifier si le loup et
-        // mouton ont une distance Manhattan > 5
-        //saé 202
-        if (animal.equals("Mouton")) {
-            if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton())){
-                deplacerAnimal("Mouton");
-            }
         } else {
-            if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())){
-                deplacerAnimal("Loup"); //Une erreur a été détectée ici quand le loup est à côté de la case de sortie
+            System.out.println("ici");
+            if (animal.equals("Mouton")) {
+                parcoursLargeur(true).toString();
+            } else {
+                parcoursLargeur(false).toString();
             }
         }
     }
@@ -637,13 +673,7 @@ public class Plateau implements Serializable {
     Dijkstra
      */
 
-    /**
-     * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
-     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
-     * Utilise l'algorithme de parcours en largeur
-     */
-
-    public boolean manhattan() {
+    public int[][] matriceNumero(){
         //Création d'une matrice ayant des entiers : -1 pour les plantes -2 pour les roches
         //Sert pour le marquage
         int[][] casesNumero = new int[lignes][colonnes];
@@ -656,6 +686,18 @@ public class Plateau implements Serializable {
                 }
             }
         }
+        return casesNumero;
+    }
+
+    /**
+     * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
+     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
+     * Utilise l'algorithme de parcours en largeur
+     */
+
+    public boolean manhattan() {
+        int[][] casesNumero = matriceNumero();
+
         //Récupération de la case mouton
         int[] posMouton = getCaseMouton();
         int posI = posMouton[0];
@@ -738,8 +780,118 @@ public class Plateau implements Serializable {
     }
 
 
-    public void parcoursLargeur(){
+    public ArrayList<int[]> parcoursLargeur(boolean isAuTourMouton){
+        //Sert pour le marquage
+        int[][] casesNumero = matriceNumero();
 
+        int[] posAnimalEnCours;
+        int[] posDestination;
+        int posIAnimal;
+        int posJAnimal;
+        int posIArrive;
+        int posJArrive;
+
+        if (isAuTourMouton){
+            //Récupération de la case mouton
+            posAnimalEnCours = getCaseMouton();
+            posIAnimal = posAnimalEnCours[0];
+            posJAnimal = posAnimalEnCours[1];
+            //Récupération de la case sortie
+            posDestination = getCaseSortie();
+            posIArrive = posDestination[0];
+            posJArrive = posDestination[1];
+        } else {
+            //Récupération de la case loup
+            posAnimalEnCours = getCaseLoup();
+            posIAnimal = posAnimalEnCours[0];
+            posJAnimal = posAnimalEnCours[1];
+            //Récupération de la case mouton
+            posDestination = setCaseSortie(); //nom à modifier
+            posIArrive = posDestination[0];
+            posJArrive = posDestination[1];
+        }
+
+        //Valeur de la case mouton = 0
+        casesNumero[posIAnimal][posJAnimal] = 0;
+
+        // Liste pour stocker le chemin parcouru
+        ArrayList<int[]> cheminParcouru = new ArrayList<>();
+
+        //Création d'une file (parcours en largeur)
+        Queue<int[]> file = new ArrayDeque<>();
+        //Ajout de la position de l'animal actuel
+        file.add(posAnimalEnCours);
+
+        while (!file.isEmpty()) {
+            //Récupération et suppression de la 1ère valeur de la file
+            int[] posActuelle;
+
+            posActuelle = file.poll();
+
+            //I et J : valeur prise de la file
+            int I = posActuelle[0];
+            int J = posActuelle[1];
+
+            cheminParcouru.add(posActuelle);
+
+            int nbrPossibiliteCase = 0;
+            //Vérification en haut
+            if (I - 1 >= 0 && casesNumero[I - 1][J] == -1) {
+                file.add(new int[]{I - 1, J});
+                casesNumero[I - 1][J] = 0;
+                nbrPossibiliteCase++;
+                //Si la case possède un loup
+                if ( I - 1 == posIArrive && J == posJArrive) {
+                    break;
+                }
+            }
+
+            // Vérification des autres directions
+            // Bas
+            if (I + 1 < lignes && casesNumero[I + 1][J] == -1) {
+                file.add(new int[]{I + 1, J});
+                casesNumero[I + 1][J] = 0;
+                nbrPossibiliteCase++;
+                if ( I + 1 == posIArrive && J == posJArrive) {
+                    break;
+                }
+            }
+
+            // Gauche
+            if (J - 1 >= 0 && casesNumero[I][J - 1] == -1) {
+                file.add(new int[]{I, J - 1});
+                casesNumero[I][J - 1] = 0;
+                nbrPossibiliteCase++;
+                if ( I == posIArrive && J - 1 == posJArrive) {
+                    break;
+                }
+            }
+
+            // Droite
+            if (J + 1 < colonnes && casesNumero[I][J + 1] == -1) {
+                file.add(new int[]{I, J + 1});
+                casesNumero[I][J + 1] = 0;
+                nbrPossibiliteCase++;
+                if ( I == posIArrive && J + 1 == posJArrive) {
+                    break;
+                }
+            }
+
+            if (nbrPossibiliteCase == 0) {
+                cheminParcouru.remove(cheminParcouru.size() - 1);
+                int index = cheminParcouru.indexOf(posActuelle);
+                if (index != -1) {
+                    cheminParcouru.subList(index + 1, cheminParcouru.size()).clear();
+                }
+            }
+
+        }
+        printNumeroCase(casesNumero);
+        //cheminParcouru.remove(0);
+        for (int[] c : cheminParcouru){
+            System.out.println(c[0]+" "+c[1]);
+        }
+        return cheminParcouru;
     }
 
     public void parcoursProfondeur(){
