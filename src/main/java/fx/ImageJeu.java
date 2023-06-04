@@ -23,14 +23,14 @@ public class ImageJeu extends Image {
     }
 
     public ImageView afficherImage() {
-        return new ImageView(getClass().getResource(this.url).toExternalForm());
+        return new ImageView(url);
     }
 
-    public ImageView afficherImage(double longueur, double largeur, boolean preserverRation){
-        ImageView img = new ImageView(getClass().getResource(this.url).toExternalForm());
+    public ImageView afficherImage(double longueur, double largeur, boolean preserverRatio){
+        ImageView img = new ImageView(url);
         img.setFitWidth(longueur);
         img.setFitHeight(largeur);
-        img.setPreserveRatio(preserverRation);
+        img.setPreserveRatio(preserverRatio);
         return img;
     }
 }

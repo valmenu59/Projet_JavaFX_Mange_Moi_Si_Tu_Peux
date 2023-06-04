@@ -16,14 +16,15 @@ import menu.Menu;
 public class Intro extends Scene {
 
     private final BorderPane panneau;
-    private static final String IMAGE_INTRO = "/UPHF_logo.svg.png";
+    private static final String IMAGE_INTRO = "/Logos/UPHF_logo.svg.png";
 
     public Intro(Stage stage) {
         //Création de la scène
         super(new BorderPane(),1280,720);
         panneau = (BorderPane) getRoot(); //Récupération borderPane
-        ImageView imageView = new ImageJeu(IMAGE_INTRO, this.getWidth() / 1.5,
-                this.getHeight() / 1.5).afficherImage(); // création de l'image au format choisi
+        ImageView imageView = new ImageJeu(getClass().getResource(IMAGE_INTRO).toExternalForm(),
+                this.getWidth() / 1.5, this.getHeight() / 1.5).afficherImage(); // création de l'image au format choisi
+
         panneau.setCenter(imageView); //Mettre l'image au centre
         Timer timer = new Timer(); //Mise en place d'un chronomètre
 
