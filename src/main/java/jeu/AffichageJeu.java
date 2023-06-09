@@ -43,6 +43,10 @@ public class AffichageJeu extends Scene {
     private static final String IMG_LOUP_MENACANT = "/ElementsJeu/loup2.png";
     private static final String IMG_MOUTON_MENACE = "/ElementsJeu/mouton2.png";
 
+
+
+
+
     //Rassemblement des styles d'affichage
     private final AnchorPane panneauTemporaire;
     private AnchorPane panneauPrincipal;

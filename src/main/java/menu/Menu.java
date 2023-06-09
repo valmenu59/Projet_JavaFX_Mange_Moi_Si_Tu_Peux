@@ -8,6 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -91,6 +93,10 @@ public class Menu extends Scene {
         texteCredit.setFont(POLICE);
         panneau.setBottom(texteCredit);
         BorderPane.setAlignment(texteCredit,Pos.BOTTOM_CENTER);
+
+
+
+
     }
 
     /**

@@ -566,9 +566,9 @@ public class Plateau implements Serializable {
         } else {
             System.out.println("ici");
             if (animal.equals("Mouton")) {
-                parcoursLargeur(true).toString();
+                parcoursProfondeur(true);
             } else {
-                parcoursLargeur(false).toString();
+                parcoursProfondeur(false);
             }
         }
     }
@@ -894,8 +894,119 @@ public class Plateau implements Serializable {
         return cheminParcouru;
     }
 
-    public void parcoursProfondeur(){
+    public ArrayList<int[]> parcoursProfondeur(boolean isAuTourMouton){
+        //Sert pour le marquage
+        int[][] casesNumero = matriceNumero();
 
+        int[] posAnimalEnCours;
+        int[] posDestination;
+        int posIAnimal;
+        int posJAnimal;
+        int posIArrive;
+        int posJArrive;
+
+        if (isAuTourMouton){
+            //Récupération de la case mouton
+            posAnimalEnCours = getCaseMouton();
+            posIAnimal = posAnimalEnCours[0];
+            posJAnimal = posAnimalEnCours[1];
+            //Récupération de la case sortie
+            posDestination = getCaseSortie();
+            posIArrive = posDestination[0];
+            posJArrive = posDestination[1];
+        } else {
+            //Récupération de la case loup
+            posAnimalEnCours = getCaseLoup();
+            posIAnimal = posAnimalEnCours[0];
+            posJAnimal = posAnimalEnCours[1];
+            //Récupération de la case mouton
+            posDestination = setCaseSortie(); //nom à modifier
+            posIArrive = posDestination[0];
+            posJArrive = posDestination[1];
+        }
+
+        //Valeur de la case mouton = 0
+        casesNumero[posIAnimal][posJAnimal] = 0;
+
+        // Liste pour stocker le chemin parcouru
+        ArrayList<int[]> cheminParcouru = new ArrayList<>();
+
+        //Création d'une file (parcours en largeur)
+        Stack<int[]> pile = new Stack<>();
+        //Ajout de la position de l'animal actuel
+        pile.push(posAnimalEnCours);
+
+        while (!pile.isEmpty()) {
+            //Récupération et suppression de la 1ère valeur de la file
+            int[] posActuelle;
+
+            posActuelle = pile.peek();
+            pile.pop();
+
+            //I et J : valeur prise de la file
+            int I = posActuelle[0];
+            int J = posActuelle[1];
+
+            cheminParcouru.add(posActuelle);
+
+            int nbrPossibiliteCase = 0;
+            //Vérification en haut
+            if (I - 1 >= 0 && casesNumero[I - 1][J] == -1) {
+                pile.add(new int[]{I - 1, J});
+                casesNumero[I - 1][J] = 0;
+                nbrPossibiliteCase++;
+                //Si la case possède un loup
+                if ( I - 1 == posIArrive && J == posJArrive) {
+                    break;
+                }
+            }
+
+            // Vérification des autres directions
+            // Bas
+            if (I + 1 < lignes && casesNumero[I + 1][J] == -1) {
+                pile.add(new int[]{I + 1, J});
+                casesNumero[I + 1][J] = 0;
+                nbrPossibiliteCase++;
+                if ( I + 1 == posIArrive && J == posJArrive) {
+                    break;
+                }
+            }
+
+            // Gauche
+            if (J - 1 >= 0 && casesNumero[I][J - 1] == -1) {
+                pile.add(new int[]{I, J - 1});
+                casesNumero[I][J - 1] = 0;
+                nbrPossibiliteCase++;
+                if ( I == posIArrive && J - 1 == posJArrive) {
+                    break;
+                }
+            }
+
+            // Droite
+            if (J + 1 < colonnes && casesNumero[I][J + 1] == -1) {
+                pile.add(new int[]{I, J + 1});
+                casesNumero[I][J + 1] = 0;
+                nbrPossibiliteCase++;
+                if ( I == posIArrive && J + 1 == posJArrive) {
+                    break;
+                }
+            }
+
+            if (nbrPossibiliteCase == 0) {
+                cheminParcouru.remove(cheminParcouru.size() - 1);
+                int index = cheminParcouru.indexOf(posActuelle);
+                if (index != -1) {
+                    cheminParcouru.subList(index + 1, cheminParcouru.size()).clear();
+                }
+            }
+
+        }
+        printNumeroCase(casesNumero);
+        //cheminParcouru.remove(0);
+        for (int[] c : cheminParcouru){
+            System.out.println(c[0]+" "+c[1]);
+        }
+        return cheminParcouru;
     }
 
     public void aStar(){
