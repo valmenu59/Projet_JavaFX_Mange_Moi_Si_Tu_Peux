@@ -3,9 +3,11 @@ package jeu;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import finDeJeu.FinDeJeu;
 import fx.PoliceJeu;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javafx.util.Duration;
 import menuSelectionPlateau.MenuSelectionAffichage;
 
 public class AffichageJeu extends Scene {
@@ -411,8 +414,11 @@ public class AffichageJeu extends Scene {
 
         texteJeu(true);
 
+        boolean gagne;
         mettreAJourAffichagePlateau();
         boucleAffichageJeu();
+
+
     }
 
 
@@ -523,16 +529,22 @@ public class AffichageJeu extends Scene {
                         AffichageJeu.this.controleur.jeu.boucleJeu();
                         mettreAJourAffichagePlateau();
                         texteJeu(false);
-                        //if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
-                            /*
-                            Ici ça sera pour la sae 202 pour afficher un message de fin de jeu
-                            et mettre boucleJeu.stop() pour arrêter la boucle
-                             */
-                        //}
+                        if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
+                            boucleJeu.stop();
+                            System.out.println("Le jeu est fini");
+                            //Permet de mettre le jeu en pause pendant 2.5 secondes, mais en mettant bien à jour l'affichage
+                            PauseTransition pause = new PauseTransition(Duration.seconds(2.5));
+                            pause.setOnFinished(Event -> {
+                                FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
+                                mainStage.setScene(fin);
+                            });
+                            pause.play();
+                        }
                     }
                 }
             }
         };
+        //Permet de démarrer la boucle
         boucleJeu.start();
     }
 

@@ -153,6 +153,23 @@ public class Plateau implements Serializable {
         return false;
     }
 
+    public void setPositionAnimal(int posI, int PosJ, String animal){
+        for (int i = 0; i < this.getLignes(); i++) {
+            for (int j = 0; j < this.getColonnes(); j++) {
+                if (this.cases[i][j].isAnimalPresent()) {
+                    if (this.cases[i][j].getAnimal().getNom().equals(animal)) {
+                        getCase(i,j).removeAnimal();
+                        if (animal.equals("Mouton")) {
+                            getCase(posI, PosJ).setAnimal(new Mouton());
+                        } else {
+                            getCase(posI, PosJ).setAnimal(new Loup());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -460,14 +477,22 @@ public class Plateau implements Serializable {
     public void printMatrices () {
         for (int i = 0; i < this.lignes; i++) {
             for (int j = 0; j < this.colonnes; j++) {
-                if (this.cases[i][j].getContenu() instanceof Roche) {
-                    System.out.print("R" + "\t");
-                } else if (this.cases[i][j].getContenu() instanceof Herbe) {
-                    System.out.print("H" + "\t");
-                } else if (this.cases[i][j].getContenu() instanceof Cactus){
-                    System.out.print("C" + "\t");
+                if (getCase(i,j).isAnimalPresent()){
+                    if (getCase(i,j).getAnimal() instanceof Loup){
+                        System.out.print("w" + "\t");
+                    } else {
+                        System.out.print("m" + "\t");
+                    }
                 } else {
-                    System.out.print("M" + "\t");
+                    if (this.cases[i][j].getContenu() instanceof Roche) {
+                        System.out.print("R" + "\t");
+                    } else if (this.cases[i][j].getContenu() instanceof Herbe) {
+                        System.out.print("H" + "\t");
+                    } else if (this.cases[i][j].getContenu() instanceof Cactus) {
+                        System.out.print("C" + "\t");
+                    } else {
+                        System.out.print("M" + "\t");
+                    }
                 }
             }
             System.out.println();
@@ -556,8 +581,14 @@ public class Plateau implements Serializable {
                 //dijkstra();
                 chemin = aStarSimple(true);
                 int [] caseMouton = getCaseMouton();
-                this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
-                this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
+                if (Arrays.equals(caseMouton, getCaseLoup())){
+                    this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
+                    this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
+                    this.cases[caseMouton[0]][caseMouton[1]].setAnimal(new Loup());
+                } else {
+                    this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
+                    this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
+                }
             } else {
                 //parcoursProfondeur(false);
                 //dijkstra();
@@ -565,6 +596,7 @@ public class Plateau implements Serializable {
                 int [] caseLoup = getCaseLoup();
                 this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());
+
             }
         }
     }

@@ -127,7 +127,9 @@ public class Controleur {
                         }
                     } else {
                         affichageJeu.getBoutonValiderEtape().setDisable(true);
-                        affichageJeu.getPanneauSecondaire().getChildren().add(affichageJeu.getTexteAlerteLabyrintheImparfait());
+                        if (affichageJeu.getPanneauSecondaire().getChildren().size() == 5) {
+                            affichageJeu.getPanneauSecondaire().getChildren().add(affichageJeu.getTexteAlerteLabyrintheImparfait());
+                        }
                     }
                 }
 

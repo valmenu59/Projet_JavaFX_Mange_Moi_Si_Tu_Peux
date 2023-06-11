@@ -97,9 +97,7 @@ public class Jeu {
             }
             deplacementMouton--;
             plateau.deplacerAnimal("Mouton", moutonEnDanger);
-            if (Arrays.equals(plateau.getCaseSortie(), plateau.getCaseMouton())){
-                partieGagne = true;
-            } else if (deplacementMouton == 0) {
+            if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
                 int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
                 setDeplacementMouton(nbr);
@@ -113,6 +111,17 @@ public class Jeu {
                 reinitialiserDeplacementLoup();
                 auTourDuMouton = true;
             }
+        }
+
+        //Permet de donner les conditions de victoires ou de défaites
+        if (Arrays.equals(plateau.getCaseSortie(), plateau.getCaseMouton())) {
+            //int[] posSortie = plateau.getCaseSortie();
+            //plateau.setPositionAnimal(posSortie[0], posSortie[1], "Mouton");
+            partieGagne = true;
+        } else if (!plateau.isAnimalPresent("Mouton")){
+            //int[] posLoup = plateau.getCaseLoup();
+            //plateau.setPositionAnimal(posLoup[0], posLoup[1], "Loup");
+            partiePerdue = true;
         }
     }
 

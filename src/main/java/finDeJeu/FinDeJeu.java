@@ -3,13 +3,11 @@ package finDeJeu;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
-public class finDeJeu extends Scene {
+public class FinDeJeu extends Scene {
 
-    /*
-    Pour la saé 202
-     */
-    public finDeJeu(boolean gagne){
+    public FinDeJeu(Stage stage, boolean gagne){
         super(new BorderPane(), 1280,720);
         BorderPane panneau = (BorderPane) this.getRoot();
         Text texte;
