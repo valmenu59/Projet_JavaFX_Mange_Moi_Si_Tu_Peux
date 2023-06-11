@@ -3,6 +3,7 @@ package jeu;
 import sauvegarde.DossierSauvegarde;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class Jeu {
 
@@ -96,7 +97,9 @@ public class Jeu {
             }
             deplacementMouton--;
             plateau.deplacerAnimal("Mouton", moutonEnDanger);
-            if (deplacementMouton == 0) {
+            if (Arrays.equals(plateau.getCaseSortie(), plateau.getCaseMouton())){
+                partieGagne = true;
+            } else if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
                 int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
                 setDeplacementMouton(nbr);

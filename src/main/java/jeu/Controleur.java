@@ -80,7 +80,6 @@ public class Controleur {
                 if (affichageJeu.getNumeroEtape() == 2 && remplacerRocheParHerbe) {
                     //si la sortie n'est pas crée
                     if (!(sortieCree)) {
-                        getPlateau().setCaseSortie(i,j);
                         sortieCree = true;
                         remplacerTypeTerrain(img, true, true);
                         //On remplace l'image roche par une image herbe
@@ -157,8 +156,8 @@ public class Controleur {
                             getCase(i,j).setAnimal(new Mouton());
                             moutonCree = true;
                         }
-                        loupCree = getPlateau().verifPresenceAnimal("Loup");
-                        moutonCree = getPlateau().verifPresenceAnimal("Mouton");
+                        loupCree = getPlateau().isAnimalPresent("Loup");
+                        moutonCree = getPlateau().isAnimalPresent("Mouton");
                         affichageJeu.getBoutonValiderEtape().setDisable(!moutonCree || !loupCree);
                     }
                 }

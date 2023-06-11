@@ -16,8 +16,6 @@ public class Plateau implements Serializable {
     //Pour parcourir le labyrinthe :
     private final transient ArrayList<int[]> casesPlante = new ArrayList<>();
     //transient permet de ne pas sauvegarder l'attribut lors de la sauvegarde
-    private final transient ArrayList<int[]> listeCasePassees = new ArrayList<>();
-    private final transient Stack<int[]> chemin = new Stack<>();
 
     //Pour garder en mémoire les cases précédentes :
     private final transient ArrayList<int[]> casesLoupPassees = new ArrayList<>();
@@ -57,27 +55,20 @@ public class Plateau implements Serializable {
         return this.cases[i][j];
     }
 
-    public void setCaseSortie(int i, int j){
-        caseSortie[0] = i;
-        caseSortie[1] = j;
-    }
 
-    public int[] setCaseSortie(){
-        caseSortie = new int[2];
+    public int[] getCaseSortie(){
         for (int i = 0; i < lignes; i++){
             for (int j = 0; j < colonnes; j++) {
                 if (i == 0 || j == 0 || i == lignes - 1 || j == colonnes - 1){
                     if (getCase(i,j).getContenu() instanceof Plante){
                         caseSortie[0] = i;
                         caseSortie[1] = j;
+                        break;
                     }
                 }
             }
         }
-        return caseSortie;
-    }
-
-    public int[] getCaseSortie(){
+        System.out.println("Case sortie "+caseSortie[0]+"   "+caseSortie[1]);
         return caseSortie;
     }
 
@@ -124,6 +115,42 @@ public class Plateau implements Serializable {
             }
         }
         return new int[2];
+    }
+
+    /**
+     * @param n : Nom de l'animal
+     * @return : renvoie vrai si l'animal choisi est présent, sinon renvoie faux
+     */
+
+
+    public boolean isAnimalPresent(String n){
+        for (int i = 0; i < this.getLignes(); i++) {
+            for (int j = 0; j < this.getColonnes(); j++) {
+                if (this.cases[i][j].isAnimalPresent()) {
+                    if (this.cases[i][j].getAnimal().getNom().equals(n)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param liste : la collection choisie
+     * @param position : un tableau de la position actuelle
+     * @return : renvoie vrai si la collection contient les mêmes valeurs que les valeurs du tableau,
+     * sinon renvoie faux
+     */
+
+    public boolean isPresentDansLaListe(Collection<int[]> liste, int[] position){
+        for (int[] l : liste){
+            //Permet de comparer que 2 tableaux sont identiques en valeurs
+            if (Arrays.equals(l, position)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -211,6 +238,7 @@ public class Plateau implements Serializable {
 
         //Etape 3 :
         //Libération des cases aux alentours de la sortie
+        caseSortie = getCaseSortie();
         if (caseSortie[0] == 0 || caseSortie[0] == lignes - 1) {
             int depart = Math.max(0, caseSortie[0] - 1);
             int arrivee = Math.min(lignes - 1, caseSortie[0] + 1);
@@ -278,12 +306,11 @@ public class Plateau implements Serializable {
      */
 
 
-
     public boolean verifPlateauCorrect(){
         //D'abord on stocke dans une liste toutes les cases passées
         casesPlante.clear();
-        listeCasePassees.clear();
-        chemin.clear();
+        ArrayList<int[]> listeCasePassees = new ArrayList<>();
+        Stack<int[]> chemin = new Stack<>();
 
         //On complète la liste des cases plantes
         completerListeCasesPlante();
@@ -293,40 +320,30 @@ public class Plateau implements Serializable {
         int jCourant = this.getCaseSortie()[1];
 
 
-        actionsCaseActuelle(iCourant, jCourant);
+        actionsCaseActuelle(iCourant, jCourant, listeCasePassees, chemin);
         //parcours en profondeur
         while (!casesPlante.isEmpty()) {
             // Vérifier les cases voisines de la case courante
             boolean deplacementPossible = false;
 
 
-            //Correspond à gauche
-            if (jCourant - 1 > 0 && this.cases[iCourant][jCourant - 1].getContenu() instanceof Plante &&
-                    !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant-1})) {
-                jCourant--;
-                actionsCaseActuelle(iCourant, jCourant);
-                deplacementPossible = true;
-            }
-            //Correspond à haut
-            else if (iCourant - 1 > 0 && this.cases[iCourant - 1][jCourant].getContenu() instanceof Plante &&
-                    !presentDansLaListe(listeCasePassees, new int[]{iCourant - 1,jCourant})) {
-                iCourant--;
-                actionsCaseActuelle(iCourant, jCourant);
-                deplacementPossible = true;
-            }
-            //Correspond à droite
-            else if (jCourant + 1 < colonnes - 1 && this.cases[iCourant][jCourant + 1].getContenu() instanceof Plante &&
-                    !presentDansLaListe(listeCasePassees, new int[]{iCourant,jCourant + 1})) {
-                jCourant++;
-                actionsCaseActuelle(iCourant, jCourant);
-                deplacementPossible = true;
-            }
-            //Correspond à bas
-            else if (iCourant + 1 < lignes - 1 && this.cases[iCourant + 1][jCourant].getContenu() instanceof Plante &&
-                    !presentDansLaListe(listeCasePassees, new int[]{iCourant + 1,jCourant})) {
-                iCourant++;
-                actionsCaseActuelle(iCourant, jCourant);
-                deplacementPossible = true;
+            // Vérification des cases voisines
+            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
+
+            for (int k = 0; k < 4; k++) {
+                int nextI = iCourant + dI[k];
+                int nextJ = jCourant + dJ[k];
+
+                // Vérification que c'est pas l'extrémité, que la case est une plante et que
+                // le tableau n'est pas présent dans la liste des cases passées
+                if (nextI > 0 && nextI < lignes - 1 && nextJ > 0 && nextJ < colonnes - 1 &&
+                    cases[nextI][nextJ].getContenu() instanceof Plante &&
+                    !isPresentDansLaListe(listeCasePassees, new int[]{nextI, nextJ})) {
+
+                   actionsCaseActuelle(nextI, nextJ, listeCasePassees, chemin);
+                   deplacementPossible = true;
+                }
             }
             if (chemin.isEmpty()) {
                 return false;
@@ -344,21 +361,7 @@ public class Plateau implements Serializable {
         return true;
     }
 
-    /**
-     * @param liste : la collection choisie
-     * @param position : un tableau de la position actuelle
-     * @return : renvoie vrai si la collection contient les mêmes valeurs que les 2 premières valeurs du tableau,
-     * sinon renvoie faux
-     */
 
-    public boolean presentDansLaListe(Collection<int[]> liste, int[] position){
-        for (int[] l : liste){
-            if (l[0] == position[0] && l[1] == position[1]){
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * @param arr : une Arraylist choisie
@@ -368,7 +371,7 @@ public class Plateau implements Serializable {
      */
 
 
-    public void supprimerTableauArrayList(ArrayList<int[]> arr, int[] l){
+    public void removeTableauArrayList(ArrayList<int[]> arr, int[] l){
         for (int i=0; i < arr.size(); i++){
             if (l[0] == arr.get(i)[0] && l[1] == arr.get(i)[1]){
                 arr.remove(i);
@@ -433,37 +436,20 @@ public class Plateau implements Serializable {
      * Ajoute la position à la liste des cases passées et push 1 ou 2 fois le chemin
      */
 
-    public void actionsCaseActuelle(int i, int j){
+    public void actionsCaseActuelle(int i, int j, ArrayList<int[]> casesPasses, Stack<int[]> chemin){
         int[] caseActuelle = new int[]{i, j};
-        supprimerTableauArrayList(casesPlante, caseActuelle);
-        listeCasePassees.add(caseActuelle);
+        removeTableauArrayList(casesPlante, caseActuelle);
+        casesPasses.add(caseActuelle);
         //En effet s'il y a 4 cases on fait 2 fois push
         if (aBien4CasesVoisinesPlantes(i,j)) {
-            chemin.push(caseActuelle);
+            //chemin.push(caseActuelle);
             chemin.push(caseActuelle);
         } else {
             chemin.push(caseActuelle);
         }
     }
 
-    /**
-     * @param n : Nom de l'animal
-     * @return : renvoie vrai si l'animal choisi est présent, sinon renvoie faux
-     */
 
-
-    public boolean verifPresenceAnimal(String n){
-        for (int i = 0; i < this.getLignes(); i++) {
-            for (int j = 0; j < this.getColonnes(); j++) {
-                if (this.cases[i][j].isAnimalPresent()) {
-                    if (this.cases[i][j].getAnimal().getNom().equals(n)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
 
     /**
@@ -559,16 +545,26 @@ public class Plateau implements Serializable {
             } else {
                 posAnimal = getCaseLoup();
                 if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())) {
-                    deplacerAnimal("Loup", false); //Une erreur a été détectée ici quand le loup est à côté de la case de sortie
-                    //Pareil pour le mouton
+                    deplacerAnimal("Loup", false);
                 }
             }
         } else {
             System.out.println("ici");
+            List<int[]> chemin;
             if (animal.equals("Mouton")) {
-                parcoursProfondeur(true);
+                //parcoursProfondeur(true);
+                //dijkstra();
+                chemin = aStarSimple(true);
+                int [] caseMouton = getCaseMouton();
+                this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
+                this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
             } else {
-                parcoursProfondeur(false);
+                //parcoursProfondeur(false);
+                //dijkstra();
+                chemin = aStarSimple(false);
+                int [] caseLoup = getCaseLoup();
+                this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
+                this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());
             }
         }
     }
@@ -588,59 +584,40 @@ public class Plateau implements Serializable {
     public boolean deplacementAnimalPassif(int i, int j, Animal a){
         //Reprise d'une arraylist déjà créée
         ArrayList<int[]> listeCasePasses;
+        int[] posActuelle;
         if (a.getNom().equals("Mouton")){
             listeCasePasses = casesMoutonPassees;
+            posActuelle = getCaseMouton();
         } else {
             listeCasePasses = casesLoupPassees;
+            posActuelle = getCaseLoup();
         }
         //Création d'une liste stockant les cases possibles
         ArrayList<int[]> casesPossibles = new ArrayList<>();
         //Regarde la position gauche
         //casesPossibles prend la valeur si la case est une plante ET n'est pas présent dans la liste
         //des cases passées
-        if (this.cases[i][j-1].getContenu() instanceof Plante && j - 1 > 0 &&
-                !presentDansLaListe(listeCasePasses, new int[]{i,j-1})){
+        int I = posActuelle[0]; // Ligne de la position actuelle
+        int J = posActuelle[1]; // Colonne de la position actuelle
 
-            casesPossibles.add(new int[]{i,j-1});
-            if (a.getNom().equals("Mouton")){
-                casesMoutonPassees.add(new int[]{i,j-1});
-            } else {
-                casesLoupPassees.add(new int[]{i,j-1});
+        // Vérification des cases voisines
+        int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+        int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
+
+
+        for (int k = 0; k < 4; k++) {
+            int nextI = I + dI[k];
+            int nextJ = J + dJ[k];
+
+            if (nextI > 0 && nextI < lignes - 1 && nextJ > 0 && nextJ < colonnes - 1){
+                int[] caseActuelle = new int[]{nextI, nextJ};
+                if (cases[nextI][nextJ].getContenu() instanceof Plante &&
+                !isPresentDansLaListe(listeCasePasses, caseActuelle)){
+                    casesPossibles.add(caseActuelle);
+                }
             }
         }
-        //Position haut
-        if (this.cases[i-1][j].getContenu() instanceof Plante && i - 1 > 0 &&
-                !presentDansLaListe(listeCasePasses, new int[]{i-1,j})){
 
-            casesPossibles.add(new int[]{i-1,j});
-            if (a.getNom().equals("Mouton")){
-                casesMoutonPassees.add(new int[]{i-1,j});
-            } else {
-                casesLoupPassees.add(new int[]{i-1,j});
-            }
-        }
-        //Position droite
-        if (this.cases[i][j+1].getContenu() instanceof Plante && j + 1 < colonnes - 1 &&
-                !presentDansLaListe(listeCasePasses, new int[]{i,j+1})){
-
-            casesPossibles.add(new int[]{i,j+1});
-            if (a.getNom().equals("Mouton")){
-                casesMoutonPassees.add(new int[]{i,j+1});
-            } else {
-                casesLoupPassees.add(new int[]{i,j+1});
-            }
-        }
-        //Position bas
-        if (this.cases[i+1][j].getContenu() instanceof Plante && i + 1 < lignes - 1 && j + 1 < colonnes - 1 &&
-                !presentDansLaListe(listeCasePasses, new int[]{i+1,j})){
-
-            casesPossibles.add(new int[]{i+1,j});
-            if (a.getNom().equals("Mouton")){
-                casesMoutonPassees.add(new int[]{i+1,j});
-            } else {
-                casesLoupPassees.add(new int[]{i+1,j});
-            }
-        }
         //Si aucune possibilité
         if (casesPossibles.isEmpty()){
             //On efface l'une des 2 listes en fonction de l'animal
@@ -660,6 +637,11 @@ public class Plateau implements Serializable {
         //Supprime l'animal à la case initiale et déplace l'animal en fonction de la sélection
         this.cases[i][j].removeAnimal();
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
+        if (a.getNom().equals("Mouton")){
+            casesMoutonPassees.add(deplacementChoisi);
+        } else {
+            casesLoupPassees.add(deplacementChoisi);
+        }
         return true;
     }
 
@@ -673,7 +655,7 @@ public class Plateau implements Serializable {
     Dijkstra
      */
 
-    public int[][] matriceNumero(){
+    public int[][] initialiserMatricePoids(){
         //Création d'une matrice ayant des entiers : -1 pour les plantes -2 pour les roches
         //Sert pour le marquage
         int[][] casesNumero = new int[lignes][colonnes];
@@ -689,26 +671,15 @@ public class Plateau implements Serializable {
         return casesNumero;
     }
 
-    /**
-     * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
-     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
-     * Utilise l'algorithme de parcours en largeur
-     */
+    public int[][] donnerPoidsCase(int[] position0){
+        int[][] casesNumero = initialiserMatricePoids();
 
-    public boolean manhattan() {
-        int[][] casesNumero = matriceNumero();
-
-        //Récupération de la case mouton
-        int[] posMouton = getCaseMouton();
-        int posI = posMouton[0];
-        int posJ = posMouton[1];
-        //Valeur de la case mouton = 0
-        casesNumero[posI][posJ] = 0;
+        casesNumero[position0[0]][position0[1]] = 0;
 
         //Création d'une file (parcours en largeur)
         Queue<int[]> file = new ArrayDeque<>();
         //Ajout de la position mouton
-        file.add(posMouton);
+        file.add(position0);
 
         while (!file.isEmpty()) {
             int[] posActuelle = file.poll(); //Récupération et suppression de la 1ère valeur de la file
@@ -716,50 +687,44 @@ public class Plateau implements Serializable {
             int I = posActuelle[0];
             int J = posActuelle[1];
 
-            //Vérification en haut
-            if (I - 1 >= 0 && casesNumero[I - 1][J] == -1) {
-                file.add(new int[]{I - 1, J});
-                casesNumero[I - 1][J] = casesNumero[I][J] + 1;
-                //Si la case possède un loup
-                if (getCase(I - 1, J).getAnimal() instanceof Loup) {
-                    printNumeroCase(casesNumero); //Permet d'afficher dans la console
-                    return casesNumero[I - 1][J] <= 5; //Retourne vrai ou faux en fonction de la valeur
-                }
-            }
 
-            // Vérification des autres directions
-            // Bas
-            if (I + 1 < lignes && casesNumero[I + 1][J] == -1) {
-                file.add(new int[]{I + 1, J});
-                casesNumero[I + 1][J] = casesNumero[I][J] + 1;
-                if (getCase(I + 1, J).getAnimal() instanceof Loup) {
-                    printNumeroCase(casesNumero);
-                    return casesNumero[I + 1][J] < 5;
-                }
-            }
+            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
 
-            // Gauche
-            if (J - 1 >= 0 && casesNumero[I][J - 1] == -1) {
-                file.add(new int[]{I, J - 1});
-                casesNumero[I][J - 1] = casesNumero[I][J] + 1;
-                if (getCase(I, J - 1).getAnimal() instanceof Loup) {
-                    printNumeroCase(casesNumero);
-                    return casesNumero[I][J - 1] <= 5;
-                }
-            }
+            //Permet de vérifier les 4 côtés
 
-            // Droite
-            if (J + 1 < colonnes && casesNumero[I][J + 1] == -1) {
-                file.add(new int[]{I, J + 1});
-                casesNumero[I][J + 1] = casesNumero[I][J] + 1;
-                if (getCase(I, J + 1).getAnimal() instanceof Loup) {
-                    printNumeroCase(casesNumero);
-                    return casesNumero[I][J + 1] <= 5;
+            for (int k = 0; k < 4; k++) {
+                int nextI = I + dI[k];
+                int nextJ = J + dJ[k];
+
+                // Vérification des limites de la grille
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes) {
+                    //vérification que la case n'a pas encore été visitée
+                    if (casesNumero[nextI][nextJ] == -1) {
+                        file.add(new int[]{nextI, nextJ});
+                        casesNumero[nextI][nextJ] = casesNumero[I][J] + 1;
+                    }
                 }
             }
         }
-        //Ne devrait jamais arriver ici
-        return false;
+
+        printNumeroCase(casesNumero);
+
+        return casesNumero;
+    }
+
+    /**
+     * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
+     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
+     * Utilise l'algorithme de parcours en largeur
+     */
+
+    public boolean manhattan() {
+        int[][] poids = donnerPoidsCase(getCaseMouton());
+
+        int[] caseLoup = getCaseLoup();
+
+        return poids[caseLoup[0]][caseLoup[1]] <= 5;
     }
 
     /**
@@ -780,9 +745,121 @@ public class Plateau implements Serializable {
     }
 
 
+
+
+    public List<int[]> aStarSimple(boolean isAuTourMouton){
+        int[][] poids;
+        int[] posDepart;
+        int[] posArrivee;
+
+        if (isAuTourMouton){
+            posDepart = getCaseMouton();
+            posArrivee = getCaseSortie();
+        } else {
+            posDepart = getCaseLoup();
+            posArrivee = getCaseMouton();
+        }
+
+        poids = donnerPoidsCase(posArrivee);
+
+        printNumeroCase(poids);
+
+        // Création d'une file de priorité (parcours en largeur)
+        Queue<int[]> queue = new ArrayDeque<>();
+        // Ajout de la position mouton
+        queue.offer(posDepart);
+
+        List<int[]> leChemin = new ArrayList<>();
+
+
+
+        int poidsActuel = poids[posDepart[0]][posDepart[1]];
+
+        poids[posDepart[0]][posDepart[1]] = -1;
+
+        while (!queue.isEmpty()) {
+            int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
+            int I = posActuelle[0]; // Ligne de la position actuelle
+            int J = posActuelle[1]; // Colonne de la position actuelle
+
+            // Vérification des cases voisines
+            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
+
+            List<int[]> casesPossibles = new ArrayList<>();
+
+            for (int k = 0; k < 4; k++) {
+                int nextI = I + dI[k];
+                int nextJ = J + dJ[k];
+
+                // Vérification des limites de la grille
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes && poids[nextI][nextJ] >= 0) {
+                    // Mise à jour de la distance si elle est plus courte
+                    if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
+                        casesPossibles.add(new int[]{nextI, nextJ});
+                    }
+                }
+            }
+
+            double plusCourteDistance = Integer.MAX_VALUE;
+            int[] positionLaPlusCourte = new int[2];
+
+            for (int[] c : casesPossibles){
+                double distance = distanceAStar(c[0], c[1], posArrivee[0], posArrivee[1]);
+                if (plusCourteDistance > distance){
+                    plusCourteDistance = distance;
+                    positionLaPlusCourte = c;
+                }
+            }
+
+            leChemin.add(positionLaPlusCourte);
+            queue.offer(positionLaPlusCourte);
+
+            //Permet de marquer la case comme visitée
+            poids[positionLaPlusCourte[0]][positionLaPlusCourte[1]] = -1;
+
+            if (Arrays.equals(posArrivee, positionLaPlusCourte)){
+                break;
+            }
+        }
+
+        System.out.println("je suis l'algo A*");
+        printNumeroCase(poids);
+        return leChemin;
+
+    }
+
+    public double distanceAStar(int iDepart, int jDepart, int iArrivee, int jArrivee){
+        return Math.sqrt(Math.pow((iDepart - iArrivee), 2) + Math.pow((jDepart - jArrivee), 2));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public ArrayList<int[]> parcoursLargeur(boolean isAuTourMouton){
         //Sert pour le marquage
-        int[][] casesNumero = matriceNumero();
+        int[][] casesNumero = initialiserMatricePoids();
 
         int[] posAnimalEnCours;
         int[] posDestination;
@@ -806,7 +883,7 @@ public class Plateau implements Serializable {
             posIAnimal = posAnimalEnCours[0];
             posJAnimal = posAnimalEnCours[1];
             //Récupération de la case mouton
-            posDestination = setCaseSortie(); //nom à modifier
+            posDestination = getCaseSortie();
             posIArrive = posDestination[0];
             posJArrive = posDestination[1];
         }
@@ -896,7 +973,7 @@ public class Plateau implements Serializable {
 
     public ArrayList<int[]> parcoursProfondeur(boolean isAuTourMouton){
         //Sert pour le marquage
-        int[][] casesNumero = matriceNumero();
+        int[][] casesNumero = initialiserMatricePoids();
 
         int[] posAnimalEnCours;
         int[] posDestination;
@@ -920,7 +997,7 @@ public class Plateau implements Serializable {
             posIAnimal = posAnimalEnCours[0];
             posJAnimal = posAnimalEnCours[1];
             //Récupération de la case mouton
-            posDestination = setCaseSortie(); //nom à modifier
+            posDestination = getCaseSortie();
             posIArrive = posDestination[0];
             posJArrive = posDestination[1];
         }
@@ -1009,12 +1086,69 @@ public class Plateau implements Serializable {
         return cheminParcouru;
     }
 
-    public void aStar(){
-
-    }
-
     //Optionnel
-    public void dijkstra(){
+    public int[][] dijkstra(){
+        int[][] distance  = new int[lignes][colonnes];
+
+        // Initialisation des distances à une valeur maximale (infini)
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+                if (getCase(i,j).getContenu() instanceof Plante) {
+                    distance[i][j] = Integer.MAX_VALUE;
+                } else {
+                    distance[i][j] = -1 ; //Permet de différencier les cases
+                }
+            }
+        }
+
+        // Récupération de la case mouton
+        int[] posMouton = getCaseMouton();
+        int posI = posMouton[0];
+        int posJ = posMouton[1];
+
+        // Valeur de la case mouton = 0
+        distance[posI][posJ] = 0;
+
+        // Création d'une file de priorité (parcours en largeur)
+        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(o -> distance[o[0]][o[1]]));
+        // Ajout de la position mouton
+        queue.offer(posMouton);
+
+        while (!queue.isEmpty()) {
+            int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
+            int I = posActuelle[0]; // Ligne de la position actuelle
+            int J = posActuelle[1]; // Colonne de la position actuelle
+
+            // Vérification des cases voisines
+            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
+
+            for (int k = 0; k < 4; k++) {
+                int nextI = I + dI[k];
+                int nextJ = J + dJ[k];
+
+                // Vérification des limites de la grille
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes) {
+                    // Calcul du poids de la case voisine
+                    int weight = 0;
+                    if (getCase(nextI, nextJ).getContenu() instanceof Plante) {
+                        weight = 1; // Poids pour les plantes
+                    }
+
+                    // Mise à jour de la distance si elle est plus courte
+                    if (distance[I][J] + weight < distance[nextI][nextJ]) {
+                        distance[nextI][nextJ] = distance[I][J] + weight;
+                        queue.offer(new int[]{nextI, nextJ});
+                    }
+                }
+            }
+        }
+        System.out.println("je suis algo de dijstra");
+        printNumeroCase(distance);
+
+
+        return distance;
+
 
     }
 

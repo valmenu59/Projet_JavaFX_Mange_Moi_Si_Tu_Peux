@@ -1,11 +1,6 @@
 package test;
 
-import demarrage.Intro;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import jeu.*;
-import menu.Menu;
-import sae.saejavafx.HelloApplication;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +48,6 @@ class JeuTest {
     //Pour tester si l'algo verifPlateauCorrect affiche bien vrai si c'est un labyrinthe parfait
     @Test
     void testMethodeLabyrintheParfait(){
-        plateau.setCaseSortie(0,1); //initilisation de la case de sortie
         plateau.getCase(0,1).setContenuPlante(new Herbe()); //permet de remplacer la case roche par herbe
         assertTrue(plateau.verifPlateauCorrect(),"Le labyrinthe créé est bien parfait");
     }
@@ -61,7 +55,6 @@ class JeuTest {
     //Pour tester si l'algo verifPlateauCorrect affiche faux si c'est un labyrinthe imparfait
     @Test
     void testMethodeLabyrintheImparfait(){
-        plateau.setCaseSortie(0,1); //initilisation de la case de sortie
         plateau.getCase(0,1).setContenuPlante(new Herbe()); //permet de remplacer la case roche par herbe
         //on veut que la case[2][2] soit entourée de roche
         plateau.getCase(3,2).setContenuGeneral(new Roche());
@@ -86,7 +79,7 @@ class JeuTest {
         arr.add(new int[]{1,34});
         arr.add(new int[]{-4,12});
         arr.add(new int[]{3,3});
-        assertTrue(plateau.presentDansLaListe(arr,new int[]{-4,12}),"Cette méthode est fonctionnelle");
+        assertTrue(plateau.isPresentDansLaListe(arr,new int[]{-4,12}),"Cette méthode est fonctionnelle");
     }
 
     @Test
@@ -95,7 +88,7 @@ class JeuTest {
         arr.add(new int[]{1,34});
         arr.add(new int[]{-4,12});
         arr.add(new int[]{3,3});
-        assertFalse(plateau.presentDansLaListe(arr,new int[]{-10,12}),"Cette méthode est fonctionnelle");
+        assertFalse(plateau.isPresentDansLaListe(arr,new int[]{-10,12}),"Cette méthode est fonctionnelle");
     }
 
     @Test
@@ -116,22 +109,13 @@ class JeuTest {
     @Test
     void testVerifPresenceAnimal(){
         plateau.getCase(2,2).setAnimal(new Loup());
-        assertFalse(plateau.verifPresenceAnimal("Mouton"), "Le plateau ne contient pas de mouton");
+        assertFalse(plateau.isAnimalPresent("Mouton"), "Le plateau ne contient pas de mouton");
     }
 
     @Test
     void testVerifPresenceAnimal2(){
         plateau.getCase(2,2).setAnimal(new Mouton());
-        assertTrue(plateau.verifPresenceAnimal("Mouton"), "Le plateau ne contient pas de mouton");
-    }
-
-
-    @Test
-    void testCaseSortie(){
-        ArrayList<int[]> arr =  new ArrayList<>();
-        plateau.setCaseSortie(0,1);
-        arr.add(plateau.getCaseSortie());
-        assertTrue(plateau.presentDansLaListe(arr,new int[]{0,1}), "Envoie vrai");
+        assertTrue(plateau.isAnimalPresent("Mouton"), "Le plateau ne contient pas de mouton");
     }
 
     @Test
