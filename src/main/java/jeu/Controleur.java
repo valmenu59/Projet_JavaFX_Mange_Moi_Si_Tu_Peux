@@ -132,7 +132,7 @@ public class Controleur {
                         }
                     }
                 }
-
+                //Ne marche qu'à l'étape 4
                 else if (affichageJeu.getNumeroEtape() == 4 && !remplacerRocheParHerbe) {
                     if (getCase(i,j).getContenu() instanceof Plante){
                         if (!moutonCree && !loupCree) {
