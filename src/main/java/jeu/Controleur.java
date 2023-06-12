@@ -52,6 +52,18 @@ public class Controleur {
     /////////////////////////////FIN GET, SET, IS////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Méthode qui permet de donner des actions utilisateurs aux images lorsque celles-ci sont cliquées
+     * A l'étape 2, seules les cases à l'extremité ET que la sortie n'est pas créée qu'une action est possible :
+     * Permet de transformer une roche en herbe
+     * A l'étape 3, seules les cases à l'intérieur et la sortie ne peuvent avoir une action utilisateur :
+     * Permet de transformer herbe -> cactus -> marguerite -> roche(*) -> herbe
+     * (*) la case de sortie ne permet pas d'avoir une roche
+     * A l'étape 4, l'utilisateur ne peut que placer au maximum un loup et un mouton
+     * @param img : l'imageview à donner l'action
+     * @param remplacerRocheParHerbe : permet de définir les cases à l'extrémité pour les différentes étapes
+     * @param isSortie : permet si l'image est à la sortie ou pas
+     */
 
     public void remplacerTypeTerrain(ImageView img, boolean remplacerRocheParHerbe, boolean isSortie){
         img.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -174,8 +186,6 @@ public class Controleur {
 
             @Override
             public void handle(ActionEvent actionEvent) {
-                //On supprime tout du panneau principal
-                //jeu.getPanneauPrincipale().getChildren().clear();
                 //On initie un nouveau plateau en mémoire
                 jeu.plateau = new Plateau(affichageJeu.getChoixNbLignes(), affichageJeu.getChoixNbColonnes());
                 //On crée le plateau

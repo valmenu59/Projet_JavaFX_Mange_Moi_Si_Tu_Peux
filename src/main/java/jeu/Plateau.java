@@ -590,8 +590,8 @@ public class Plateau implements Serializable {
 
             } else {
                 //parcoursProfondeur(false);
-                //dijkstra();
-                chemin = aStarSimple(false);
+                chemin = dijkstra(false);
+                //chemin = aStarSimple(false);
                 int [] caseLoup = getCaseLoup();
                 this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());
@@ -1301,34 +1301,40 @@ public class Plateau implements Serializable {
     }
 
     //Optionnel
-    public int[][] dijkstra(){
-        int[][] distance  = new int[lignes][colonnes];
+    public List<int[]> dijkstra(boolean isAuTourMouton){
+        int[][] poids;
+        int[] posDepart;
+        int[] posArrivee;
 
-        // Initialisation des distances à une valeur maximale (infini)
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
-                if (getCase(i,j).getContenu() instanceof Plante) {
-                    distance[i][j] = Integer.MAX_VALUE;
-                } else {
-                    distance[i][j] = -1 ; //Permet de différencier les cases
-                }
-            }
+        if (isAuTourMouton){
+            posDepart = getCaseMouton();
+            posArrivee = getCaseSortie();
+        } else {
+            posDepart = getCaseLoup();
+            posArrivee = getCaseMouton();
         }
 
-        // Récupération de la case mouton
-        int[] posMouton = getCaseMouton();
-        int posI = posMouton[0];
-        int posJ = posMouton[1];
+        poids = donnerPoidsCase(posArrivee, initialiserMatricePoids());
 
-        // Valeur de la case mouton = 0
-        distance[posI][posJ] = 0;
+        printNumeroCase(poids);
 
         // Création d'une file de priorité (parcours en largeur)
-        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(o -> distance[o[0]][o[1]]));
+        Queue<int[]> queue = new ArrayDeque<>();
         // Ajout de la position mouton
-        queue.offer(posMouton);
+        queue.offer(posDepart);
+
+        List<int[]> leChemin = new ArrayList<>();
+
+
+
+        int poidsActuel = poids[posDepart[0]][posDepart[1]];
+
+        poids[posDepart[0]][posDepart[1]] = -1;
+
+
 
         while (!queue.isEmpty()) {
+            System.out.println("ici");
             int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
             int I = posActuelle[0]; // Ligne de la position actuelle
             int J = posActuelle[1]; // Colonne de la position actuelle
@@ -1337,32 +1343,45 @@ public class Plateau implements Serializable {
             int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
             int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
 
+            List<int[]> casesPossibles = new ArrayList<>();
+            int plusPetitPoids = Integer.MAX_VALUE;
+            int[] caseAPasser = new int[2];
+
+
+
             for (int k = 0; k < 4; k++) {
                 int nextI = I + dI[k];
                 int nextJ = J + dJ[k];
 
                 // Vérification des limites de la grille
-                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes) {
-                    // Calcul du poids de la case voisine
-                    int weight = 0;
-                    if (getCase(nextI, nextJ).getContenu() instanceof Plante) {
-                        weight = 1; // Poids pour les plantes
-                    }
-
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes && poids[nextI][nextJ] >= 0) {
                     // Mise à jour de la distance si elle est plus courte
-                    if (distance[I][J] + weight < distance[nextI][nextJ]) {
-                        distance[nextI][nextJ] = distance[I][J] + weight;
-                        queue.offer(new int[]{nextI, nextJ});
+                    if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
+                        if (poids[nextI][nextJ] <= plusPetitPoids){
+                            caseAPasser = new int[]{nextI, nextJ};
+                            plusPetitPoids = poids[nextI][nextJ];
+                        }
                     }
                 }
             }
+
+
+
+            leChemin.add(caseAPasser);
+            queue.offer(caseAPasser);
+            poids[caseAPasser[0]][caseAPasser[1]] = -1;
+
+            if (Arrays.equals(posArrivee, caseAPasser)){
+                break;
+            }
         }
-        System.out.println("je suis algo de dijstra");
-        printNumeroCase(distance);
 
-
-        return distance;
-
+        System.out.println("je suis Dijkstra");
+        printNumeroCase(poids);
+        for (int[] c : leChemin){
+            System.out.println(c[0]+" "+c[1]);
+        }
+        return leChemin;
 
     }
 

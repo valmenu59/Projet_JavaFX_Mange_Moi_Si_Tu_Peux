@@ -776,18 +776,22 @@ public class AffichageJeu extends Scene {
         for (int i=0; i < getPlateau().getLignes(); i++){
             for (int j=0; j < getPlateau().getColonnes(); j++){
                 ImageView img = getImageView(i,j);
+                //Si un animal est présent
                 if (getCase(i,j).isAnimalPresent()) {
+                    //Si le loup n'est pas menaçant
                     if (!this.getJeu().isMoutonEnDanger()) {
                         if (getCase(i,j).getAnimal() instanceof Loup) {
                             img.setImage(loup);
                         } else {
                             img.setImage(mouton);
                         }
+                    //Si le loup est menaçant
                     } else if (getCase(i,j).getAnimal() instanceof Loup) {
                         img.setImage(loupMenacant);
                     } else {
                         img.setImage(moutonDanger);
                     }
+                //Si c'est pas un animal
                 } else if (getCase(i,j).getContenu() instanceof Roche) {
                     img.setImage(roche);
                 } else if (getCase(i,j).getContenu() instanceof Herbe) {
