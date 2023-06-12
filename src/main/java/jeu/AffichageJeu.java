@@ -11,6 +11,7 @@ import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -60,6 +61,8 @@ public class AffichageJeu extends Scene {
     private Stage mainStage;
     private Scene mainScene;
     private VBox panneau2;
+
+    private VBox vBox1;
 
     //Panneaux déroulants
     private ChoiceBox<Integer> choixNblignes;
@@ -198,6 +201,11 @@ public class AffichageJeu extends Scene {
         return this.controleur.jeu.plateau.cases[i][j];
     }
 
+    /**
+     * @param element : Un String qui correspond à un objet du jeu
+     * @return : retourne la source de l'image d'un élément
+     */
+
     public String getSource (String element){
         switch (element){
             case "roche" -> {
@@ -257,11 +265,22 @@ public class AffichageJeu extends Scene {
         return this.controleur.jeu;
     }
 
+    public Button getBoutonPause(){
+        return boutonPause;
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////
     /////////////////////////////FIN GET, SET, IS////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////
 
+
+    /**
+     * Permet d'afficher une Alerte de type ERROR et qui retourne au menu ensuite
+     * @param e : Une exception
+     * @param texte : Le texte spécifique correspondant à l'exception
+     * @param stage : Stage actuel
+     */
 
     public void messageAlerte(Exception e, String texte, Stage stage){
         e.printStackTrace();
@@ -269,9 +288,13 @@ public class AffichageJeu extends Scene {
         alerte.setHeaderText(texte);
         alerte.setContentText(e.toString());
         alerte.showAndWait();
-        MenuSelectionAffichage menuSelection = new MenuSelectionAffichage(stage);
-        stage.setScene(menuSelection);
+        menu.Menu menu = new menu.Menu(stage);
+        stage.setScene(menu);
     }
+
+    /**
+     * Permet de créer la fenêtre du jeu avec un Splitpane possédant un VBox à gauche et un AnchorPane à droite
+     */
 
 
     public void creerFenetreJeu() {
@@ -283,6 +306,8 @@ public class AffichageJeu extends Scene {
 
         //Création du VBox à la partie gauche qui prend 20% de la scène
         this.panneau2 = new VBox();
+        panneau2.setSpacing(20);
+        panneau2.setPadding(new Insets(10, 0, 0, 10));
         panneau2.setPrefWidth(mainScene.getWidth() * 0.20);
 
         // Création de l'AnchorPane pour la partie droite
@@ -303,8 +328,10 @@ public class AffichageJeu extends Scene {
     }
 
 
-
-
+    /**
+     * Etape 1 du jeu : implémente les différents boutons et actions nécessaires
+     * @param retour : si revient de l'étape 2
+     */
 
 
     public void etape1(boolean retour) {
@@ -316,6 +343,8 @@ public class AffichageJeu extends Scene {
             Text texte = new Text("Options");
             //Cette méthode permet le texte du jeu
 
+            //Ajout d'un vBox
+            vBox1 = new VBox();
 
             //On rajoute le texte dans panneau2
             panneau2.getChildren().add(texte);
@@ -326,6 +355,11 @@ public class AffichageJeu extends Scene {
             boutonCreerPlateau = new Button("Créer votre plateau");
             controleur.validerLignesColonnes(boutonCreerPlateau);
             panneau2.getChildren().add(boutonCreerPlateau);
+
+            vBox1.getChildren().addAll(listeMenuDeroulantetLabelEtape1);
+            vBox1.getChildren().add(boutonCreerPlateau);
+            panneau2.getChildren().add(vBox1);
+
             boutonValiderEtape = new Button("Valider cette étape");
             controleur.validerEtape(boutonValiderEtape);
             boutonValiderEtape.setDisable(true); //Permet de rendre le bouton inactif
@@ -343,8 +377,7 @@ public class AffichageJeu extends Scene {
             panneau2.getChildren().add(boutonRetourMenu);
 
         } else {
-            panneau2.getChildren().addAll(1,listeMenuDeroulantetLabelEtape1);
-            panneau2.getChildren().add(5,boutonCreerPlateau);
+            panneau2.getChildren().add(1,vBox1);
             boutonValiderEtape.setDisable(false);
             boutonRetour.setDisable(true);
         }
@@ -352,6 +385,11 @@ public class AffichageJeu extends Scene {
     }
 
 
+
+    /**
+     * Etape 2 du jeu : implémente les différents boutons et actions nécessaires
+     * @param retour : si revient de l'étape 3
+     */
 
 
     public void etape2(boolean retour) {
@@ -368,12 +406,15 @@ public class AffichageJeu extends Scene {
         //boutonRetour.setDisable(false);
         if (!retour) {
             //Avant on supprime tout ce qu'on a plus besoin
-            panneau2.getChildren().removeAll(listeMenuDeroulantetLabelEtape1);
-            panneau2.getChildren().remove(boutonCreerPlateau);
+            panneau2.getChildren().remove(vBox1);
         } else {
             panneau2.getChildren().remove(boutonCreerLabyrinthe);
         }
     }
+
+    /**
+     * Etape 3 du jeu : implémente les différents boutons et actions nécessaires
+     */
 
     public void etape3() {
         this.numeroEtape = 3;
@@ -389,6 +430,10 @@ public class AffichageJeu extends Scene {
 
     }
 
+    /**
+     * Etape 4 du jeu : implémente les différents boutons et actions nécessaires
+     */
+
     public void etape4(){
         this.numeroEtape = 4;
         boutonValiderEtape.setDisable(true);
@@ -396,6 +441,10 @@ public class AffichageJeu extends Scene {
         panneau2.getChildren().remove(1);
         texteEtape();
     }
+
+    /**
+     * Etape principale du jeu
+     */
 
     public void etapeJeu(){
         numeroEtape = 5;
@@ -416,7 +465,9 @@ public class AffichageJeu extends Scene {
         boucleAffichageJeu();
     }
 
-
+    /**
+     * Permet de donner une action différente à la case de sortie
+     */
 
     public void changerActionCaseSortie(){
         for (int i = 0; i < getPlateau().getLignes(); i++) {
@@ -430,6 +481,10 @@ public class AffichageJeu extends Scene {
             }
         }
     }
+
+    /**
+     * Donne le texte de chaque étape
+     */
 
 
     public void texteEtape() {
@@ -482,6 +537,11 @@ public class AffichageJeu extends Scene {
         }
     }
 
+    /**
+     * Texte lors du jeu avec les différents attributs appelés
+     * @param nouveau : si ce n'est déjà pas implementé
+     */
+
     public void texteJeu(boolean nouveau){
         String nomAnimal;
         if (getJeu().isAuTourDuMouton()){
@@ -509,7 +569,10 @@ public class AffichageJeu extends Scene {
     }
 
 
-
+    /**
+     * Permet de modifier le jeu tout en mettant l'affichage du jeu
+     * Si le jeu est fini, va dans la classe ActionFinDeJeu
+     */
 
     public void boucleAffichageJeu(){
         boucleJeu = new AnimationTimer() {
@@ -525,6 +588,7 @@ public class AffichageJeu extends Scene {
                         mettreAJourAffichagePlateau();
                         texteJeu(false);
                         if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
+                            boutonRetourMenu.setDisable(true);
                             boucleJeu.stop();
                             System.out.println("Le jeu est fini");
                             //Permet de mettre le jeu en pause pendant 3 secondes, mais en mettant bien à jour l'affichage
@@ -546,6 +610,14 @@ public class AffichageJeu extends Scene {
         boucleJeu.start();
     }
 
+    /**
+     * Permet de créer un menu déroulant avec un label
+     * @param texte : texte du label
+     * @param nbMin : nombre minimum du menu déroulant
+     * @param nbMax : nombre maximum du menu déroulant
+     * @param nbDefaut : nombre affiché par défaut
+     * @return : retourne le nombre affiché
+     */
 
 
     public ChoiceBox<Integer> creerMenuDeroulant(String texte, int nbMin, int nbMax, int nbDefaut) {
@@ -569,8 +641,12 @@ public class AffichageJeu extends Scene {
         return choix;
     }
 
-
-
+    /**
+     * Permet de retrouver la position i et j de la matrice à partir de la position de la souris
+     * @param x : position x de la souris
+     * @param y : position y de la souris
+     * @return : retourne un tableau de position i, j
+     */
 
 
     public int[] retrouverPosIetJ(double x, double y) {
@@ -581,24 +657,22 @@ public class AffichageJeu extends Scene {
         return l;
     }
 
-    public double[] retrouverPosXetY(int i, int j){
-        double[] l = new double[2];
-        l[0]  = xDepart + j * taille;
-        l[1] = yDepart + i * taille;
-        return l;
-    }
-
-
-
-
-
+    /**
+     * Méthode permettant de créer une image
+     * @param imageSource : Un string de l'URL
+     * @return : retourne une Image
+     */
 
     public Image creerImage(String imageSource) {
         //permet de récupérer une image dans le répertoire
-        Image image = new Image(getClass().getResource(imageSource).toExternalForm(),
+        return new Image(getClass().getResource(imageSource).toExternalForm(),
                 taille, taille, false, false);
-        return image;
     }
+
+    /**
+     * Méthode permettant d'afficher un nouveau plateau
+     * @param avecActionUtilisateur : permet de donner une action utilisateur ou pas
+     */
 
     public void afficherPlateauJeu(boolean avecActionUtilisateur) {
         //Le but de cette fonction est d'afficher le plateau du jeu dans le panneau principal
@@ -664,6 +738,15 @@ public class AffichageJeu extends Scene {
         }
     }
 
+    /**
+     * Permet d'insérer des ImageView dans le plateau avec la position x et y du panneau, s'il donne une action
+     * à l'utilisateur à partir d'une image
+     * @param x : position x du panneau
+     * @param y : position y du panneau
+     * @param avecActionUtilisateur : peut donner une action utilisateur
+     * @param objet : l'image à afficher
+     */
+
     public void mettreImageViewDansPlateau(double x, double y, boolean avecActionUtilisateur, Image objet){
         ImageView imageView = new ImageView(objet);
         imageView.setX(x);
@@ -675,7 +758,9 @@ public class AffichageJeu extends Scene {
         panneauPrincipal.getChildren().add(imageView);
     }
 
-
+    /**
+     * Permet de mettre à jour l'affichage du jeu en fonction de la classe Plateau
+     */
 
 
     public void mettreAJourAffichagePlateau(){
@@ -718,12 +803,14 @@ public class AffichageJeu extends Scene {
         }
     }
 
+    /**
+     * Tout ce qui en dessous permet de centrer le plateau du jeu pour que peu importe le nombre de lignes
+     *  et le nombre de colonnes le plateau soit centré et que la taille des cases s'adaptent pour que tout
+     *  soit directement visible
+     * @return : retourne un double de position x et y
+     */
+
     public double[] taillePlateauEcran(){
-        /*
-        Tout ce qui en dessous permet de centrer le plateau du jeu pour que peu importe le nombre de lignes
-        et le nombre de colonnes le plateau soit centré et que la taille des cases s'adaptent pour que tout
-        soit directement visible
-         */
         double[] tableau = new double[2];
         double x = (mainScene.getWidth() * 0.8) * 0.05;
         double y = mainScene.getHeight() * 0.1;
@@ -739,6 +826,10 @@ public class AffichageJeu extends Scene {
         tableau[1] = y;
         return tableau;
     }
+
+    /**
+     * Permet d'afficher un texte d'alerte si le labyrinthe créé est imparfait
+     */
 
 
     public void texteAlerteLabyrintheImparfait(){

@@ -307,20 +307,15 @@ public class Controleur {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (affichageJeu.isEstEnPause()){
-                    b.setText("Marche");
+                    affichageJeu.getBoutonPause().setText("Pause");
                     affichageJeu.setMettreEnPause(false);
                 } else {
-                    b.setText("Pause");
+                    affichageJeu.getBoutonPause().setText("Marche");
                     affichageJeu.setMettreEnPause(true);
                 }
             }
         });
     }
-
-
-
-
-
 
 
 
