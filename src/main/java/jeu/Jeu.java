@@ -99,9 +99,13 @@ public class Jeu {
             plateau.deplacerAnimal("Mouton", moutonEnDanger);
             if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
-                int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
-                setDeplacementMouton(nbr);
-                planteDeplacementMouton = nbr;
+                if (!moutonEnDanger) {
+                    int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
+                    setDeplacementMouton(nbr);
+                    planteDeplacementMouton = nbr;
+                } else {
+                    planteDeplacementMouton = 2;
+                }
                 auTourDuMouton = false;
             }
         } else {
