@@ -8,6 +8,9 @@ import fx.PoliceJeu;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -370,11 +373,6 @@ public class AffichageJeu extends Scene {
         } else {
             panneau2.getChildren().remove(boutonCreerLabyrinthe);
         }
-        //On vide les 2 ArrayList
-        //listeLabel.clear();
-        //listeDeListeDeroulant.clear();
-
-
     }
 
     public void etape3() {
@@ -414,11 +412,8 @@ public class AffichageJeu extends Scene {
 
         texteJeu(true);
 
-        boolean gagne;
         mettreAJourAffichagePlateau();
         boucleAffichageJeu();
-
-
     }
 
 
@@ -532,11 +527,14 @@ public class AffichageJeu extends Scene {
                         if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
                             boucleJeu.stop();
                             System.out.println("Le jeu est fini");
-                            //Permet de mettre le jeu en pause pendant 2.5 secondes, mais en mettant bien à jour l'affichage
-                            PauseTransition pause = new PauseTransition(Duration.seconds(2.5));
-                            pause.setOnFinished(Event -> {
-                                FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
-                                mainStage.setScene(fin);
+                            //Permet de mettre le jeu en pause pendant 3 secondes, mais en mettant bien à jour l'affichage
+                            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+                            pause.setOnFinished(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent actionEvent) {
+                                    FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
+                                    mainStage.setScene(fin);
+                                }
                             });
                             pause.play();
                         }

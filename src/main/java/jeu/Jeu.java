@@ -96,17 +96,16 @@ public class Jeu {
                 this.plateau.planteQuiPousse();
             }
             deplacementMouton--;
+            System.out.println("Je suis dans jeu "+deplacementMouton);
             plateau.deplacerAnimal("Mouton", moutonEnDanger);
             if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
-                if (!moutonEnDanger) {
+                if (plateau.isAnimalPresent("Mouton")) {
                     int nbr = plateau.moutonMangePlante(caseM[0], caseM[1]);
                     setDeplacementMouton(nbr);
                     planteDeplacementMouton = nbr;
-                } else {
-                    planteDeplacementMouton = 2;
+                    auTourDuMouton = false;
                 }
-                auTourDuMouton = false;
             }
         } else {
             deplacementLoup--;
