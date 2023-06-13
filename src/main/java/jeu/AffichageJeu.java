@@ -937,7 +937,7 @@ public class AffichageJeu extends Scene {
     public void creerMenuDeroulantTemps() {
         //Cette méthode permet de créer un menu déroulant à partir de différents paramètres
         //D'abord on crée un label avec texte comme paramètre
-        Label lab = new Label("Choisissez le temps entre chaque déplacement : \n");
+        Label lab = new Label("Choisissez le temps entre chaque \ndéplacement : \n");
         //On crée un menu déroulant composé de chiffres entiers
         choixTempsEntreChaqueDeplacement = new ChoiceBox<>();
         //On rajoute le nombre de secondes entre chaque tour
