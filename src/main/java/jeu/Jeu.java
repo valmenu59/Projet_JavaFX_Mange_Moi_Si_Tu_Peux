@@ -90,7 +90,7 @@ public class Jeu {
 
 
     public void boucleJeu() {
-        int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 20;
+        int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 12;
         System.out.println("Loup menaçant "+ plateau.manhattan());
         moutonEnDanger = plateau.manhattan();
         if (auTourDuMouton) {

@@ -549,6 +549,13 @@ public class Plateau implements Serializable {
             isMoutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
+                if (jeu.isMoutonEnDanger()){
+                    if (Math.random() <= 0.25){
+                        return 2;
+                    } else {
+                        return 3;
+                    }
+                }
                 return 2;
             } else if (this.cases[i][j].getContenu() instanceof Cactus) {
                 this.cases[i][j].setContenuPlante(new Terre());
@@ -825,7 +832,7 @@ public class Plateau implements Serializable {
             }
         }
 
-        printNumeroCase(casesNumero);
+        //printNumeroCase(casesNumero);
 
         return casesNumero;
     }
@@ -850,7 +857,6 @@ public class Plateau implements Serializable {
      */
 
     private void printNumeroCase(int[][] plateau){
-        System.out.println("Manhanttan : ");
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
                 String numero = String.format("%2d", plateau[i][j]); //Permet de décaler s'il y a un seul caractère
@@ -878,7 +884,7 @@ public class Plateau implements Serializable {
 
         poids = donnerPoidsCase(posArrivee, initialiserMatricePoids());
 
-        printNumeroCase(poids);
+        //printNumeroCase(poids);
 
         // Création d'une file de priorité (parcours en largeur)
         Queue<int[]> queue = new ArrayDeque<>();
@@ -896,6 +902,7 @@ public class Plateau implements Serializable {
 
 
         while (!queue.isEmpty()) {
+            System.out.println("A* Simple");
             int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
             int I = posActuelle[0]; // Ligne de la position actuelle
             int J = posActuelle[1]; // Colonne de la position actuelle
@@ -918,6 +925,8 @@ public class Plateau implements Serializable {
                     }
                 }
             }
+
+            printNumeroCase(poids);
 
             double plusCourteDistance = Double.MAX_VALUE;
             int[] positionLaPlusCourte = new int[2];
@@ -1010,7 +1019,7 @@ public class Plateau implements Serializable {
         donnerPoidsCase(caseSortie, poids);
 
 
-        printNumeroCase(poids);
+        //printNumeroCase(poids);
 
         // Création d'une file de priorité (parcours en largeur)
         Queue<int[]> queue = new ArrayDeque<>();
@@ -1028,7 +1037,7 @@ public class Plateau implements Serializable {
 
 
         while (!queue.isEmpty()) {
-
+            System.out.println("A* Complexe");
             int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
             int I = posActuelle[0]; // Ligne de la position actuelle
             int J = posActuelle[1]; // Colonne de la position actuelle
@@ -1039,7 +1048,6 @@ public class Plateau implements Serializable {
 
             List<int[]> casesPossibles = new ArrayList<>();
             List<int[]> casesMargueritesTour0 = new ArrayList<>();
-            int caseLaPlusForte = 0;
 
             for (int k = 0; k < 4; k++) {
                 int nextI = I + dI[k];
@@ -1106,7 +1114,7 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis l'algo A* Complexe");
-        printNumeroCase(poids);
+        //printNumeroCase(poids);
         return leChemin;
 
     }
@@ -1406,7 +1414,7 @@ public class Plateau implements Serializable {
 
 
         while (!queue.isEmpty()) {
-            System.out.println("ici");
+            System.out.println("Dijsktra");
             int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
             int I = posActuelle[0]; // Ligne de la position actuelle
             int J = posActuelle[1]; // Colonne de la position actuelle
@@ -1449,10 +1457,7 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis Dijkstra");
-        printNumeroCase(poids);
-        for (int[] c : leChemin){
-            System.out.println(c[0]+" "+c[1]);
-        }
+        //printNumeroCase(poids);
         return leChemin;
 
     }

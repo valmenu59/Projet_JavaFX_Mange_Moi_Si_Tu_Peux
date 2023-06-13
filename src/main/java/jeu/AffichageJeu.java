@@ -941,7 +941,7 @@ public class AffichageJeu extends Scene {
         //On crée un menu déroulant composé de chiffres entiers
         choixTempsEntreChaqueDeplacement = new ChoiceBox<>();
         //On rajoute le nombre de secondes entre chaque tour
-        choixTempsEntreChaqueDeplacement.getItems().addAll(0.01, 0.02, 0.05, 0.1, 0.25, 0.4, 0.5, 0.6, 0.75, 1., 1.25, 1.5, 2., 3., 5., 8., 10., 15., 30.);
+        choixTempsEntreChaqueDeplacement.getItems().addAll(0.05, 0.1, 0.25, 0.4, 0.5, 0.6, 0.75, 1., 1.25, 1.5, 2., 3., 5., 8., 10.);
         //Permet d'afficher la valeur par défaut
         choixTempsEntreChaqueDeplacement.setValue(0.5);
         VBox vBox = new VBox();
