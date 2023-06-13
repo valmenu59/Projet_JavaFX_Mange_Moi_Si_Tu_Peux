@@ -959,6 +959,7 @@ public class Plateau implements Serializable {
             int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
 
             List<int[]> casesPossibles = new ArrayList<>();
+            List<int[]> casesMargueritesTour0 = new ArrayList<>();
             int caseLaPlusForte = 0;
 
             for (int k = 0; k < 4; k++) {
@@ -966,44 +967,39 @@ public class Plateau implements Serializable {
                 int nextJ = J + dJ[k];
 
                 // Vérification des limites de la grille
-                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes ) {
-                    // Mise à jour de la distance si elle est plus courte
-                    System.out.println("Nombre de déplacements : "+nombreDeplacement);
-                    if (nombreDeplacement != 0){
-                        if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
-                            casesPossibles.add(new int[]{nextI, nextJ});
-                        }
-                    } else {
-                        //Peut revenir sur une case déjà visitée
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes) {
+                    if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
+                        casesPossibles.add(new int[]{nextI, nextJ});
+                    }
+                    //Si le nombre de tour restant du mouton = 0 ET que la case est une marguerite,
+                    //peut exceptionnellement revenir en arrière
+                     if (nombreDeplacement == 0) {
                         if (poids[nextI][nextJ] >= -1) {
-                            int valeur;
-                            if (getCase(nextI, nextJ).getContenu() instanceof Herbe || getCase(nextI, nextJ).getContenu() instanceof Terre) {
-                                valeur = 2;
-                            } else if (getCase(nextI, nextJ).getContenu() instanceof Marguerite) {
-                                valeur = 4;
-                            } else {
-                                valeur = 1;
-                            }
-                            if (valeur == caseLaPlusForte) {
-                                casesPossibles.add(new int[]{nextI, nextJ});
-                            } else if (valeur > caseLaPlusForte) {
-                                caseLaPlusForte = valeur;
-                                casesPossibles.clear();
-                                casesPossibles.add(new int[]{nextI, nextJ});
+                            if (getCase(nextI, nextJ).getContenu() instanceof Marguerite) {
+                                casesMargueritesTour0.add(new int[]{nextI, nextJ});
                             }
                         }
                     }
                 }
             }
 
+            //Uniquement au tour 0 du mouton && qu'il y a au moins une case marguerite aux alentours du mouton
+            if (!casesMargueritesTour0.isEmpty()){
+                casesPossibles.clear();
+                casesPossibles = casesMargueritesTour0;
+                casesMargueritesTour0.clear();
+            }
+
+            //Cas rare où le mouton est dans tous les cas condamnés
             if (casesPossibles.isEmpty() && leChemin.isEmpty()) {
                 //Dans le cas où il n'y a plus aucune possiblité
                 System.out.println("Je rentre dans A* simple");
                 return aStarSimple(true);
-            } else if (casesPossibles.isEmpty()){
+            } else if (casesPossibles.isEmpty()){ //Cas où il n'y a plus d'autre chemin possible
                 return leChemin;
             }
 
+            //Maintenant prend le chemin le faible en poids ET en distance
             double plusCourteDistance = Double.MAX_VALUE;
             int[] positionLaPlusCourte = new int[2];
 
