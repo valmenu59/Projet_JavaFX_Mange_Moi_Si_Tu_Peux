@@ -20,6 +20,10 @@ public class Plateau implements Serializable {
     //Pour garder en mémoire les cases précédentes :
     private final transient ArrayList<int[]> casesLoupPassees = new ArrayList<>();
     private final transient ArrayList<int[]> casesMoutonPassees = new ArrayList<>();
+    private final transient Queue<int[]> filePheromonesMouton = new ArrayDeque<>();
+    private final transient Queue<int[]> filePheromonesLoup = new ArrayDeque<>();
+    private final transient Queue<Integer> fileNbDeplacementMouton = new ArrayDeque<>();
+
     private transient int planteMangee;
 
     /**
@@ -77,9 +81,31 @@ public class Plateau implements Serializable {
         return this.planteMangee;
     }
 
-    public void moutonAMangePlante(){
+    public void isMoutonAMangePlante(){
         this.planteMangee++;
     }
+
+    public ArrayList<int[]> getCasesLoupPassees(){
+        return casesLoupPassees;
+    }
+
+    public ArrayList<int[]> getCasesMoutonPassees(){
+        return casesMoutonPassees;
+    }
+
+    public Queue<int[]> getFilePheromonesMouton(){
+        return filePheromonesMouton;
+    }
+
+    public Queue<int[]> getFilePheromonesLoup(){
+        return filePheromonesLoup;
+    }
+
+    public Queue<Integer> getFileNbDeplacementMouton(){
+        return fileNbDeplacementMouton;
+    }
+
+
 
     /**
      * @return : renvoie la case du mouton en un tableau de 2 entiers
@@ -151,23 +177,6 @@ public class Plateau implements Serializable {
             }
         }
         return false;
-    }
-
-    public void setPositionAnimal(int posI, int PosJ, String animal){
-        for (int i = 0; i < this.getLignes(); i++) {
-            for (int j = 0; j < this.getColonnes(); j++) {
-                if (this.cases[i][j].isAnimalPresent()) {
-                    if (this.cases[i][j].getAnimal().getNom().equals(animal)) {
-                        getCase(i,j).removeAnimal();
-                        if (animal.equals("Mouton")) {
-                            getCase(posI, PosJ).setAnimal(new Mouton());
-                        } else {
-                            getCase(posI, PosJ).setAnimal(new Loup());
-                        }
-                    }
-                }
-            }
-        }
     }
 
 
@@ -534,7 +543,7 @@ public class Plateau implements Serializable {
     public int moutonMangePlante(int i, int j){
         //Permet d'obtenir le nombre de déplacements du mouton en fonction de la case
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
-            moutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
+            isMoutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 return 2;
@@ -578,7 +587,6 @@ public class Plateau implements Serializable {
             System.out.println("ici");
             List<int[]> chemin;
             if (animal.equals("Mouton")) {
-                //parcoursProfondeur(true);
                 //dijkstra();
                 //chemin = aStarSimple(true);
                 chemin = aStarComplexeMouton();
@@ -587,25 +595,41 @@ public class Plateau implements Serializable {
                 printMatrices();
                 this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
+                filePheromonesMouton.add(caseMouton);
 
             } else {
-                //parcoursProfondeur(false);
                 chemin = dijkstra(false);
                 //chemin = aStarSimple(false);
                 int [] caseLoup = getCaseLoup();
                 this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());
+                filePheromonesLoup.add(caseLoup);
 
             }
         }
         if (!isAnimalPresent("Loup")){
             caseMouton = getCaseMouton();
-            System.out.println("Loup"+getCaseLoup()[0]+ getCaseLoup()[1]+"Mouton"+ getCaseMouton()[0]+ getCaseMouton()[1]);
             System.out.println("le mouton s'est dirigé vers le loup");
             this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
             this.cases[caseMouton[0]][caseMouton[1]].setAnimal(new Loup());
         }
     }
+
+    public void supprimerPheromones(boolean isAutourDuMouton){
+        if (isAutourDuMouton){
+            int nbPheromonesASupprimer = fileNbDeplacementMouton.poll();
+            for (int i = 0; i < nbPheromonesASupprimer; i++){
+                filePheromonesMouton.poll();
+            }
+        } else {
+            for (int i = 0; i < 3; i++){
+                filePheromonesLoup.poll();
+            }
+        }
+    }
+
+
+
 
     /**
      *
@@ -647,11 +671,64 @@ public class Plateau implements Serializable {
             int nextI = I + dI[k];
             int nextJ = J + dJ[k];
 
+            /*
+            Au tour du mouton :
+                0% de chance que casesPossibles prenne une case qui est stockée dans caseActuelle
+                100% de chance que casesPossibles prenne une case qui n'a ni phéromones loup ni phéromones mouton
+                80% de chance que casesPossibles prenne une case qui a des phéromones mouton mais pas de phéromones loup
+                50% de chance que casesPossibles prenne une case qui a des phéromones loup mais pas de phéromones mouton
+                20% de chance que casesPossibles prenne une case qui a des phéromones loup et mouton
+
+             Au tour du loup :
+                0% de chance que casesPossibles prenne une case qui est stockée dans caseActuelle
+                100% de chance que casesPossibles prenne une case qui n'a ni phéromones loup ni phéromones mouton
+                100% de chance que casesPossibles prenne une case qui a des phéromones mouton mais pas de phéromones loup
+                    dont 60% de chance qu'il stocke une deuxième fois dans casesPossibles
+                40% de chance que casesPossibles prenne une case qui a des phéromones loup mais pas de phéromones mouton
+                100% de chance que casesPossibles prenne une case qui a des phéromones loup et mouton
+                    dont 20% de chance qu'il stocke une deuxième fois dans casesPossibles
+             */
+
             if (nextI > 0 && nextI < lignes - 1 && nextJ > 0 && nextJ < colonnes - 1){
                 int[] caseActuelle = new int[]{nextI, nextJ};
-                if (cases[nextI][nextJ].getContenu() instanceof Plante &&
-                !isPresentDansLaListe(listeCasePasses, caseActuelle)){
-                    casesPossibles.add(caseActuelle);
+                if (cases[nextI][nextJ].getContenu() instanceof Plante){
+                   if (!isPresentDansLaListe(listeCasePasses, caseActuelle)){
+                       if (a.getNom().equals("Mouton")){
+                           if (!isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               casesPossibles.add(caseActuelle);
+                           } else if (isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               if (Math.random() <= 0.80){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           } else if (isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               if (Math.random() <= 0.50){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           } else {
+                               if (Math.random() <= 0.20){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           }
+                       } else {
+                           if (!isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               casesPossibles.add(caseActuelle);
+                           } else if (isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               casesPossibles.add(caseActuelle);
+                               if (Math.random() <= 0.60){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           } else if (isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
+                               if (Math.random() <= 0.40){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           } else {
+                               casesPossibles.add(caseActuelle);
+                               if (Math.random() <= 0.20){
+                                   casesPossibles.add(caseActuelle);
+                               }
+                           }
+                       }
+                    }
                 }
             }
         }
@@ -677,8 +754,10 @@ public class Plateau implements Serializable {
         this.cases[deplacementChoisi[0]][deplacementChoisi[1]].setAnimal(a);
         if (a.getNom().equals("Mouton")){
             casesMoutonPassees.add(deplacementChoisi);
+            filePheromonesMouton.add(deplacementChoisi);
         } else {
             casesLoupPassees.add(deplacementChoisi);
+            filePheromonesLoup.add(deplacementChoisi);
         }
         return true;
     }

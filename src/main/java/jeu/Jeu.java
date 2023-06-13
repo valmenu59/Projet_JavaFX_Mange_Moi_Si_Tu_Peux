@@ -20,6 +20,7 @@ public class Jeu {
     private final DossierSauvegarde sauvegarde = new DossierSauvegarde();
 
 
+
     /**
      * Constructeur de la classe jeu
      */
@@ -88,12 +89,17 @@ public class Jeu {
 
 
     public void boucleJeu() {
+        int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 30;
         System.out.println("Loup menaçant "+ plateau.manhattan());
         moutonEnDanger = plateau.manhattan();
         if (auTourDuMouton) {
             if (deplacementMouton == planteDeplacementMouton) {
                 this.nbTour++;
                 this.plateau.planteQuiPousse();
+                plateau.getFileNbDeplacementMouton().add(planteDeplacementMouton);
+                if (nbTour > multiplicateurPheromones){
+                    plateau.supprimerPheromones(true);
+                }
             }
             deplacementMouton--;
             System.out.println("Je suis dans jeu "+deplacementMouton);
@@ -108,6 +114,9 @@ public class Jeu {
                 }
             }
         } else {
+            if (deplacementLoup == 3 && nbTour > multiplicateurPheromones){
+                plateau.supprimerPheromones(false);
+            }
             deplacementLoup--;
             plateau.deplacerAnimal("Loup", moutonEnDanger);
             if (deplacementLoup == 0) {
@@ -116,14 +125,10 @@ public class Jeu {
             }
         }
 
-        //Permet de donner les conditions de victoires ou de défaites
+        //Permet de donner les conditions de victoire ou de défaite
         if (Arrays.equals(plateau.getCaseSortie(), plateau.getCaseMouton())) {
-            //int[] posSortie = plateau.getCaseSortie();
-            //plateau.setPositionAnimal(posSortie[0], posSortie[1], "Mouton");
             partieGagne = true;
         } else if (!plateau.isAnimalPresent("Mouton")){
-            //int[] posLoup = plateau.getCaseLoup();
-            //plateau.setPositionAnimal(posLoup[0], posLoup[1], "Loup");
             partiePerdue = true;
         }
     }
