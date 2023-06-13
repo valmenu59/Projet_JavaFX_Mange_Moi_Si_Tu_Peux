@@ -1,5 +1,6 @@
 package menuSelectionPlateau;
 
+import fx.ActionAllerNouvelleScene;
 import fx.BoutonJeu;
 import fx.ImageJeu;
 import fx.PoliceJeu;
@@ -16,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import menu.Menu;
 
 public class MenuSelectionAffichage extends Scene {
 
@@ -83,18 +85,13 @@ public class MenuSelectionAffichage extends Scene {
         vBox.getChildren().add(vBox2);
 
 
-        /*
-        BoutonJeu bouton = new BoutonJeu("Ouvrir l'explorateur de fichiers", Color.ORANGERED);
-        controleur.ouvrirExplorateur(bouton, stage);
-        vBox.getChildren().add(bouton);
-        */
         Text text = new Text();
         vBox.getChildren().add(text);
 
 
 
         BoutonJeu boutonMenu = new BoutonJeu("Retourner au menu", Color.rgb(150,150,150));
-        controleur.retourMenu(boutonMenu, stage);
+        boutonMenu.setOnAction(event -> new ActionAllerNouvelleScene<>(stage, Menu.class).handle(event));
         vBox.getChildren().add(boutonMenu);
 
     }

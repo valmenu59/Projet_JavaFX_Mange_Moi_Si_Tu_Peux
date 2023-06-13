@@ -18,24 +18,6 @@ public class SelectionControleur {
     public SelectionControleur() {
     }
 
-    /**
-     * @param bouton : le bouton à donner l'action
-     * @param stage : la classe à afficher via une fenêtre
-     * Méthode qui permet d'aller au menu
-     */
-
-    public void retourMenu(Button bouton, Stage stage) {
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Menu menu = new Menu(stage);
-                stage.setScene(menu);
-            }
-        });
-    }
-
-
-
 
     public void ouvrirSauvegardeJeu(Label l, String url, Stage stage){
         l.setOnMouseClicked(new EventHandler<MouseEvent>() {

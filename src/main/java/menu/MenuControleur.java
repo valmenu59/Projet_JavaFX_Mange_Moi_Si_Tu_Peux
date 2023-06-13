@@ -16,22 +16,6 @@ public class MenuControleur {
 
     public MenuControleur(){}
 
-    /**
-     * @param bouton : le bouton à donner l'action
-     * @param stage : la classe à afficher via une fenêtre
-     * Méthode qui permet d'aller dans les paramètres
-     */
-
-    public void parametreJeu(Button bouton, Stage stage){
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Parametres param = new Parametres(stage);
-                stage.setScene(param);
-
-            }
-        });
-    }
 
     /**
      * @param bouton : le bouton à donner l'action
@@ -65,22 +49,6 @@ public class MenuControleur {
         });
     }
 
-    /**
-     * @param bouton : le bouton à donner l'action
-     * @param stage : la classe à afficher via une fenêtre
-     * Méthode qui permet dans le menu de sélection de plateaux préétablis ou d'ouvrir l'explorateur
-     * de fichier afin de sélection un plateau déjà créé
-     */
-
-    public void demarrerMenuSelection(Button bouton, Stage stage){
-        bouton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                MenuSelectionAffichage menuSelection = new MenuSelectionAffichage(stage);
-                stage.setScene(menuSelection);
-            }
-        });
-    }
 
     /**
      * @param b : le bouton à donner l'action

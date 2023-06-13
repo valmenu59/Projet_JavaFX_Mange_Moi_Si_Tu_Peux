@@ -1,5 +1,6 @@
 package menu;
 
+import fx.ActionAllerNouvelleScene;
 import fx.BoutonJeu;
 import fx.ImageJeu;
 import fx.PoliceJeu;
@@ -15,6 +16,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import menuSelectionPlateau.MenuSelectionAffichage;
+import parametres.Parametres;
 import sauvegarde.DossierSauvegarde;
 
 public class Menu extends Scene {
@@ -39,15 +42,7 @@ public class Menu extends Scene {
         //Initialisation de la sauvegarde
         DossierSauvegarde sauvegarde = new DossierSauvegarde();
 
-        /*
-        ImageView logo = new ImageJeu(getClass().getResource(IMG_LOGO).toExternalForm())
-                .afficherImage(500,225,true); //Affichage du logo
-        panneau.setRight(logo);
 
-        // Configuration du placement du logo en haut à droite
-        BorderPane.setAlignment(logo, Pos.TOP_RIGHT);
-
-         */
         BackgroundImage imageArrierePlan = new BackgroundImage(
                 new ImageJeu(getClass().getResource(IMG_ARRIERE_PLAN).toExternalForm()),
                 BackgroundRepeat.NO_REPEAT,
@@ -72,7 +67,7 @@ public class Menu extends Scene {
 
         //Ajout d'un bouton
         BoutonJeu recupererSauvegarde = creerBoutonMenu("Plateaux supplémentaires");
-        this.menuControleur.demarrerMenuSelection(recupererSauvegarde, stage);
+        recupererSauvegarde.setOnAction(event -> new ActionAllerNouvelleScene<>(stage, MenuSelectionAffichage.class).handle(event));
 
         //Ajout d'un bouton
         BoutonJeu bouton = creerBoutonMenu("Ouvrez vos propres plateaux");
@@ -80,7 +75,7 @@ public class Menu extends Scene {
 
         //Ajout d'un bouton
         BoutonJeu parametre = creerBoutonMenu("Paramètres");
-        this.menuControleur.parametreJeu(parametre, stage);
+        parametre.setOnAction(event -> new ActionAllerNouvelleScene<>(stage, Parametres.class).handle(event));
 
         //Ajout d'un bouton
         BoutonJeu boutonQuitter = creerBoutonMenu("Quitter le jeu");
