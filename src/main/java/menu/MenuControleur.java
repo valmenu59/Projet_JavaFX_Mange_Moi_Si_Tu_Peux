@@ -63,8 +63,9 @@ public class MenuControleur {
             public void handle(ActionEvent actionEvent) {
                 FileChooser explorateur = new FileChooser();
                 //Permet de filtrer la sélection de fichier
-                explorateur.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("SAE *.sae", "*.sae"));
+                explorateur.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("BINAIRE SAE *.sae", "*.sae"),
+                        new FileChooser.ExtensionFilter("TEXTE TXT *.txt", "*.txt"));
                 //Ouvre l'explorateur de fichiers
                 File fichier = explorateur.showOpenDialog(stage);
                 //Si l'utilisateur a ouvert un fichier

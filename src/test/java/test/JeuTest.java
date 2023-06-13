@@ -119,6 +119,13 @@ class JeuTest {
     }
 
     @Test
+    void testVerifPresenceAnimal3(){
+        plateau.getCase(2,2).setAnimal(new Mouton());
+        plateau.getCase(2,4).setAnimal(new Mouton());
+        assertFalse(plateau.isAnimalPresent("Mouton"), "Le plateau contient trop de moutons");
+    }
+
+    @Test
     void testMoutonMangePlante(){
         int i,j;
         //Remplacement de toutes les cases herbes par une case marguerite

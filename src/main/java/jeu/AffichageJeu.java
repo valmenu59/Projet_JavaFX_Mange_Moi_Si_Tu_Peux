@@ -55,10 +55,9 @@ public class AffichageJeu extends Scene {
 
 
     //Rassemblement des styles d'affichage
-    private final AnchorPane panneauTemporaire;
     private AnchorPane panneauPrincipal;
-    //private SplitPane separateur;
-    private Stage mainStage;
+    private final SplitPane separateur;
+    private final Stage mainStage;
     private Scene mainScene;
     private VBox panneau2;
 
@@ -101,8 +100,9 @@ public class AffichageJeu extends Scene {
 
 
     public AffichageJeu(Stage stage, boolean vientDeLaSauvegarde){
-        super(new AnchorPane(), 1280,720);
-        panneauTemporaire = (AnchorPane) getRoot();
+        super(new SplitPane(), 1280,720);
+        //panneauTemporaire = (AnchorPane) getRoot();
+        separateur = (SplitPane) getRoot();
         mainStage = stage;
 
         vientSauvegarde = vientDeLaSauvegarde;
@@ -139,8 +139,8 @@ public class AffichageJeu extends Scene {
     }
 
     public AffichageJeu(Stage stage, String adressePlateau, boolean sauvegardeVientDuFichierResources){
-        super(new AnchorPane(), 1280,720);
-        panneauTemporaire = (AnchorPane) getRoot();
+        super(new SplitPane(), 1280,720);
+        separateur = (SplitPane) getRoot();
         mainStage = stage;
         vientSauvegarde = true;
         //Permet de créer la base pour les autres éléments visuels
@@ -291,6 +291,7 @@ public class AffichageJeu extends Scene {
      */
 
     public void messageAlerte(Exception e, String texte, Stage stage){
+        System.out.println("iciiiiiiiiiiiiiiii");
         e.printStackTrace();
         Alert alerte = new Alert(Alert.AlertType.ERROR);
         alerte.setHeaderText(texte);
@@ -306,11 +307,9 @@ public class AffichageJeu extends Scene {
 
 
     public void creerFenetreJeu() {
-        mainScene = panneauTemporaire.getScene();
-        //On va à la racine
-        Pane parentPane = (Pane) mainScene.getRoot();
-        //On supprime l'AnchorPane de Menu
-        parentPane.getChildren().remove(panneauTemporaire);
+
+        //récupération de la scène
+        mainScene = separateur.getScene();
 
         //Création du VBox à la partie gauche qui prend 20% de la scène
         this.panneau2 = new VBox();
@@ -321,15 +320,13 @@ public class AffichageJeu extends Scene {
         // Création de l'AnchorPane pour la partie droite
         this.panneauPrincipal = new AnchorPane();
 
-        // Création du SplitPane
-        SplitPane splitPane = new SplitPane(panneau2,panneauPrincipal);
+        // Ajout des 2 items
+        separateur.getItems().addAll(panneau2,panneauPrincipal);
         //Permet de diviser les deux parties à 20% de la taille de la scène
-        splitPane.setDividerPositions(0.20);
+        separateur.setDividerPositions(0.20);
         //Permet de ne plus redimensionner les panneaux
-        panneau2.maxWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
-        panneau2.minWidthProperty().bind(splitPane.widthProperty().multiply(0.20));
-        //on rajoute à la racine le splitPane
-        mainScene.setRoot(splitPane);
+        panneau2.maxWidthProperty().bind(separateur.widthProperty().multiply(0.20));
+        panneau2.minWidthProperty().bind(separateur.widthProperty().multiply(0.20));
         //Permet de définir le style de panneau2
         panneau2.setStyle("-fx-background-color: rgb(161,236,158)");
 

@@ -145,22 +145,25 @@ public class Plateau implements Serializable {
 
     /**
      * @param n : Nom de l'animal
-     * @return : renvoie vrai si l'animal choisi est présent, sinon renvoie faux
+     * @return : renvoie vrai si l'animal choisi est présent qu'une fois, sinon renvoie faux
      */
 
 
     public boolean isAnimalPresent(String n){
+        int cmpt = 0;
         for (int i = 0; i < this.getLignes(); i++) {
             for (int j = 0; j < this.getColonnes(); j++) {
                 if (this.cases[i][j].isAnimalPresent()) {
                     if (this.cases[i][j].getAnimal().getNom().equals(n)) {
-                        return true;
+                        cmpt++;
                     }
                 }
             }
         }
-        return false;
+        return cmpt == 1;
     }
+
+
 
     /**
      * @param liste : la collection choisie

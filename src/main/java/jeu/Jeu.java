@@ -1,5 +1,6 @@
 package jeu;
 
+import exceptions.PlateauException;
 import sauvegarde.DossierSauvegarde;
 
 import java.io.*;
@@ -185,18 +186,25 @@ public class Jeu {
             fileInputStream = getClass().getResourceAsStream(adresse);
         }
         try (fileInputStream){
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            int colonnes = objectInputStream.readInt();
-            int lignes = objectInputStream.readInt();
-            plateau = new Plateau(lignes,colonnes);
-            plateau.creerPlateau();
+            if (adresse.endsWith(".sae")){
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                int colonnes = objectInputStream.readInt();
+                int lignes = objectInputStream.readInt();
+                plateau = new Plateau(lignes, colonnes);
+                plateau.creerPlateau();
 
-            for (int i = 0; i < lignes; i++){
-                for (int j = 0; j < colonnes; j++){
-                    plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
+                for (int i = 0; i < lignes; i++) {
+                    for (int j = 0; j < colonnes; j++) {
+                        plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
+                    }
+                }
+                System.out.println("Fichier récupéré avec succès !");
+            } else if (adresse.endsWith(".txt")){
+                String message = creerPlateauViaFichierTexte(adresse);
+                if (!message.equals("succès")){
+                    throw new PlateauException(message);
                 }
             }
-            System.out.println("Fichier récupéré avec succès !");
         } catch (IOException e) {
             throw new IOException("Impossible de lire le fichier de sauvegarde.", e);
         } catch (ClassNotFoundException e) {
@@ -204,6 +212,89 @@ public class Jeu {
         } catch (Exception e){
             throw new Exception("Autre erreur : "+e.getMessage());
         }
+    }
+
+
+
+    public String creerPlateauViaFichierTexte(String adresse) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(adresse));
+        String texteLigne;
+        int ligneIndex = 0;
+        int nbColonnes;
+        int nbLignes = 0;
+
+        texteLigne = br.readLine().replaceAll("[\n\t\r ]", "");
+        nbColonnes = texteLigne.length();
+        nbLignes++;
+
+        while((texteLigne = br.readLine()) != null)
+        {
+            nbLignes++;
+        }
+
+        br.close();
+
+        System.out.println("Nombre de lignes : " + nbLignes);
+        System.out.println("Nombre de lettres dans la première ligne : " + nbColonnes);
+
+        if (nbLignes < 5 || nbColonnes < 6){
+            //Trop petit
+            System.out.println("Plateau trop petit");
+            plateau = null;
+            return "Plateau trop petit";
+        }
+
+        plateau = new Plateau(nbLignes, nbColonnes);
+        plateau.creerPlateau();
+
+        BufferedReader br2 = new BufferedReader(new FileReader(adresse));
+
+
+        while ((texteLigne = br2.readLine()) != null) {
+            // Ignorer les caractères de saut de ligne, tabulation et retour chariot
+            texteLigne = texteLigne.replaceAll("[\n\t\r ]", "");
+
+            for (int colonneIndex = 0; colonneIndex < texteLigne.length(); colonneIndex++) {
+
+                char caractere = texteLigne.charAt(colonneIndex);
+
+
+                switch (caractere) {
+                    case 'x', 'X' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Roche());
+                    case 'h', 'H', 's', 'S' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Herbe());
+                    case 'f', 'F' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Marguerite());
+                    case 'c', 'C' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Cactus());
+                    case 'm', 'M' -> plateau.getCase(ligneIndex, colonneIndex).setAnimal(new Mouton());
+                    case 'l', 'L' -> plateau.getCase(ligneIndex, colonneIndex).setAnimal(new Loup());
+                }
+            }
+            //passage à la ligne suivante
+            ligneIndex++;
+        }
+
+        br2.close();
+
+
+        //Maintenant on vérifie l'état du plateau
+        //Vérification si c'est un labyrinthe parfait
+        if (!plateau.verifPlateauCorrect()){
+            System.out.println("Labyrinthe imparfait");
+            plateau = null;
+            return "Labyrinthe imparfait";
+        }
+        if (!plateau.isAnimalPresent("Loup")){
+            System.out.println("Loup manquant ou trop de loups");
+            plateau = null;
+            return "Loup manquant ou trop de loups";
+        }
+        if (!plateau.isAnimalPresent("Mouton")){
+            System.out.println("Mouton manquant ou trop de moutons");
+            plateau = null;
+            return "Mouton manquant ou trop de moutons";
+        }
+
+        System.out.println("Fichier récupéré avec succès !");
+        return "succès";
     }
 
 
