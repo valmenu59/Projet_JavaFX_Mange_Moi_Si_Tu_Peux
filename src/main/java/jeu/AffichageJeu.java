@@ -1,7 +1,10 @@
 package jeu;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import finDeJeu.FinDeJeu;
 import fx.PoliceJeu;
@@ -17,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -66,6 +68,7 @@ public class AffichageJeu extends Scene {
     //Panneaux déroulants
     private ChoiceBox<Integer> choixNblignes;
     private ChoiceBox<Integer> choixNbColonnes;
+    private ChoiceBox<Double> choixTempsEntreChaqueDeplacement;
 
     //Boutons
     private Button boutonCreerPlateau;
@@ -184,6 +187,11 @@ public class AffichageJeu extends Scene {
     public int getChoixNbColonnes() {
         //Permet de récupérer la valeur choisie du menu déroulant
         return choixNbColonnes.getValue();
+    }
+
+    public double getChoixTempsEntreChaqueDeplacement() {
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return choixTempsEntreChaqueDeplacement.getValue();
     }
 
     public Button getBoutonValiderEtape(){
@@ -354,8 +362,8 @@ public class AffichageJeu extends Scene {
             //On rajoute le texte dans panneau2
             panneau2.getChildren().add(texte);
             //Cette méthode permet de créer un menu déroulant avec un chiffre mini, maxi et celui affiché par défaut
-            choixNbColonnes = creerMenuDeroulant("Nombre de colonnes : ", 10, 18, 14);
-            choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 14, 9);
+            choixNbColonnes = creerMenuDeroulant("Nombre de colonnes : ", 10, 27, 14);
+            choixNblignes = creerMenuDeroulant("Nombre de lignes : ", 7, 21, 9);
             //Ensuite on crée différents boutons
             boutonCreerPlateau = new Button("Créer votre plateau");
             controleur.validerLignesColonnes(boutonCreerPlateau);
@@ -467,6 +475,7 @@ public class AffichageJeu extends Scene {
         texteJeu(true);
 
         mettreAJourAffichagePlateau();
+        creerMenuDeroulantTemps();
         boucleAffichageJeu();
     }
 
@@ -579,42 +588,58 @@ public class AffichageJeu extends Scene {
      * Si le jeu est fini, va dans la classe ActionFinDeJeu
      */
 
-    public void boucleAffichageJeu(){
+    public void boucleAffichageJeu() {
         boucleJeu = new AnimationTimer() {
+            private long dernierTemps = 0;
+            private long tempsAccumule = 0;
+            private long tempsEntreDeplacements = (long) (getChoixTempsEntreChaqueDeplacement() * 1_000_000_000); // Conversion en nanosecondes
+
             @Override
-            public void handle(long l) {
+            public void handle(long tempsActuel) {
                 if (!estEnPause) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        AffichageJeu.this.controleur.jeu.boucleJeu();
-                        mettreAJourAffichagePlateau();
-                        afficherListeCasesPassesEtPheromones();
-                        texteJeu(false);
-                        if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
-                            boutonRetourMenu.setDisable(true);
-                            boucleJeu.stop();
-                            System.out.println("Le jeu est fini");
-                            //Permet de mettre le jeu en pause pendant 3 secondes, mais en mettant bien à jour l'affichage
-                            PauseTransition pause = new PauseTransition(Duration.seconds(3));
-                            pause.setOnFinished(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent actionEvent) {
-                                    FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
-                                    mainStage.setScene(fin);
-                                }
-                            });
-                            pause.play();
+                    if (dernierTemps == 0) {
+                        dernierTemps = tempsActuel;
+                    } else {
+                        long tempsEcoule = tempsActuel - dernierTemps;
+                        dernierTemps = tempsActuel;
+
+                        tempsAccumule += tempsEcoule;
+
+                        // Vérifier si suffisamment de temps s'est écoulé pour effectuer un déplacement
+                        if (tempsAccumule >= tempsEntreDeplacements) {
+                            AffichageJeu.this.controleur.jeu.boucleJeu();
+                            mettreAJourAffichagePlateau();
+                            afficherListeCasesPassesEtPheromones();
+                            texteJeu(false);
+                            if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()) {
+                                boutonRetourMenu.setDisable(true);
+                                boucleJeu.stop();
+                                System.out.println("Le jeu est fini");
+                                //Permet de mettre le jeu en pause pendant 3 secondes, mais en mettant bien à jour l'affichage
+                                PauseTransition pause = new PauseTransition(Duration.seconds(3));
+                                pause.setOnFinished(new EventHandler<ActionEvent>() {
+                                    @Override
+                                    public void handle(ActionEvent actionEvent) {
+                                        FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
+                                        mainStage.setScene(fin);
+                                    }
+                                });
+                                pause.play();
+                            }
+
+                            tempsAccumule -= tempsEntreDeplacements;
                         }
                     }
+                    tempsEntreDeplacements = (long) (getChoixTempsEntreChaqueDeplacement() * 1_000_000_000);
                 }
             }
         };
-        //Permet de démarrer la boucle
+
+        // Démarrer la boucle
         boucleJeu.start();
     }
+
+
 
     /**
      * Permet de créer un menu déroulant avec un label
@@ -902,6 +927,28 @@ public class AffichageJeu extends Scene {
         }
 
         panneauPrincipal.getChildren().addAll(listeCercles);
+    }
+
+    /**
+     * Permet de créer un menu déroulant de Double pour le temps entre chaque déplacement
+     */
+
+
+    public void creerMenuDeroulantTemps() {
+        //Cette méthode permet de créer un menu déroulant à partir de différents paramètres
+        //D'abord on crée un label avec texte comme paramètre
+        Label lab = new Label("Choisissez le temps entre chaque déplacement : \n");
+        //On crée un menu déroulant composé de chiffres entiers
+        choixTempsEntreChaqueDeplacement = new ChoiceBox<>();
+        //On rajoute le nombre de secondes entre chaque tour
+        choixTempsEntreChaqueDeplacement.getItems().addAll(0.01, 0.02, 0.05, 0.1, 0.25, 0.4, 0.5, 0.6, 0.75, 1., 1.25, 1.5, 2., 3., 5., 8., 10., 15., 30.);
+        //Permet d'afficher la valeur par défaut
+        choixTempsEntreChaqueDeplacement.setValue(0.5);
+        VBox vBox = new VBox();
+
+        vBox.getChildren().add(lab);
+        vBox.getChildren().add(choixTempsEntreChaqueDeplacement);
+        panneau2.getChildren().add(vBox);
     }
 
 
