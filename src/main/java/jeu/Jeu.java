@@ -1,6 +1,6 @@
 package jeu;
 
-import exceptions.PlateauException;
+import exception.PlateauException;
 import sauvegarde.DossierSauvegarde;
 
 import java.io.*;
@@ -254,7 +254,7 @@ public class Jeu {
             // Ignorer les caractères de saut de ligne, tabulation et retour chariot
             texteLigne = texteLigne.replaceAll("[\n\t\r ]", "");
 
-            for (int colonneIndex = 0; colonneIndex < texteLigne.length(); colonneIndex++) {
+            for (int colonneIndex = 0; colonneIndex < nbColonnes; colonneIndex++) {
 
                 char caractere = texteLigne.charAt(colonneIndex);
 
@@ -275,8 +275,7 @@ public class Jeu {
         br2.close();
 
 
-        //Maintenant on vérifie l'état du plateau
-        //Vérification si c'est un labyrinthe parfait
+        //Maintenant, on vérifie l'état du plateau
         if (!plateau.verifPlateauCorrect()){
             System.out.println("Labyrinthe imparfait");
             plateau = null;
