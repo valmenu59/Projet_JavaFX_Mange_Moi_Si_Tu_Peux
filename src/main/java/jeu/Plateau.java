@@ -591,8 +591,6 @@ public class Plateau implements Serializable {
                 //chemin = aStarSimple(true);
                 chemin = aStarComplexeMouton();
                 caseMouton = getCaseMouton();
-                System.out.println("Loup"+getCaseLoup()[0]+ getCaseLoup()[1]+"Mouton"+ getCaseMouton()[0]+ getCaseMouton()[1]);
-                printMatrices();
                 this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
                 filePheromonesMouton.add(caseMouton);
@@ -675,8 +673,8 @@ public class Plateau implements Serializable {
             Au tour du mouton :
                 0% de chance que casesPossibles prenne une case qui est stockée dans caseActuelle
                 100% de chance que casesPossibles prenne une case qui n'a ni phéromones loup ni phéromones mouton
-                80% de chance que casesPossibles prenne une case qui a des phéromones mouton mais pas de phéromones loup
-                50% de chance que casesPossibles prenne une case qui a des phéromones loup mais pas de phéromones mouton
+                50% de chance que casesPossibles prenne une case qui a des phéromones mouton mais pas de phéromones loup
+                35% de chance que casesPossibles prenne une case qui a des phéromones loup mais pas de phéromones mouton
                 20% de chance que casesPossibles prenne une case qui a des phéromones loup et mouton
 
              Au tour du loup :
@@ -697,7 +695,7 @@ public class Plateau implements Serializable {
                            if (!isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
                                casesPossibles.add(caseActuelle);
                            } else if (isPresentDansLaListe(filePheromonesMouton, caseActuelle) && !isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
-                               if (Math.random() <= 0.80){
+                               if (Math.random() <= 0.60){
                                    casesPossibles.add(caseActuelle);
                                }
                            } else if (isPresentDansLaListe(filePheromonesLoup, caseActuelle)){
@@ -705,7 +703,7 @@ public class Plateau implements Serializable {
                                    casesPossibles.add(caseActuelle);
                                }
                            } else {
-                               if (Math.random() <= 0.20){
+                               if (Math.random() <= 0.35){
                                    casesPossibles.add(caseActuelle);
                                }
                            }
@@ -941,7 +939,6 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis l'algo A*");
-        printNumeroCase(poids);
         return leChemin;
 
     }
@@ -1106,9 +1103,6 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis l'algo A* Complexe");
-        for (int[] c : leChemin){
-            System.out.println(c[0]+"   "+c[1]);
-        }
         printNumeroCase(poids);
         return leChemin;
 

@@ -9,7 +9,6 @@ import fx.PoliceJeu;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -21,13 +20,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javafx.util.Duration;
-import menuSelectionPlateau.MenuSelectionAffichage;
+import sauvegarde.DossierSauvegarde;
 
 public class AffichageJeu extends Scene {
     //Reprend la classe controleur
@@ -87,6 +87,9 @@ public class AffichageJeu extends Scene {
     private final ArrayList<Rectangle> listeCarreNoir = new ArrayList<>();
     private final ArrayList<ImageView> listeImages = new ArrayList<>();
 
+    private final ArrayList<Rectangle> listeCasePassees = new ArrayList<>();
+    private final ArrayList<Circle> listeCercles = new ArrayList<>();
+
     //Autres
     private AnimationTimer boucleJeu;
     private double taille;
@@ -113,7 +116,12 @@ public class AffichageJeu extends Scene {
 
 
         if (vientDeLaSauvegarde){
-            this.controleur.jeu.reprendreSauvegarde();
+            DossierSauvegarde sauvegarde = new DossierSauvegarde();
+            try {
+                this.controleur.jeu.reprendreSauvegarde(sauvegarde.getCheminDaccesSauvegarde(), false);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
             boutonRetourMenu = new Button("Retourner au menu");
             controleur.retournerAuMenu(boutonRetourMenu, mainStage);
@@ -141,9 +149,9 @@ public class AffichageJeu extends Scene {
         controleur = new Controleur(this);
         try {
             if (sauvegardeVientDuFichierResources){
-                this.controleur.jeu.reprendreSauvegardeViaFichierResources(adressePlateau);
+                this.controleur.jeu.reprendreSauvegarde(adressePlateau, true);
             } else {
-                this.controleur.jeu.reprendreSauvegarde(adressePlateau);
+                this.controleur.jeu.reprendreSauvegarde(adressePlateau, false);
             }
         } catch (IOException e) {
             String texte = "Erreur de lecture : "+"\n"+"" +
@@ -586,6 +594,7 @@ public class AffichageJeu extends Scene {
                     } finally {
                         AffichageJeu.this.controleur.jeu.boucleJeu();
                         mettreAJourAffichagePlateau();
+                        afficherListeCasesPassesEtPheromones();
                         texteJeu(false);
                         if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()){
                             boutonRetourMenu.setDisable(true);
@@ -849,6 +858,53 @@ public class AffichageJeu extends Scene {
         texteAlerteLabyrintheImparfait.setFont(POLICE_ALERTE);
         texteAlerteLabyrintheImparfait.setX(10);
         texteAlerteLabyrintheImparfait.setY(20);
+    }
+
+    public void afficherListeCasesPassesEtPheromones(){
+        panneauPrincipal.getChildren().removeAll(listeCercles);
+        listeCercles.clear();
+        double tailleObjet = taille / 15;
+        //Circle cercle = new Circle(tailleObjet);
+        //Rectangle rectangle = new Rectangle(tailleObjet, tailleObjet);
+        for (int[] pheromonesMouton : getPlateau().getFilePheromonesMouton()){
+            double x = xDepart + taille * pheromonesMouton[1] + tailleObjet * 2;
+            double y = yDepart + taille * pheromonesMouton[0] + tailleObjet * 2;
+            Circle cercle = new Circle(tailleObjet);
+            cercle.setLayoutX(x);
+            cercle.setLayoutY(y);
+            cercle.setFill(Color.BLACK);
+            listeCercles.add(cercle);
+        }
+        for (int[] pheromonesLoup : getPlateau().getFilePheromonesLoup()){
+            double x = xDepart + taille * (pheromonesLoup[1] + 1) - tailleObjet * 2;
+            double y = yDepart + taille * pheromonesLoup[0] + tailleObjet * 2;
+            Circle cercle = new Circle(tailleObjet);
+            cercle.setLayoutX(x);
+            cercle.setLayoutY(y);
+            cercle.setFill(Color.BLACK);
+            listeCercles.add(cercle);
+        }
+        for (int[] listePassageMouton : getPlateau().getCasesMoutonPassees()){
+            double x = xDepart + taille * listePassageMouton[1] + tailleObjet * 2;
+            double y = yDepart + taille * (listePassageMouton[0] + 1) - tailleObjet * 2;
+            Circle cercle = new Circle(tailleObjet);
+            cercle.setLayoutX(x);
+            cercle.setLayoutY(y);
+            cercle.setFill(Color.BLACK);
+            listeCercles.add(cercle);
+        }
+
+        for (int[] listePassageLoup : getPlateau().getCasesLoupPassees()){
+            double x = xDepart + taille * (listePassageLoup[1] + 1) - tailleObjet * 2;
+            double y = yDepart + taille * (listePassageLoup[0] + 1) - tailleObjet * 2;
+            Circle cercle = new Circle(tailleObjet);
+            cercle.setLayoutX(x);
+            cercle.setLayoutY(y);
+            cercle.setFill(Color.BLACK);
+            listeCercles.add(cercle);
+        }
+
+        panneauPrincipal.getChildren().addAll(listeCercles);
     }
 
 

@@ -89,7 +89,7 @@ public class Jeu {
 
 
     public void boucleJeu() {
-        int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 30;
+        int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 20;
         System.out.println("Loup menaçant "+ plateau.manhattan());
         moutonEnDanger = plateau.manhattan();
         if (auTourDuMouton) {
@@ -170,32 +170,6 @@ public class Jeu {
         }
     }
 
-    /**
-     * Méthode permettant de reprendre l'état du plateau venant d'un fichier binaire à partir
-     * d'un emplacement précis
-     */
-
-
-    public void reprendreSauvegarde() {
-        try (FileInputStream fileInputStream = new FileInputStream(sauvegarde.getCheminDaccesSauvegarde());
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-            int colonnes = objectInputStream.readInt();
-            int lignes = objectInputStream.readInt();
-            System.out.println("Colonnes: " + colonnes);
-            System.out.println("Lignes: " + lignes);
-            plateau = new Plateau(lignes,colonnes);
-            plateau.creerPlateau();
-
-            for (int i = 0; i < lignes; i++){
-                for (int j = 0; j < colonnes; j++){
-                    plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
-                }
-            }
-            System.out.println("Fichier récupé avec succès !");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * @param adresse : donne l'adresse du fichier binaire
@@ -203,9 +177,15 @@ public class Jeu {
      * d'un emplacement choisi
      */
 
-    public void reprendreSauvegarde(String adresse) throws Exception {
-        try (FileInputStream fileInputStream = new FileInputStream(adresse);
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+    public void reprendreSauvegarde(String adresse, boolean vientDuFichierRessource) throws Exception {
+        InputStream fileInputStream;
+        if (!vientDuFichierRessource){
+            fileInputStream = new FileInputStream(adresse);
+        } else {
+            fileInputStream = getClass().getResourceAsStream(adresse);
+        }
+        try (fileInputStream){
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             int colonnes = objectInputStream.readInt();
             int lignes = objectInputStream.readInt();
             plateau = new Plateau(lignes,colonnes);
@@ -216,38 +196,16 @@ public class Jeu {
                     plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
                 }
             }
-            System.out.println("Fichier récupé avec succès !");
+            System.out.println("Fichier récupéré avec succès !");
         } catch (IOException e) {
             throw new IOException("Impossible de lire le fichier de sauvegarde.", e);
         } catch (ClassNotFoundException e) {
             throw new ClassNotFoundException("Impossible de charger les données de sauvegarde.", e);
         } catch (Exception e){
-            throw new Exception("Autre erreur !");
+            throw new Exception("Autre erreur : "+e.getMessage());
         }
     }
 
-    public void reprendreSauvegardeViaFichierResources(String adresse) throws Exception {
-        try (InputStream inputStream = getClass().getResourceAsStream(adresse);
-             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
-            int colonnes = objectInputStream.readInt();
-            int lignes = objectInputStream.readInt();
-            plateau = new Plateau(lignes,colonnes);
-            plateau.creerPlateau();
-
-            for (int i = 0; i < lignes; i++){
-                for (int j = 0; j < colonnes; j++){
-                    plateau.cases[i][j] = (Case) objectInputStream.readObject(); //récupération de l'objet case[i][j]
-                }
-            }
-            System.out.println("Fichier récupé avec succès !");
-        } catch (IOException e) {
-            throw new IOException("Impossible de lire le fichier de sauvegarde.", e);
-        } catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Impossible de charger les données de sauvegarde.", e);
-        } catch (Exception e){
-            throw new Exception("Autre erreur !");
-        }
-    }
 
 
 }
