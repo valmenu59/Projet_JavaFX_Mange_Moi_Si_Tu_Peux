@@ -1,7 +1,6 @@
 package sae.saejavafx;
 
 import demarrage.Intro;
-import fx.ImageJeu;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 

@@ -240,9 +240,9 @@ public class Controleur {
                         jeu.sauvegarderPlateau();
                         Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
                         confirmation.setHeaderText("Plateau sauvegardé avec succès");
-                        confirmation.setContentText("Source du fichier : "+"\n"+
-                                sauvegarde.getCheminFichier()+"\n"+"\n"+
-                                "Si vous voulez absolument conserver votre plateau, copier le fichier vers un autre dossier puis renommez-le");
+                        confirmation.setContentText("Si vous voulez absolument conserver votre plateau, copier le \n" +
+                                "fichier vers un autre dossier puis renommez-le tout en gardant\n" +
+                                ".sae");
 
                         ButtonType boutonCopier = new ButtonType("Copier le chemin d'accès", ButtonBar.ButtonData.APPLY);
                         ButtonType boutonOk = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
