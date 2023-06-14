@@ -89,7 +89,7 @@ public class Jeu {
      */
 
 
-    public void boucleJeu() {
+    public void boucleJeu(String[] choixAlgoAnimaux) {
         int multiplicateurPheromones = plateau.getColonnes() * plateau.getLignes() / 12;
         System.out.println("Loup menaçant "+ plateau.manhattan());
         moutonEnDanger = plateau.manhattan();
@@ -104,7 +104,7 @@ public class Jeu {
             }
             deplacementMouton--;
             System.out.println("Je suis dans jeu "+deplacementMouton);
-            plateau.deplacerAnimal("Mouton", moutonEnDanger);
+            plateau.deplacerAnimal("Mouton", moutonEnDanger, choixAlgoAnimaux[0]);
             if (deplacementMouton == 0) {
                 int[] caseM = plateau.getCaseMouton();
                 if (plateau.isAnimalPresent("Mouton")) {
@@ -119,7 +119,7 @@ public class Jeu {
                 plateau.supprimerPheromones(false);
             }
             deplacementLoup--;
-            plateau.deplacerAnimal("Loup", moutonEnDanger);
+            plateau.deplacerAnimal("Loup", moutonEnDanger, choixAlgoAnimaux[1]);
             if (deplacementLoup == 0) {
                 reinitialiserDeplacementLoup();
                 auTourDuMouton = true;

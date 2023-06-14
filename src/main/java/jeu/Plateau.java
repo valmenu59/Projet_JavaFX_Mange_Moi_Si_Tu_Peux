@@ -85,13 +85,6 @@ public class Plateau implements Serializable {
         this.planteMangee++;
     }
 
-    public ArrayList<int[]> getCasesLoupPassees(){
-        return casesLoupPassees;
-    }
-
-    public ArrayList<int[]> getCasesMoutonPassees(){
-        return casesMoutonPassees;
-    }
 
     public Queue<int[]> getFilePheromonesMouton(){
         return filePheromonesMouton;
@@ -550,18 +543,28 @@ public class Plateau implements Serializable {
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 if (jeu.isMoutonEnDanger()){
-                    if (Math.random() <= 0.25){
-                        return 2;
-                    } else {
+                    if (Math.random() <= 0.80) {
                         return 3;
                     }
                 }
                 return 2;
             } else if (this.cases[i][j].getContenu() instanceof Cactus) {
                 this.cases[i][j].setContenuPlante(new Terre());
+                if (jeu.isMoutonEnDanger()){
+                    if (Math.random() <= 0.60){
+                        return 2;
+                    } else if (Math.random() <= 0.80){
+                        return 3;
+                    }
+                }
                 return 1;
             } else {
                 this.cases[i][j].setContenuPlante(new Terre());
+                if (jeu.isMoutonEnDanger()){
+                    if (Math.random() <= 0.10){
+                        return 5;
+                    }
+                }
                 return 4;
             }
         } else {
@@ -578,36 +581,43 @@ public class Plateau implements Serializable {
      */
 
 
-    public void deplacerAnimal(String animal, boolean danger){
+    public void deplacerAnimal(String animal, boolean danger, String algo){
         int[] posAnimal;
         int[] caseMouton;
         if (!danger) {
             if (animal.equals("Mouton")) {
                 posAnimal = getCaseMouton();
                 if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Mouton())) {
-                    deplacerAnimal("Mouton", false);
+                    deplacerAnimal("Mouton", false, algo);
                 }
             } else {
                 posAnimal = getCaseLoup();
                 if (!deplacementAnimalPassif(posAnimal[0], posAnimal[1], new Loup())) {
-                    deplacerAnimal("Loup", false);
+                    deplacerAnimal("Loup", false, algo);
                 }
             }
         } else {
             System.out.println("ici");
             List<int[]> chemin;
             if (animal.equals("Mouton")) {
-                //dijkstra();
-                //chemin = aStarSimple(true);
-                chemin = aStarComplexeMouton();
+                if (algo.equals("Dijkstra")) {
+                    chemin = dijkstra(true);
+                } else if (algo.equals("A*")){
+                    chemin = aStarSimple(true);
+                } else {
+                    chemin = aStarComplexeMouton();
+                }
                 caseMouton = getCaseMouton();
                 this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
                 filePheromonesMouton.add(caseMouton);
 
             } else {
-                chemin = dijkstra(false);
-                //chemin = aStarSimple(false);
+                if (algo.equals("Dijkstra")) {
+                    chemin = dijkstra(false);
+                } else {
+                    chemin = aStarSimple(false);
+                }
                 int [] caseLoup = getCaseLoup();
                 this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
                 this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());

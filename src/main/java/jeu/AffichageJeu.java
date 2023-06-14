@@ -1,10 +1,7 @@
 package jeu;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import finDeJeu.FinDeJeu;
 import fx.PoliceJeu;
@@ -69,6 +66,8 @@ public class AffichageJeu extends Scene {
     private ChoiceBox<Integer> choixNblignes;
     private ChoiceBox<Integer> choixNbColonnes;
     private ChoiceBox<Double> choixTempsEntreChaqueDeplacement;
+    private ChoiceBox<String> choixAlgoMouton;
+    private ChoiceBox<String> choixAlgoLoup;
 
     //Boutons
     private Button boutonCreerPlateau;
@@ -192,6 +191,16 @@ public class AffichageJeu extends Scene {
     public double getChoixTempsEntreChaqueDeplacement() {
         //Permet de récupérer la valeur choisie du menu déroulant
         return choixTempsEntreChaqueDeplacement.getValue();
+    }
+
+    public String getChoixAlgoMouton(){
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return choixAlgoMouton.getValue();
+    }
+
+    public String getChoixAlgoLoup(){
+        //Permet de récupérer la valeur choisie du menu déroulant
+        return choixAlgoLoup.getValue();
     }
 
     public Button getBoutonValiderEtape(){
@@ -473,9 +482,10 @@ public class AffichageJeu extends Scene {
         panneau2.getChildren().add(boutonPause);
 
         texteJeu(true);
-
         mettreAJourAffichagePlateau();
         creerMenuDeroulantTemps();
+
+        creerMenuDeroulantAlgoAChoisir();
         boucleAffichageJeu();
     }
 
@@ -607,9 +617,9 @@ public class AffichageJeu extends Scene {
 
                         // Vérifier si suffisamment de temps s'est écoulé pour effectuer un déplacement
                         if (tempsAccumule >= tempsEntreDeplacements) {
-                            AffichageJeu.this.controleur.jeu.boucleJeu();
+                            AffichageJeu.this.controleur.jeu.boucleJeu(new String[]{getChoixAlgoMouton(), getChoixAlgoLoup()});
                             mettreAJourAffichagePlateau();
-                            afficherListeCasesPassesEtPheromones();
+                            afficherListePheromones();
                             texteJeu(false);
                             if (getJeu().isPartieGagne() || getJeu().isPartiePerdue()) {
                                 boutonRetourMenu.setDisable(true);
@@ -882,47 +892,27 @@ public class AffichageJeu extends Scene {
         texteAlerteLabyrintheImparfait.setY(20);
     }
 
-    public void afficherListeCasesPassesEtPheromones(){
+    public void afficherListePheromones(){
         panneauPrincipal.getChildren().removeAll(listeCercles);
         listeCercles.clear();
         double tailleObjet = taille / 15;
-        //Circle cercle = new Circle(tailleObjet);
-        //Rectangle rectangle = new Rectangle(tailleObjet, tailleObjet);
+
         for (int[] pheromonesMouton : getPlateau().getFilePheromonesMouton()){
             double x = xDepart + taille * pheromonesMouton[1] + tailleObjet * 2;
             double y = yDepart + taille * pheromonesMouton[0] + tailleObjet * 2;
             Circle cercle = new Circle(tailleObjet);
             cercle.setLayoutX(x);
             cercle.setLayoutY(y);
-            cercle.setFill(Color.BLACK);
+            cercle.setFill(Color.BLUE);
             listeCercles.add(cercle);
         }
         for (int[] pheromonesLoup : getPlateau().getFilePheromonesLoup()){
             double x = xDepart + taille * (pheromonesLoup[1] + 1) - tailleObjet * 2;
-            double y = yDepart + taille * pheromonesLoup[0] + tailleObjet * 2;
+            double y = yDepart + taille * (pheromonesLoup[0] + 1) - tailleObjet * 2;
             Circle cercle = new Circle(tailleObjet);
             cercle.setLayoutX(x);
             cercle.setLayoutY(y);
-            cercle.setFill(Color.BLACK);
-            listeCercles.add(cercle);
-        }
-        for (int[] listePassageMouton : getPlateau().getCasesMoutonPassees()){
-            double x = xDepart + taille * listePassageMouton[1] + tailleObjet * 2;
-            double y = yDepart + taille * (listePassageMouton[0] + 1) - tailleObjet * 2;
-            Circle cercle = new Circle(tailleObjet);
-            cercle.setLayoutX(x);
-            cercle.setLayoutY(y);
-            cercle.setFill(Color.BLACK);
-            listeCercles.add(cercle);
-        }
-
-        for (int[] listePassageLoup : getPlateau().getCasesLoupPassees()){
-            double x = xDepart + taille * (listePassageLoup[1] + 1) - tailleObjet * 2;
-            double y = yDepart + taille * (listePassageLoup[0] + 1) - tailleObjet * 2;
-            Circle cercle = new Circle(tailleObjet);
-            cercle.setLayoutX(x);
-            cercle.setLayoutY(y);
-            cercle.setFill(Color.BLACK);
+            cercle.setFill(Color.RED);
             listeCercles.add(cercle);
         }
 
@@ -949,6 +939,34 @@ public class AffichageJeu extends Scene {
         vBox.getChildren().add(lab);
         vBox.getChildren().add(choixTempsEntreChaqueDeplacement);
         panneau2.getChildren().add(vBox);
+    }
+
+    public void creerMenuDeroulantAlgoAChoisir() {
+        Label lab = new Label("Choisissez l'algorithme de \ndéplacement pour le mouton : \n");
+        //On crée un menu déroulant composé de chiffres entiers
+        choixAlgoMouton = new ChoiceBox<>();
+        //On rajoute le nombre de secondes entre chaque tour
+        choixAlgoMouton.getItems().addAll("Dijkstra", "A*", "A* avancé");
+        //Permet d'afficher la valeur par défaut
+        choixAlgoMouton.setValue("A* avancé");
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(lab);
+        vBox.getChildren().add(choixAlgoMouton);
+        panneau2.getChildren().add(vBox);
+
+
+
+        Label lab2 = new Label("Choisissez l'algorithme de \ndéplacement pour le loup : \n");
+        choixAlgoLoup = new ChoiceBox<>();
+        choixAlgoLoup.getItems().addAll("Dijkstra", "A*");
+        choixAlgoLoup.setValue("Dijkstra");
+
+        VBox vBox2 = new VBox();
+        vBox2.getChildren().add(lab2);
+        vBox2.getChildren().add(choixAlgoLoup);
+        panneau2.getChildren().add(vBox2);
+
     }
 
 
