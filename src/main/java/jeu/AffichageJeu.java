@@ -486,6 +486,14 @@ public class AffichageJeu extends Scene {
         creerMenuDeroulantTemps();
 
         creerMenuDeroulantAlgoAChoisir();
+
+        Text legende = new Text("\n\n\nLégende : \n" +
+                "Points rouges : phéromones loup\n" +
+                "Points bleus : phéromones mouton\n" +
+                "\n" +
+                "Les phéromones ont une incidence \n" +
+                "sur le déplacement des animaux");
+        panneau2.getChildren().add(legende);
         boucleAffichageJeu();
     }
 
@@ -626,11 +634,11 @@ public class AffichageJeu extends Scene {
                                 boucleJeu.stop();
                                 System.out.println("Le jeu est fini");
                                 //Permet de mettre le jeu en pause pendant 3 secondes, mais en mettant bien à jour l'affichage
-                                PauseTransition pause = new PauseTransition(Duration.seconds(3));
+                                PauseTransition pause = new PauseTransition(Duration.seconds(2));
                                 pause.setOnFinished(new EventHandler<ActionEvent>() {
                                     @Override
                                     public void handle(ActionEvent actionEvent) {
-                                        FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne());
+                                        FinDeJeu fin = new FinDeJeu(mainStage, getJeu().isPartieGagne(), getJeu().getNbTour(), getPlateau().getNbrPlanteMangee());
                                         mainStage.setScene(fin);
                                     }
                                 });

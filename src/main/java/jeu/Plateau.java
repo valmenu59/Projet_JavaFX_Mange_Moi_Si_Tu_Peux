@@ -24,6 +24,9 @@ public class Plateau implements Serializable {
     private final transient Queue<int[]> filePheromonesLoup = new ArrayDeque<>();
     private final transient Queue<Integer> fileNbDeplacementMouton = new ArrayDeque<>();
 
+    private final transient ArrayList<int[]> leCheminMouton = new ArrayList<>();
+    private final transient ArrayList<int[]> leCheminLoup = new ArrayList<>();
+
     private transient int planteMangee;
 
     /**
@@ -537,7 +540,7 @@ public class Plateau implements Serializable {
             } else {
                 this.cases[i][j].setContenuPlante(new Terre());
                 if (jeu.isMoutonEnDanger()){
-                    if (Math.random() <= 0.10){
+                    if (rand <= 0.10){
                         return 5;
                     }
                 }
@@ -573,32 +576,36 @@ public class Plateau implements Serializable {
                 }
             }
         } else {
-            System.out.println("ici");
-            List<int[]> chemin;
             if (animal.equals("Mouton")) {
-                if (algo.equals("Dijkstra")) {
-                    chemin = dijkstra(true);
-                } else if (algo.equals("A*")){
-                    chemin = aStarSimple(true);
-                } else {
-                    chemin = aStarComplexeMouton();
+                if (jeu.getDeplacementMouton() == jeu.getPlanteDeplacementMouton()) {
+                    leCheminMouton.clear();
+                    if (algo.equals("Dijkstra")) {
+                        dijkstra(true);
+                    } else if (algo.equals("A*")) {
+                        aStarSimple(true);
+                    } else {
+                        aStarComplexeMouton();
+                    }
                 }
                 caseMouton = getCaseMouton();
                 this.cases[caseMouton[0]][caseMouton[1]].removeAnimal();
-                this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Mouton());
+                this.cases[leCheminMouton.get(0)[0]][leCheminMouton.get(0)[1]].setAnimal(new Mouton());
                 filePheromonesMouton.add(caseMouton);
-
+                leCheminMouton.remove(0);
             } else {
-                if (algo.equals("Dijkstra")) {
-                    chemin = dijkstra(false);
-                } else {
-                    chemin = aStarSimple(false);
+                if (jeu.getDeplacementLoup() == 3) {
+                    leCheminLoup.clear();
+                    if (algo.equals("Dijkstra")) {
+                        dijkstra(false);
+                    } else {
+                        aStarSimple(false);
+                    }
                 }
                 int [] caseLoup = getCaseLoup();
                 this.cases[caseLoup[0]][caseLoup[1]].removeAnimal();
-                this.cases[chemin.get(0)[0]][chemin.get(0)[1]].setAnimal(new Loup());
+                this.cases[leCheminLoup.get(0)[0]][leCheminLoup.get(0)[1]].setAnimal(new Loup());
                 filePheromonesLoup.add(caseLoup);
-
+                leCheminLoup.remove(0);
             }
         }
         if (!isAnimalPresent("Loup")){
@@ -867,12 +874,11 @@ public class Plateau implements Serializable {
      * avec des poids croissants, nous faisons l'inverse à partir d'un point x pour aller vers un point 0
      * avec des poids décroissants
      * @param isAuTourMouton : si c'est bien au tour du mouton
-     * @return : retourne une liste de chemin
      */
 
 
 
-    public List<int[]> dijkstra(boolean isAuTourMouton){
+    public void dijkstra(boolean isAuTourMouton){
         int[][] poids;
         int[] posDepart;
         int[] posArrivee;
@@ -894,7 +900,7 @@ public class Plateau implements Serializable {
         // Ajout de la position mouton
         queue.offer(posDepart);
 
-        List<int[]> leChemin = new ArrayList<>();
+        //List<int[]> leChemin = new ArrayList<>();
 
 
 
@@ -934,7 +940,11 @@ public class Plateau implements Serializable {
                 }
             }
 
-            leChemin.add(caseAPasser);
+            if (isAuTourMouton) {
+                leCheminMouton.add(caseAPasser);
+            } else {
+                leCheminLoup.add(caseAPasser);
+            }
             queue.offer(caseAPasser);
             poids[caseAPasser[0]][caseAPasser[1]] = -1;
 
@@ -942,9 +952,7 @@ public class Plateau implements Serializable {
                 break;
             }
         }
-
         System.out.println("je suis Dijkstra");
-        return leChemin;
 
     }
 
@@ -954,11 +962,10 @@ public class Plateau implements Serializable {
      * Reprend exactement le même principe que l'algorithme de Dijkstra sauf qu'en plus les cases
      * ayant les petits poids on prend la case ayant la plus petite distance par rapport au point d'arrivé
      * @param isAuTourMouton
-     * @return : retourne une liste de chemins
      */
 
 
-    public List<int[]> aStarSimple(boolean isAuTourMouton){
+    public void aStarSimple(boolean isAuTourMouton){
         int[][] poids;
         int[] posDepart;
         int[] posArrivee;
@@ -980,7 +987,7 @@ public class Plateau implements Serializable {
         // Ajout de la position mouton
         file.offer(posDepart);
 
-        List<int[]> leChemin = new ArrayList<>();
+        //List<int[]> leChemin = new ArrayList<>();
 
 
 
@@ -1029,7 +1036,11 @@ public class Plateau implements Serializable {
                     }
                 }
 
-                leChemin.add(positionLaPlusCourte);
+                if (isAuTourMouton) {
+                    leCheminMouton.add(positionLaPlusCourte);
+                } else {
+                    leCheminLoup.add(positionLaPlusCourte);
+                }
                 file.offer(positionLaPlusCourte);
 
 
@@ -1041,10 +1052,7 @@ public class Plateau implements Serializable {
                 }
             }
         }
-
         System.out.println("je suis l'algo A*");
-        return leChemin;
-
     }
 
     /**
@@ -1061,7 +1069,7 @@ public class Plateau implements Serializable {
 
 
 
-    public List<int[]> aStarComplexeMouton(){
+    public void aStarComplexeMouton(){
         int[][] poids;
         int[] posDepart;
         int[] posArrivee;
@@ -1119,8 +1127,6 @@ public class Plateau implements Serializable {
         // Ajout de la position mouton
         queue.offer(posDepart);
 
-        List<int[]> leChemin = new ArrayList<>();
-
 
 
         int poidsActuel = poids[posDepart[0]][posDepart[1]];
@@ -1171,12 +1177,13 @@ public class Plateau implements Serializable {
             }
 
             //Cas rare où le mouton est dans tous les cas condamnés
-            if (casesPossibles.isEmpty() && leChemin.isEmpty()) {
+            if (casesPossibles.isEmpty() && leCheminMouton.isEmpty()) {
                 //Dans le cas où il n'y a plus aucune possiblité
                 System.out.println("Je rentre dans A* simple");
-                return aStarSimple(true);
+
+                aStarSimple(true);
             } else if (casesPossibles.isEmpty()){ //Cas où il n'y a plus d'autre chemin possible
-                return leChemin;
+                break;
             }
 
             //Maintenant prend le chemin le faible en poids ET en distance
@@ -1191,7 +1198,7 @@ public class Plateau implements Serializable {
                 }
             }
 
-            leChemin.add(positionLaPlusCourte);
+            leCheminMouton.add(positionLaPlusCourte);
             queue.offer(positionLaPlusCourte);
 
             //Permet de marquer la case comme visitée
@@ -1207,7 +1214,6 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis l'algo A* Complexe");
-        return leChemin;
 
     }
 

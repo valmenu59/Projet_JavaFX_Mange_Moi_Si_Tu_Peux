@@ -33,7 +33,7 @@ public class Jeu {
         deplacementMouton = 2;
         deplacementLoup = 3;
         planteDeplacementMouton = 2;
-        nbTour = -1;
+        nbTour = 0;
 
     }
 
@@ -76,6 +76,10 @@ public class Jeu {
 
     public int getDeplacementMouton(){
         return this.deplacementMouton;
+    }
+
+    public int getPlanteDeplacementMouton(){
+        return this.planteDeplacementMouton;
     }
 
 

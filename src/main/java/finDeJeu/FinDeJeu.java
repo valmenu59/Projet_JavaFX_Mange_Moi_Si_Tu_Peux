@@ -17,7 +17,7 @@ public class FinDeJeu extends Scene {
     private static final Font POLICE = PoliceJeu.creerPolice(38, true);
 
 
-    public FinDeJeu(Stage stage, boolean gagne){
+    public FinDeJeu(Stage stage, boolean gagne, int nbTour, int nbPlanteMangees){
         super(new BorderPane(), 1280,720);
         BorderPane panneau = (BorderPane) this.getRoot();
         VBox vBox = new VBox();
@@ -27,11 +27,13 @@ public class FinDeJeu extends Scene {
         ActionFinDeJeu actions = new ActionFinDeJeu();
         Text texte;
         if (gagne){
-            texte = new Text("Félicitation, le mouton est sorti de l'enclos !"+"\n"+
-                    "Vous avez gagné !");
+            texte = new Text("Félicitation, le mouton est sorti de l'enclos !\n"+
+                    "Vous avez gagné !\n\n" +
+                    "Nombre de tours : "+nbTour+"\t Nombre de plantes mangées : "+nbPlanteMangees);
         } else {
-            texte = new Text("Oh non ! Le loup a mangé le mouton !"+"\n"+
-                    "Vous avez perdu !");
+            texte = new Text("Oh non ! Le loup a mangé le mouton !\n"+
+                    "Vous avez perdu !\n\n" +
+                    "Nombre de tours : "+nbTour+"\t Nombre de plantes mangées : "+nbPlanteMangees);
         }
         texte.setFont(POLICE);
         texte.setTextAlignment(TextAlignment.CENTER);
