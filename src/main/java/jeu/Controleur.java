@@ -101,7 +101,7 @@ public class Controleur {
                         //Permet d'activer le bouton valider
                         affichageJeu.getBoutonValiderEtape().setDisable(false);
                         //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
-                    } else if (sortieCree && getCase(i,j).getContenu().getNom().equals("Herbe")) {
+                    } else if (sortieCree) {
                         //Même principe qu'au dessus
                         sortieCree = false;
                         remplacerTypeTerrain(img,true,false);
@@ -293,6 +293,13 @@ public class Controleur {
                 } else if (affichageJeu.getNumeroEtape() == 3){
                     affichageJeu.etape2(true);
                 } else if (affichageJeu.getNumeroEtape() == 4){
+                    int[] caseLoup = getPlateau().getCaseLoup();
+                    int[] caseMouton = getPlateau().getCaseMouton();
+                    //Supprime les 2 animaux
+                    getPlateau().getCase(caseLoup[0], caseLoup[1]).setAnimal(null);
+                    getPlateau().getCase(caseMouton[0], caseMouton[1]).setAnimal(null);
+                    remplacerTypeTerrain(affichageJeu.getImageView(caseLoup[0],caseLoup[1]), false, false);
+                    remplacerTypeTerrain(affichageJeu.getImageView(caseMouton[0],caseMouton[1]), false, false);
                     affichageJeu.etape3();
                 }
             }

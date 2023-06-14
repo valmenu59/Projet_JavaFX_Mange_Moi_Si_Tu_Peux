@@ -72,7 +72,6 @@ public class Plateau implements Serializable {
                 }
             }
         }
-        System.out.println("Case sortie "+caseSortie[0]+"   "+caseSortie[1]);
         return caseSortie;
     }
 
@@ -200,6 +199,7 @@ public class Plateau implements Serializable {
                 }
             }
         }
+        System.out.println(getCaseSortie()[0]+" "+getCaseSortie()[1]);
     }
 
 
@@ -213,15 +213,18 @@ public class Plateau implements Serializable {
         // Etape 1 :
         // Initialisation du plateau avec les cases des positions I et J impairs sont des plantes, OU que
         // I et J sont à l'avant-dernier lignes ou colonnes
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
+        for (int i = 1; i < lignes - 1; i++) {
+            for (int j = 1; j < colonnes - 1; j++) {
                 if ((i % 2 == 1 && j % 2 == 1) || (i == lignes - 2 && j == colonnes - 2)){
                     this.cases[i][j].setPlanteRandom();
-                } else if (!(i == 0 || i == lignes - 1 || j == 0 || j == colonnes - 1)) {
+                } else {
                     this.cases[i][j].setContenuGeneral(new Roche());
                 }
             }
         }
+
+        caseSortie = getCaseSortie();
+
 
         //Etape 2 :
         // Suppression de l'obstacle EST ou SUD à partir de la case actuelle (en boucle)
@@ -246,6 +249,8 @@ public class Plateau implements Serializable {
             }
         }
 
+
+
         //Ajout des roches si le nombre de lignes ou/et de colonnes est pair
         if (lignes % 2 == 0){
             for (int j = 0; j < colonnes; j++){
@@ -258,9 +263,12 @@ public class Plateau implements Serializable {
             }
         }
 
+
+
         //Etape 3 :
         //Libération des cases aux alentours de la sortie
         caseSortie = getCaseSortie();
+        System.out.println(caseSortie[0]+"    "+caseSortie[1]);
         if (caseSortie[0] == 0 || caseSortie[0] == lignes - 1) {
             int depart = Math.max(0, caseSortie[0] - 1);
             int arrivee = Math.min(lignes - 1, caseSortie[0] + 1);
@@ -416,40 +424,7 @@ public class Plateau implements Serializable {
         }
     }
 
-    /**
-     * @param i : position i du plateau
-     * @param j : position j du plateau
-     * @return : renvoie vrai si la case actuelle a 4 voisins de type plante ET qu'il y a au moins 2 roches.
-     * En effet, le parcours en profondeur a pour défaut que s'il y a 4 cases possibles
-     * il ne fait au maximum que 2 cases au mieux de 3
-     */
 
-    public boolean aBien4CasesVoisinesPlantes(int i, int j){
-        /*
-        Cette méthode permet de vérifier qu'il y a 4 voisins de type plante ET
-        qu'il y a au moins 2 roches.
-        En effet, le parcours en profondeur a pour défaut que s'il y a 4 cases possibles
-        il ne fait au maximum que 2 cases au mieux de 3
-         */
-        int cmpt = 0;
-        int roche = 0;
-        if (!( i == 0 || j == 0 || i == lignes-1 || j == colonnes-1)){
-            for (int a= -1; a<=1; a++){
-                for (int b=-1; b<=1; b++){
-                    if (Math.abs(a) != Math.abs(b)){
-                        if (this.cases[i+a][j+b].getContenu() instanceof Plante){
-                            cmpt++;
-                        }
-                    } else {
-                        if (this.cases[i+a][j+b].getContenu() instanceof Roche){
-                            roche++;
-                        }
-                    }
-                }
-            }
-        }
-        return cmpt == 4 && roche >= 2;
-    }
 
     /**
      * @param i : position i du plateau
@@ -462,13 +437,7 @@ public class Plateau implements Serializable {
         int[] caseActuelle = new int[]{i, j};
         removeTableauArrayList(casesPlante, caseActuelle);
         casesPasses.add(caseActuelle);
-        //En effet s'il y a 4 cases on fait 2 fois push
-        if (aBien4CasesVoisinesPlantes(i,j)) {
-            //chemin.push(caseActuelle);
-            chemin.push(caseActuelle);
-        } else {
-            chemin.push(caseActuelle);
-        }
+        chemin.push(caseActuelle);
     }
 
 
@@ -529,31 +498,38 @@ public class Plateau implements Serializable {
     }
 
     /**
+     * * Renvoie 4 si c'est une marguerite, 2 si c'est une terre ou une herbe, 1 si c'est un cactus
+     * Si c'est n'importe quelle plante sauf de la terre, le mouton la mange et crée une case de type terre
+     * Afin de favoriser les chances que le mouton gagne, j'ai pris une initiative où si le mouton est en danger :
+     * Il y a 80% de chance que le mouton avance de 3 s'il mange une herbe, 1% de chance qu'il avance de 4
+     * Il y a 60% de chance que le mouton avance de 2 s'il mange un cactus, 15% de chance qu'il avance de 3
+     * Il y a 10% de chance que le mouton avance de 5 s'il mange une marguerite
      * @param i : position i du plateau
      * @param j : position j du plateau
      * @return : retourne un entier en fonction de la plante où le mouton arrête son tour
-     * Renvoie 4 si c'est une marguerite, 2 si c'est une terre ou une herbe, 1 si c'est un cactus
-     * Si c'est n'importe quelle plante sauf de la terre, le mouton la mange et crée une case de type terre
      */
 
     public int moutonMangePlante(int i, int j){
+        double rand = Math.random();
         //Permet d'obtenir le nombre de déplacements du mouton en fonction de la case
         if (!(this.cases[i][j].getContenu() instanceof Terre)){
             isMoutonAMangePlante(); //permet d'augmenter le compteur du nombre de plantes mangées
             if (this.cases[i][j].getContenu() instanceof Herbe){
                 this.cases[i][j].setContenuPlante(new Terre());
                 if (jeu.isMoutonEnDanger()){
-                    if (Math.random() <= 0.80) {
+                    if (rand <= 0.80) {
                         return 3;
+                    } else if (rand <= 0.81){
+                        return 4;
                     }
                 }
                 return 2;
             } else if (this.cases[i][j].getContenu() instanceof Cactus) {
                 this.cases[i][j].setContenuPlante(new Terre());
                 if (jeu.isMoutonEnDanger()){
-                    if (Math.random() <= 0.60){
+                    if (rand <= 0.60){
                         return 2;
-                    } else if (Math.random() <= 0.80){
+                    } else if (rand <= 0.75){
                         return 3;
                     }
                 }
@@ -705,6 +681,8 @@ public class Plateau implements Serializable {
                 40% de chance que casesPossibles prenne une case qui a des phéromones loup mais pas de phéromones mouton
                 100% de chance que casesPossibles prenne une case qui a des phéromones loup et mouton
                     dont 20% de chance qu'il stocke une deuxième fois dans casesPossibles
+
+                Permet de favoriser le déplacement et développer des spécificités pour les animaux
              */
 
             if (nextI > 0 && nextI < lignes - 1 && nextJ > 0 && nextJ < colonnes - 1){
@@ -782,12 +760,12 @@ public class Plateau implements Serializable {
 
 
     /*
-    Différentes méthodes pour la saé 202 :
-    Manhattan pour détecter que le mouton et loup sont bien à 5 cases de distances de manhattan
-    parcours en largeur
-    parcours en profondeur
-    A*
-    Dijkstra
+    Différentes méthodes pour la saé 202
+     */
+
+    /**
+     * Permet d'initialiser une matrice de poids négatif : -1 si la case est une plante, -2 si la case est une roche
+     * @return : retourne une matrice d'entiers
      */
 
     public int[][] initialiserMatricePoids(){
@@ -805,6 +783,14 @@ public class Plateau implements Serializable {
         }
         return casesNumero;
     }
+
+    /**
+     * Utilise un parcours en largeur
+     * Cet algorithme permet de donner des poids croissants à partir d'un point de départ
+     * @param position0 : point de départ
+     * @param casesNumero : matrice d'entiers à donner des poids croissants
+     * @return : retourne une matrice d'entiers
+     */
 
     public int[][] donnerPoidsCase(int[] position0, int[][] casesNumero){
 
@@ -842,7 +828,6 @@ public class Plateau implements Serializable {
             }
         }
 
-        //printNumeroCase(casesNumero);
 
         return casesNumero;
     }
@@ -877,6 +862,100 @@ public class Plateau implements Serializable {
     }
 
 
+    /**
+     * Reprend la base de l'algorithme de Dijsktra sauf qu'au mieux de partir d'un point 0 à un point x
+     * avec des poids croissants, nous faisons l'inverse à partir d'un point x pour aller vers un point 0
+     * avec des poids décroissants
+     * @param isAuTourMouton : si c'est bien au tour du mouton
+     * @return : retourne une liste de chemin
+     */
+
+
+
+    public List<int[]> dijkstra(boolean isAuTourMouton){
+        int[][] poids;
+        int[] posDepart;
+        int[] posArrivee;
+
+        if (isAuTourMouton){
+            posDepart = getCaseMouton();
+            posArrivee = getCaseSortie();
+        } else {
+            posDepart = getCaseLoup();
+            posArrivee = getCaseMouton();
+        }
+
+        poids = donnerPoidsCase(posArrivee, initialiserMatricePoids());
+
+        printNumeroCase(poids);
+
+        // Création d'une file de priorité (parcours en largeur)
+        Queue<int[]> queue = new ArrayDeque<>();
+        // Ajout de la position mouton
+        queue.offer(posDepart);
+
+        List<int[]> leChemin = new ArrayList<>();
+
+
+
+        int poidsActuel = poids[posDepart[0]][posDepart[1]];
+
+        poids[posDepart[0]][posDepart[1]] = -1;
+
+
+
+        while (!queue.isEmpty()) {
+            int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
+            int I = posActuelle[0]; // Ligne de la position actuelle
+            int J = posActuelle[1]; // Colonne de la position actuelle
+
+            // Vérification des cases voisines
+            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
+            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
+
+
+            int plusPetitPoids = Integer.MAX_VALUE;
+            int[] caseAPasser = new int[2];
+
+
+            for (int k = 0; k < 4; k++) {
+                int nextI = I + dI[k];
+                int nextJ = J + dJ[k];
+
+                // Vérification des limites de la grille
+                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes && poids[nextI][nextJ] >= 0) {
+                    // Mise à jour de la distance si elle est plus courte
+                    if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
+                        if (poids[nextI][nextJ] <= plusPetitPoids){
+                            caseAPasser = new int[]{nextI, nextJ};
+                            plusPetitPoids = poids[nextI][nextJ];
+                        }
+                    }
+                }
+            }
+
+            leChemin.add(caseAPasser);
+            queue.offer(caseAPasser);
+            poids[caseAPasser[0]][caseAPasser[1]] = -1;
+
+            if (Arrays.equals(posArrivee, caseAPasser)){
+                break;
+            }
+        }
+
+        System.out.println("je suis Dijkstra");
+        return leChemin;
+
+    }
+
+
+
+    /**
+     * Reprend exactement le même principe que l'algorithme de Dijkstra sauf qu'en plus les cases
+     * ayant les petits poids on prend la case ayant la plus petite distance par rapport au point d'arrivé
+     * @param isAuTourMouton
+     * @return : retourne une liste de chemins
+     */
 
 
     public List<int[]> aStarSimple(boolean isAuTourMouton){
@@ -897,9 +976,9 @@ public class Plateau implements Serializable {
         //printNumeroCase(poids);
 
         // Création d'une file de priorité (parcours en largeur)
-        Queue<int[]> queue = new ArrayDeque<>();
+        Queue<int[]> file = new ArrayDeque<>();
         // Ajout de la position mouton
-        queue.offer(posDepart);
+        file.offer(posDepart);
 
         List<int[]> leChemin = new ArrayList<>();
 
@@ -911,9 +990,9 @@ public class Plateau implements Serializable {
 
 
 
-        while (!queue.isEmpty()) {
+        while (!file.isEmpty()) {
             System.out.println("A* Simple");
-            int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
+            int[] posActuelle = file.poll(); // Récupération et suppression de la première valeur de la file
             int I = posActuelle[0]; // Ligne de la position actuelle
             int J = posActuelle[1]; // Colonne de la position actuelle
 
@@ -936,27 +1015,30 @@ public class Plateau implements Serializable {
                 }
             }
 
-            printNumeroCase(poids);
+             //Permet de gérer les cas rare où casesPossible récupère aucune case non visitée
+             if (!casesPossibles.isEmpty())   {
+                // pour vérifier la distance
+                double plusCourteDistance = Double.MAX_VALUE;
+                int[] positionLaPlusCourte = new int[2];
 
-            double plusCourteDistance = Double.MAX_VALUE;
-            int[] positionLaPlusCourte = new int[2];
-
-            for (int[] c : casesPossibles){
-                double distance = distanceAStar(c[0], c[1], posArrivee[0], posArrivee[1]);
-                if (plusCourteDistance > distance){
-                    plusCourteDistance = distance;
-                    positionLaPlusCourte = c;
+                for (int[] c : casesPossibles) {
+                    double distance = distanceAStar(c[0], c[1], posArrivee[0], posArrivee[1]);
+                    if (plusCourteDistance > distance) {
+                        plusCourteDistance = distance;
+                        positionLaPlusCourte = c;
+                    }
                 }
-            }
 
-            leChemin.add(positionLaPlusCourte);
-            queue.offer(positionLaPlusCourte);
+                leChemin.add(positionLaPlusCourte);
+                file.offer(positionLaPlusCourte);
 
-            //Permet de marquer la case comme visitée
-            poids[positionLaPlusCourte[0]][positionLaPlusCourte[1]] = -1;
 
-            if (Arrays.equals(posArrivee, positionLaPlusCourte)){
-                break;
+                //Permet de marquer la case comme visitée
+                poids[positionLaPlusCourte[0]][positionLaPlusCourte[1]] = -1;
+
+                if (Arrays.equals(posArrivee, positionLaPlusCourte)) {
+                    break;
+                }
             }
         }
 
@@ -966,13 +1048,14 @@ public class Plateau implements Serializable {
     }
 
     /**
-     * Vous avez ajouté une variable nombreDeplacement pour suivre le nombre de déplacements restants pour le mouton.
-     * Vous avez initialisé la case du loup avec une valeur de -3 pour la rendre inaccessible.
-     * Vous avez ajouté une condition pour vérifier si le loup est à côté de la case de sortie. Dans ce cas, la position d'arrivée du mouton est mise à jour pour être à l'opposé de la sortie.
-     * Vous avez utilisé une nouvelle méthode donnerPoidsCase pour mettre à jour les poids des cases en fonction de leur contenu.
-     * Vous avez effectué des calculs de poids différents en fonction du nombre de déplacements restants. Si le nombre de déplacements est différent de zéro, vous utilisez la comparaison de poids actuelle pour choisir les cases possibles. Sinon, vous attribuez des valeurs de poids basées sur le type de contenu de la case.
-     * Vous avez utilisé une variable caseLaPlusForte pour suivre la valeur la plus élevée rencontrée lors du choix des cases possibles. Cela vous permet de sélectionner les cases possibles avec la plus grande valeur.
-     * @return : retourne une liste de chemin à passer pour le mouton
+     * Cet algorithme reprend le principe de aStarSimple mais qu'en plus on a rajouté des conditions supplémentaires :
+     * D'abord on rend les cases aux alentours du loup inaccessibles. Si le loup si situe à côté de la case d'arrivée,
+     * le mouton prend la direction opposée
+     * Si le nombre de déplacements du mouton est égal à 0, le mouton priorise à aller sur les cases Marguerites s'il en a.
+     * Si c'est le cas, il peut exceptionnellement revenir en arrière.
+     * Si aucun déplacement n'est possible sauf à aller vers le loup, le mouton est condamné. Il va prendre le chemin créé
+     * par aStarSimple et donc va se diriger vers le loup
+     * Cet algorithme ne concerne que le mouton
      */
 
 
@@ -1124,13 +1207,20 @@ public class Plateau implements Serializable {
         }
 
         System.out.println("je suis l'algo A* Complexe");
-        //printNumeroCase(poids);
         return leChemin;
 
     }
 
 
-
+    /**
+     * Permet de calculer une distance entre 2 points dans un plan 2D avec la formule :
+     * sqrt( (x0 - x1)² + (y0 - y1)² )
+     * @param iDepart : y0
+     * @param jDepart : x0
+     * @param iArrivee : y1
+     * @param jArrivee : x1
+     * @return : retourne une distance
+     */
 
 
     public double distanceAStar(int iDepart, int jDepart, int iArrivee, int jArrivee){
@@ -1154,6 +1244,11 @@ public class Plateau implements Serializable {
 
 
 
+
+
+    /////////////////////////////////////////////////////////////////////////
+    ////////////////////// METHODES NON UTILISEES ///////////////////////////
+    /////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1388,88 +1483,6 @@ public class Plateau implements Serializable {
             System.out.println(c[0]+" "+c[1]);
         }
         return cheminParcouru;
-    }
-
-    //Optionnel
-    public List<int[]> dijkstra(boolean isAuTourMouton){
-        int[][] poids;
-        int[] posDepart;
-        int[] posArrivee;
-
-        if (isAuTourMouton){
-            posDepart = getCaseMouton();
-            posArrivee = getCaseSortie();
-        } else {
-            posDepart = getCaseLoup();
-            posArrivee = getCaseMouton();
-        }
-
-        poids = donnerPoidsCase(posArrivee, initialiserMatricePoids());
-
-        printNumeroCase(poids);
-
-        // Création d'une file de priorité (parcours en largeur)
-        Queue<int[]> queue = new ArrayDeque<>();
-        // Ajout de la position mouton
-        queue.offer(posDepart);
-
-        List<int[]> leChemin = new ArrayList<>();
-
-
-
-        int poidsActuel = poids[posDepart[0]][posDepart[1]];
-
-        poids[posDepart[0]][posDepart[1]] = -1;
-
-
-
-        while (!queue.isEmpty()) {
-            System.out.println("Dijsktra");
-            int[] posActuelle = queue.poll(); // Récupération et suppression de la première valeur de la file
-            int I = posActuelle[0]; // Ligne de la position actuelle
-            int J = posActuelle[1]; // Colonne de la position actuelle
-
-            // Vérification des cases voisines
-            int[] dI = {-1, 1, 0, 0}; // Déplacements en ligne (haut, bas)
-            int[] dJ = {0, 0, -1, 1}; // Déplacements en colonne (gauche, droite)
-
-            List<int[]> casesPossibles = new ArrayList<>();
-            int plusPetitPoids = Integer.MAX_VALUE;
-            int[] caseAPasser = new int[2];
-
-
-
-            for (int k = 0; k < 4; k++) {
-                int nextI = I + dI[k];
-                int nextJ = J + dJ[k];
-
-                // Vérification des limites de la grille
-                if (nextI >= 0 && nextI < lignes && nextJ >= 0 && nextJ < colonnes && poids[nextI][nextJ] >= 0) {
-                    // Mise à jour de la distance si elle est plus courte
-                    if (poidsActuel > poids[nextI][nextJ] && poids[nextI][nextJ] >= 0) {
-                        if (poids[nextI][nextJ] <= plusPetitPoids){
-                            caseAPasser = new int[]{nextI, nextJ};
-                            plusPetitPoids = poids[nextI][nextJ];
-                        }
-                    }
-                }
-            }
-
-
-
-            leChemin.add(caseAPasser);
-            queue.offer(caseAPasser);
-            poids[caseAPasser[0]][caseAPasser[1]] = -1;
-
-            if (Arrays.equals(posArrivee, caseAPasser)){
-                break;
-            }
-        }
-
-        System.out.println("je suis Dijkstra");
-        //printNumeroCase(poids);
-        return leChemin;
-
     }
 
 

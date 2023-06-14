@@ -602,7 +602,7 @@ public class AffichageJeu extends Scene {
         boucleJeu = new AnimationTimer() {
             private long dernierTemps = 0;
             private long tempsAccumule = 0;
-            private long tempsEntreDeplacements = (long) (getChoixTempsEntreChaqueDeplacement() * 1_000_000_000); // Conversion en nanosecondes
+            private long tempsEntreDeplacements = (long) (getChoixTempsEntreChaqueDeplacement() * 1_000_000_000);
 
             @Override
             public void handle(long tempsActuel) {
@@ -744,7 +744,7 @@ public class AffichageJeu extends Scene {
         //Maintenant on fait une double boucle pour créer un "tableau" en fonction du nombre de colonnes et lignes choisies
         for (int i = 0; i < getPlateau().getLignes(); i++) {
             for (int j = 0; j < getPlateau().getColonnes(); j++) {
-                //D'abord on ne créer que des carrés
+                //D'abord on ne crée que des carrés
                 Rectangle carre = new Rectangle(x, y, taille, taille);
                 carre.setFill(Color.WHITE);
                 carre.setStroke(Color.BLACK);
@@ -927,7 +927,7 @@ public class AffichageJeu extends Scene {
     public void creerMenuDeroulantTemps() {
         //Cette méthode permet de créer un menu déroulant à partir de différents paramètres
         //D'abord on crée un label avec texte comme paramètre
-        Label lab = new Label("Choisissez le temps entre chaque \ndéplacement : \n");
+        Label lab = new Label("Choisissez le temps d'attente entre \nchaque déplacement (en s) : \n");
         //On crée un menu déroulant composé de chiffres entiers
         choixTempsEntreChaqueDeplacement = new ChoiceBox<>();
         //On rajoute le nombre de secondes entre chaque tour

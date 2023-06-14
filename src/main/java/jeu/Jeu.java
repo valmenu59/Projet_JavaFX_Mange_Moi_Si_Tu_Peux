@@ -86,6 +86,13 @@ public class Jeu {
 
     /**
      * Permet de faire une boucle en déplaçant les animaux, et de vérifier si la partie est terminée ou pas
+     * Si c'est au tour du mouton et que c'est un nouveau tour, on augmente le nombre de tours de 1, on fait pousser
+     * les cases de type terre et on déplace le mouton. On supprime les phéromones mouton à partir d'un certain nombre
+     * de tours (chaque déplacement laisse une phéromone)
+     * Si le nombre de déplacements du mouton est égal à 0, il mange la plante présente sur la case et prend le "pouvoir"
+     * de celle-ci
+     * C'est exactement pareil pour le loup sauf qu'il ne mange pas de plante et se déplace toujours de 3
+     * Vérifie à la fin si la partie est terminée ou pas (mouton mangé ou le mouton est à la case sortie
      */
 
 
@@ -181,17 +188,20 @@ public class Jeu {
     public void reprendreSauvegarde(String adresse, boolean vientDuFichierRessource) throws Exception {
         InputStream fileInputStream;
         if (!vientDuFichierRessource){
+            //Si vient de l'explorateur de fichiers
             fileInputStream = new FileInputStream(adresse);
         } else {
+            //Si vient de ressources
             fileInputStream = getClass().getResourceAsStream(adresse);
         }
         try (fileInputStream){
             if (adresse.endsWith(".sae")){
+                //Si c'est un fichier binaire
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-                int colonnes = objectInputStream.readInt();
-                int lignes = objectInputStream.readInt();
+                int colonnes = objectInputStream.readInt(); //récupère nombre de colonnes
+                int lignes = objectInputStream.readInt(); //récupère nombre de lignes
                 plateau = new Plateau(lignes, colonnes);
-                plateau.creerPlateau();
+                plateau.creerPlateau(); //création du plateau
 
                 for (int i = 0; i < lignes; i++) {
                     for (int j = 0; j < colonnes; j++) {
@@ -200,6 +210,7 @@ public class Jeu {
                 }
                 System.out.println("Fichier récupéré avec succès !");
             } else if (adresse.endsWith(".txt")){
+                //si c'est un fichier texte
                 String message = creerPlateauViaFichierTexte(adresse);
                 if (!message.equals("succès")){
                     throw new PlateauException(message);
@@ -223,26 +234,29 @@ public class Jeu {
         int nbColonnes;
         int nbLignes = 0;
 
-        texteLigne = br.readLine().replaceAll("[\n\t\r ]", "");
-        nbColonnes = texteLigne.length();
+        //Première étape : récupération du nombre de lignes et de colonnes
+
+        texteLigne = br.readLine().replaceAll("[\n\t\r ]", ""); //enlève les caractères entre crochet
+        nbColonnes = texteLigne.length(); //récupère le nombre de caractères de la ligne 0
         nbLignes++;
 
         while((texteLigne = br.readLine()) != null)
         {
-            nbLignes++;
+            nbLignes++; //Permet de récupérer le nombre de lignes
         }
 
-        br.close();
+        br.close(); //Ferme le fichier texte
 
         System.out.println("Nombre de lignes : " + nbLignes);
         System.out.println("Nombre de lettres dans la première ligne : " + nbColonnes);
 
         if (nbLignes < 5 || nbColonnes < 6){
             //Trop petit
-            System.out.println("Plateau trop petit");
             plateau = null;
             return "Plateau trop petit";
         }
+
+        // Etape 2 : création du tableau et récupération de chaque caractère individuellement
 
         plateau = new Plateau(nbLignes, nbColonnes);
         plateau.creerPlateau();
@@ -258,7 +272,7 @@ public class Jeu {
 
                 char caractere = texteLigne.charAt(colonneIndex);
 
-
+                //Permet de transformer des caractères spécifiques en un objet
                 switch (caractere) {
                     case 'x', 'X' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Roche());
                     case 'h', 'H', 's', 'S' -> plateau.getCase(ligneIndex, colonneIndex).setContenuGeneral(new Herbe());
@@ -276,18 +290,19 @@ public class Jeu {
 
 
         //Maintenant, on vérifie l'état du plateau
+        if (Arrays.equals(plateau.getCaseSortie(), new int[2])){
+            plateau = null;
+            return "Sortie manquante";
+        }
         if (!plateau.verifPlateauCorrect()){
-            System.out.println("Labyrinthe imparfait");
             plateau = null;
             return "Labyrinthe imparfait";
         }
         if (!plateau.isAnimalPresent("Loup")){
-            System.out.println("Loup manquant ou trop de loups");
             plateau = null;
             return "Loup manquant ou trop de loups";
         }
         if (!plateau.isAnimalPresent("Mouton")){
-            System.out.println("Mouton manquant ou trop de moutons");
             plateau = null;
             return "Mouton manquant ou trop de moutons";
         }
