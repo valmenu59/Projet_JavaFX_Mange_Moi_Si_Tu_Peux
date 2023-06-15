@@ -101,7 +101,7 @@ public class Controleur {
                         //Permet d'activer le bouton valider
                         affichageJeu.getBoutonValiderEtape().setDisable(false);
                         //Sinon dans l'autre cas si la sortie est créée est que le terrain sélectionné est de type herbe
-                    } else if (sortieCree) {
+                    } else if (sortieCree && getCase(i,j).getContenu() instanceof Plante) {
                         //Même principe qu'au dessus
                         sortieCree = false;
                         remplacerTypeTerrain(img,true,false);

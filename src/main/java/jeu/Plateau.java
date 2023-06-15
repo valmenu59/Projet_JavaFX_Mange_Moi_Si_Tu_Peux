@@ -902,8 +902,6 @@ public class Plateau implements Serializable {
 
         //List<int[]> leChemin = new ArrayList<>();
 
-
-
         int poidsActuel = poids[posDepart[0]][posDepart[1]];
 
         poids[posDepart[0]][posDepart[1]] = -1;

@@ -91,19 +91,7 @@ class JeuTest {
         assertFalse(plateau.isPresentDansLaListe(arr,new int[]{-10,12}),"Cette méthode est fonctionnelle");
     }
 
-    @Test
-    void testMethodeABien4CasesVoisinesPlantes(){
-        assertFalse(plateau.aBien4CasesVoisinesPlantes(3,3), "Cette case n'a pas aux alentours de lui" +
-                "4 cases voisines et plantes ET 2 cases roches aux extrémités");
-    }
 
-    @Test
-    void testMethodeABien4CasesVoisinesPlantes2(){
-        plateau.getCase(2,4).setContenuGeneral(new Roche());
-        plateau.getCase(2,2).setContenuGeneral(new Roche());
-        assertTrue(plateau.aBien4CasesVoisinesPlantes(3,3), "Cette case a bien aux alentours de lui" +
-                "4 cases voisines et plantes ET 2 cases roches aux extrémités");
-    }
 
 
     @Test
@@ -159,6 +147,36 @@ class JeuTest {
                 "une marguerite et donc renvoie la valeur 4");
     }
 
+
+    @Test
+    void testerManhanttan1(){
+        int i, j;
+        plateau.getCase(3,3).setContenuGeneral(new Roche());
+        plateau.getCase(3,2 ).setAnimal(new Mouton());
+        plateau.getCase(3, 5).setAnimal(new Loup());
+        assertTrue(plateau.manhattan(), "La distance de Manhanttan entre le loup et le mouton est " +
+                "égal à 5 donc doit renvoyer vrai");
+    }
+
+    @Test
+    void testerManhanttan2(){
+        plateau.getCase(3,3).setContenuGeneral(new Roche());
+        plateau.getCase(3,2 ).setAnimal(new Mouton());
+        plateau.getCase(3, 6).setAnimal(new Loup());
+        assertFalse(plateau.manhattan(), "La distance de Manhanttan entre le loup et le mouton est " +
+                "égal à 6 donc doit renvoyer faux");
+    }
+
+
+    @Test
+    void testerPoidsCase1(){
+        plateau.getCase(0,1).setContenuGeneral(new Herbe()); //créée une case de sortie
+        plateau.getCase(1, 2).setContenuGeneral(new Roche());
+        int [][] poids = plateau.initialiserMatricePoids();
+        plateau.donnerPoidsCase(plateau.getCaseSortie(), poids);
+        assertEquals(5, poids[1][3], "Le poids de cette case est bien égale à 5 (test parcours" +
+                "en largeur");
+    }
 
 
 }
