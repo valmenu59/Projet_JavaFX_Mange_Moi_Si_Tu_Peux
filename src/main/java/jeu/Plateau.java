@@ -849,7 +849,49 @@ public class Plateau implements Serializable {
 
         int[] caseLoup = getCaseLoup();
 
-        return poids[caseLoup[0]][caseLoup[1]] <= 5;
+        //return poids[caseLoup[0]][caseLoup[1]] <= 5;
+
+        if (poids[caseLoup[0]][caseLoup[1]] > 5){
+            return false;
+        }
+
+        int[] caseMouton = getCaseMouton();
+
+
+        //Pour la vision j'utilise l'algoritme de tracé de segment de Bresenham :
+        // https://fr.wikipedia.org/wiki/Algorithme_de_trac%C3%A9_de_segment_de_Bresenham
+        //Permet de voir si le loup voit le mouton ou inversement. Si une des cases stockées est
+        //Une roche, la vision est obstruée donc renvoie faux, sinon renvoie vrai
+
+        //Calcule la différence entre les coordonnées du loup et du mouton
+        double dx = caseLoup[0] - caseMouton[0];
+        double dy = caseLoup[1] - caseMouton[1];
+        //Calcul du nombre d'itérations
+        double pas = Math.max(Math.abs(dx), Math.abs(dy));
+
+        //Permet incrémenter x et y
+        double xIncrementation = dx / pas;
+        double yIncrementation = dy / pas;
+
+        ArrayList<int[]> listeCasePassantParDroite = new ArrayList<>();
+
+        double x = caseMouton[0];
+        double y = caseMouton[1];
+        
+        //Boucle d'itération
+        for (int i = 0; i < pas; i++) {
+            int posI = (int) Math.round(x);
+            int posJ = (int) Math.round(y);
+            //Si parmi une itération est une case roche : renvoie faux
+            if (getCase(posI, posJ).getContenu() instanceof Roche){
+                return false;
+            }
+
+            x+= xIncrementation;
+            y+= yIncrementation;
+        }
+
+        return true;
     }
 
     /**
