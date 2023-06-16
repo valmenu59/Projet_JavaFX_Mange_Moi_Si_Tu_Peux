@@ -154,8 +154,8 @@ class JeuTest {
         plateau.getCase(3,3).setContenuGeneral(new Roche());
         plateau.getCase(3,2 ).setAnimal(new Mouton());
         plateau.getCase(3, 5).setAnimal(new Loup());
-        assertTrue(plateau.manhattan(), "La distance de Manhanttan entre le loup et le mouton est " +
-                "égal à 5 donc doit renvoyer vrai");
+        assertFalse(plateau.manhattan(), "La distance de Manhanttan entre le loup et le mouton est " +
+                "égal à 5 donc doit renvoyer mais il y a une roche devant donc renvoie faux");
     }
 
     @Test
@@ -167,6 +167,15 @@ class JeuTest {
                 "égal à 6 donc doit renvoyer faux");
     }
 
+    @Test
+    void testerManhanttan3(){
+        plateau.getCase(3,3).setContenuGeneral(new Roche());
+        plateau.getCase(3,2 ).setAnimal(new Mouton());
+        plateau.getCase(7, 3).setAnimal(new Loup());
+        assertTrue(plateau.manhattan(), "La distance de Manhanttan entre le loup et le mouton est " +
+                "égal à 5 mais il y a aucun obstacle roche");
+    }
+
 
     @Test
     void testerPoidsCase1(){
@@ -176,6 +185,32 @@ class JeuTest {
         plateau.donnerPoidsCase(plateau.getCaseSortie(), poids);
         assertEquals(5, poids[1][3], "Le poids de cette case est bien égale à 5 (test parcours" +
                 "en largeur");
+    }
+
+    @Test
+    void testerCasesTerreQuiPousse(){
+        plateau.getCase(1,1).setContenuPlante(new Terre());
+        plateau.planteQuiPousse();
+        plateau.planteQuiPousse();
+        plateau.planteQuiPousse();
+        assertFalse(plateau.getCase(1,1).getContenu() instanceof Terre, "Cette case n'est plus de type" +
+                "Terre mais est devenue l'une des 3 plantes car on a passé plus de 2 tours");
+    }
+
+    @Test
+    void testerMethodeSupprimerObstacle1(){
+        plateau.getCase(3,3).setContenuGeneral(new Roche());
+        plateau.supprimerObstacle(3,2,'E');
+        assertFalse(plateau.getCase(3,3).getContenu() instanceof Roche, "La méthode a bien supprimé " +
+                "La case roche à l'est");
+    }
+
+    @Test
+    void testerMethodeSupprimerObstacle2(){
+        plateau.getCase(3,3).setContenuGeneral(new Roche());
+        plateau.supprimerObstacle(2,3,'S');
+        assertFalse(plateau.getCase(3,3).getContenu() instanceof Roche, "La méthode a bien supprimé " +
+                "La case roche au sud");
     }
 
 
