@@ -841,7 +841,9 @@ public class Plateau implements Serializable {
 
     /**
      * Cette méthode permet de calculer la distance de Manhanttan entre le loup et le mouton
-     * Si la distance est inférieure ou égale à 5 renvoie vrai, sinon renvoie faux.
+     * Si la distance est supérieure à 5 renvoie faux.
+     * Après nous avons rajouté un algorithme permettant que les roches sont un obstacle pour la vision
+     * Si dans le segment loup - mouton il y a une roche => renvoie faux, sinon renvoie vrai
      */
 
     public boolean manhattan() {
