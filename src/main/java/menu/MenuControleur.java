@@ -110,7 +110,8 @@ public class MenuControleur {
         lien.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                ApplicationFX.getInstance().getHostServices().showDocument("https://github.com/valmenu59/SAE_JavaFX");
+                ApplicationFX.getInstance().getHostServices()
+                        .showDocument("https://github.com/valmenu59/Projet_JavaFX_Mange_Moi_Si_Tu_Peux");
             }
         });
     }
