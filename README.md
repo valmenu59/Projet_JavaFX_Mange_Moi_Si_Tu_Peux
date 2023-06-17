@@ -1,6 +1,6 @@
-Projet JavaFX "Mange-moi si tu peux !"
+#titre Projet JavaFX "Mange-moi si tu peux !"
 
-Le but du projet était de créer un mini jeu où un loup et un mouton sont dans un enclos. L'objectif du loup est de manger le mouton et l'objectif du mouton est manger le plus de plantes possibles au sein de l'enclos.
+##titre Le but du projet était de créer un mini jeu où un loup et un mouton sont dans un enclos. L'objectif du loup est de manger le mouton et l'objectif du mouton est manger le plus de plantes possibles au sein de l'enclos.
 
 Avant de lancer le jeu, l'utilisateur doit passer par plusieurs étapes afin de créer le terrain : 
   * Il peut choisir le nombre de lignes et de colonnes selon les possiblités prédifinis
@@ -34,7 +34,7 @@ Pendant que le jeu tourne, l'utilisateur peut :
   * Changer la vitesse de déplacement des animaux
   * Choisir l'algorithme de recherche lorsque le mouton est menacé selon les choix possibles.
 
-==================================
+-----------------------------------------------------------------
 
 En dehors du jeu, l'utilisateur peut en plus : 
   * Ouvrir le dernier plateau sauvegardé
@@ -45,25 +45,7 @@ En dehors du jeu, l'utilisateur peut en plus :
 
 Pour le fichier texte voici un exemple : 
 
-x x x x x x x x x x
-
-x f x x h h h h l x
-
-x c x x h x f x h x
-
-x h x x h x x h h x
-
-x h h h h x x h x x
-
-x h c x f x x h h x
-
-x h x h h h x h x x
-
-x h x x h h x f h x
-
-x h m f h h x h x x
-
-x x x x x x x s x x
+[Lien d'un exemple d'un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
 
 
 x : Une roche
@@ -83,7 +65,7 @@ Il est tout à fait possible de mettre les lettres en majuscules.
 Si une des conditions du création du plateau n'est pas remplie, une erreur indicative sera affichée.
 
 
-==================================
+-------------------------------------------------------------------------
 
 
 Voici les différents algorithmes utilisés : 
