@@ -44,27 +44,47 @@ En dehors du jeu, l'utilisateur peut en plus :
     * Il peut ouvrir un fichier texte de format .txt
 
 Pour le fichier texte voici un exemple : 
+
 x x x x x x x x x x
+
 x f x x h h h h l x
+
 x c x x h x f x h x
+
 x h x x h x x h h x
+
 x h h h h x x h x x
+
 x h c x f x x h h x
+
 x h x h h h x h x x
+
 x h x x h h x f h x
+
 x h m f h h x h x x
+
 x x x x x x x s x x
 
+
 x : Une roche
+
 f : Une marguerite 
+
 h ou s : Une herbe
+
 c : Un cactus
-m : Un mouton 
+
+m : Un mouton
+
 l : Un loup
+
 Il est tout à fait possible de mettre les lettres en majuscules.
+
 Si une des conditions du création du plateau n'est pas remplie, une erreur indicative sera affichée.
 
+
 ==================================
+
 
 Voici les différents algorithmes utilisés : 
    * Pour la vérification de labyrinthe parfait : Utilisation du parcours en profondeur
