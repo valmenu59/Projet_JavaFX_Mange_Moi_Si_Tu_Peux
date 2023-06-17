@@ -1,17 +1,16 @@
+/*
+ * Copyright (c)  @link https://github.com/valmenu59/SAE_JavaFX @link https://github.com/valmenu59
+ * CC BY-NC - Attribution - Partage dans les mêmes conditions - Pas d'utilisation commerciale
+ */
+
 package menuSelectionPlateau;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import jeu.AffichageJeu;
-import menu.Menu;
-
-import java.io.File;
 
 public class SelectionControleur {
 

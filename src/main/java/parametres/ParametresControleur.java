@@ -1,12 +1,16 @@
+/*
+ * Copyright (c)  @link https://github.com/valmenu59/SAE_JavaFX @link https://github.com/valmenu59
+ * CC BY-NC - Attribution - Partage dans les mêmes conditions - Pas d'utilisation commerciale
+ */
+
 package parametres;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
 
-import menu.Menu;
+
 import sauvegarde.DossierSauvegarde;
 
 public class ParametresControleur {
