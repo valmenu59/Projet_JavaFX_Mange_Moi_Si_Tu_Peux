@@ -44,7 +44,7 @@ En dehors du jeu, l'utilisateur peut en plus :
     * Il peut ouvrir un fichier texte de format .txt
     
 
-Pour le fichier texte voici un exemple : [un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
+Pour le fichier texte voici un exemple : [un fichier texte]([https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS](https://github.com/valmenu59/Projet_JavaFX_Mange_Moi_Si_Tu_Peux/blob/master/exemples/plateau.txt))
 
 Légende :
 
