@@ -3,11 +3,12 @@ package menu;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jeu.AffichageJeu;
-import menuSelectionPlateau.MenuSelectionAffichage;
-import parametres.Parametres;
+import sae.saejavafx.ApplicationFX;
+
 
 import java.io.File;
 
@@ -91,6 +92,20 @@ public class MenuControleur {
             @Override
             public void handle(ActionEvent actionEvent) {
                 stage.close();
+            }
+        });
+    }
+
+    /**
+     * Permet d'ouvrir un lien internet
+     * @param lien : un Hyperlink
+     */
+
+    public void ouvrirLien(Hyperlink lien){
+        lien.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                ApplicationFX.getInstance().getHostServices().showDocument("https://github.com/valmenu59/SAE_JavaFX");
             }
         });
     }

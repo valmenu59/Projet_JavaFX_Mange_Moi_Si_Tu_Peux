@@ -6,7 +6,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Application extends javafx.application.Application {
+public class ApplicationFX extends javafx.application.Application {
+    private static ApplicationFX instance;
+
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -21,11 +23,16 @@ public class Application extends javafx.application.Application {
                 new Image(getClass().getResource("/Logos/icones/64.png").toExternalForm()),
                 new Image(getClass().getResource("/Logos/icones/128.png").toExternalForm()),
                 new Image(getClass().getResource("/Logos/icones/256.png").toExternalForm()));
+        instance = this;
         stage.show();
         stage.setScene(intro);
 
 
 
+    }
+
+    public static ApplicationFX getInstance() {
+        return instance;
     }
 
     public static void main(String[] args) {

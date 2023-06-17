@@ -7,13 +7,10 @@ import fx.PoliceJeu;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import menuSelectionPlateau.MenuSelectionAffichage;
@@ -81,13 +78,14 @@ public class Menu extends Scene {
         BoutonJeu boutonQuitter = creerBoutonMenu("Quitter le jeu");
         this.menuControleur.quitterJeu(boutonQuitter, stage);
 
-        //Ajout d'un texte
-        Text texteCredit = new Text("Créé généreusement par :\n" +
-                "MENU Valentin, FONTAINE Valentin, FAES Hugo !");
-        texteCredit.setTextAlignment(TextAlignment.CENTER);
-        texteCredit.setFont(POLICE);
-        panneau.setBottom(texteCredit);
-        BorderPane.setAlignment(texteCredit,Pos.BOTTOM_CENTER);
+        //Ajout d'un lien internet cliquable
+        Hyperlink lien = new Hyperlink("Ouvrir la page Github du projet");
+        menuControleur.ouvrirLien(lien);
+        lien.setTextFill(Color.BLACK);
+        lien.setTextAlignment(TextAlignment.CENTER);
+        lien.setFont(POLICE);
+        panneau.setBottom(lien);
+        BorderPane.setAlignment(lien ,Pos.BOTTOM_CENTER);
 
 
 
