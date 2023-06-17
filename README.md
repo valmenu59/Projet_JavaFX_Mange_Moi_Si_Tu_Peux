@@ -42,8 +42,9 @@ En dehors du jeu, l'utilisateur peut en plus :
   * Ouvrir un plateau via un explorateur de fichiers :
     * Il peut ouvrir un fichier binaire d'extension .sae
     * Il peut ouvrir un fichier texte de format .txt
+    
 
-Pour le fichier texte voici un exemple : [ouvrir un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
+Pour le fichier texte voici un exemple : [un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
 
 Légende :
 
