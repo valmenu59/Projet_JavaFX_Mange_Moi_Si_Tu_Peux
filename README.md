@@ -1,6 +1,6 @@
-#titre Projet JavaFX "Mange-moi si tu peux !"
+# Projet JavaFX "Mange-moi si tu peux !"
 
-##titre Le but du projet était de créer un mini jeu où un loup et un mouton sont dans un enclos. L'objectif du loup est de manger le mouton et l'objectif du mouton est manger le plus de plantes possibles au sein de l'enclos.
+## Le but du projet était de créer un mini jeu où un loup et un mouton sont dans un enclos. L'objectif du loup est de manger le mouton et l'objectif du mouton est manger le plus de plantes possibles au sein de l'enclos.
 
 Avant de lancer le jeu, l'utilisateur doit passer par plusieurs étapes afin de créer le terrain : 
   * Il peut choisir le nombre de lignes et de colonnes selon les possiblités prédifinis
@@ -28,7 +28,7 @@ Par contre en cas de menace :
   * Le mouton se dérige vers la case de sortie.
   * Le loup se dirige vers le mouton
 
-Le jeu se termine lorsque le mouton est arrivé sur la case de sortie (victoire) ou que le loup a mangé le mouton (défaite).
+### Le jeu se termine lorsque le mouton est arrivé sur la case de sortie (victoire) ou que le loup a mangé le mouton (défaite).
 
 Pendant que le jeu tourne, l'utilisateur peut : 
   * Changer la vitesse de déplacement des animaux
@@ -45,7 +45,7 @@ En dehors du jeu, l'utilisateur peut en plus :
 
 Pour le fichier texte voici un exemple : 
 
-[Lien d'un exemple d'un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
+[exemple d'un fichier texte](https://1drv.ms/t/s!Av-iByuQhqOsrcoVoy0lrTdK4rmRbA?e=a9RyQS)
 
 
 x : Une roche
