@@ -74,3 +74,24 @@ Voici les différents algorithmes utilisés :
    * Pour vérifier l'obstruction de vision du loup vers le mouton : Utilisation de l'algorithme de tracé de segment de Bresenham
    * Pour le déplacement du loup et du mouton : Utilisation de l'algorithme de Dijkstra et de l'algorithme A* (peut-être modifié selon le choix de l'utilisateur)
    * Pour le mouton, il y a un algorthme A* amélioré où plusieurs conditions sont ajoutées afin d'améliorer ses chances de survie.
+
+
+-------------------------------------------------------------------
+
+## Voici des captures d'écran du jeu : 
+
+### Le menu principal : 
+
+![Capture d'écran du menu principal](exemples/screen_menu.png)
+
+### Lors de la création du plateau :
+
+![Capture d'écran de la création du plateau](exemples/screen_creation_plateau.png)
+
+### Lors du jeu en action :
+
+![Capture d'écran du jeu](exemples/screen_jeu.png)
+
+### Le menu de sélection du plateau :
+
+![Capture d'écran du menu de sélection](exemples/screen_selection_plateau.png)
