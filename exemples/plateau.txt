@@ -1,0 +1,10 @@
+x x x x x x x x x x
+x f x x h h h h l x
+x c x x h x f x h x
+x h x x h x x h h x
+x h h h h x x h x x
+x h c x f x x h h x
+x h x h h h x h x x
+x h x x h h x f h x
+x h m f h h x h x x
+x x x x x x x s x x
